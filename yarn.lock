@@ -493,15 +493,15 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@mikro-orm/cli@^4.4.3":
-  version "4.4.3"
-  resolved "https://registry.yarnpkg.com/@mikro-orm/cli/-/cli-4.4.3.tgz#aa4deb429faeeeaf1d2d17bb47dd6cf6cb5a0a95"
-  integrity sha512-C/ZGO8omjzSoHxXV5r+F/RuGe4AHwXZSb1avKAtZe4tTA4tafRTfrovqMyCO0aOsNKD9JzG40Eq6NVdq7wLCew==
+"@mikro-orm/cli@^4.4.4":
+  version "4.4.4"
+  resolved "https://registry.yarnpkg.com/@mikro-orm/cli/-/cli-4.4.4.tgz#bb09a134f71741ff43789bae5096ac0f6cce2ecf"
+  integrity sha512-7DLxmZoNh5syuDlkG1QNrWN6nw5/Vy69hFXigK3+9KJt1sGpKYV3V7GWvlocvvED1FoWDZKaXNzwg2Cc1t7bBw==
   dependencies:
-    "@mikro-orm/core" "^4.4.3"
-    "@mikro-orm/entity-generator" "^4.4.3"
-    "@mikro-orm/knex" "^4.4.3"
-    "@mikro-orm/migrations" "^4.4.3"
+    "@mikro-orm/core" "^4.4.4"
+    "@mikro-orm/entity-generator" "^4.4.4"
+    "@mikro-orm/knex" "^4.4.4"
+    "@mikro-orm/migrations" "^4.4.4"
     ansi-colors "4.1.1"
     cli-table3 "0.6.0"
     fs-extra "9.1.0"
@@ -509,10 +509,10 @@
     yargonaut "1.1.4"
     yargs "15.4.1"
 
-"@mikro-orm/core@^4.4.3":
-  version "4.4.3"
-  resolved "https://registry.yarnpkg.com/@mikro-orm/core/-/core-4.4.3.tgz#68333da6b9edcbc35d6cbf9b140329da34669208"
-  integrity sha512-pS1Gg24SkrxCcnmEOJaGMmJnlb2FpNSloO7N8BqYVd4ToXO1Scao4Bld2PxDvQgPdvRo6MpIJjKXYnCLkIq6oA==
+"@mikro-orm/core@^4.4.4":
+  version "4.4.4"
+  resolved "https://registry.yarnpkg.com/@mikro-orm/core/-/core-4.4.4.tgz#32de2c02b6ac3d983d7cb808f261f28bb4dc8e15"
+  integrity sha512-oCFB9cGdJzgPum4rSB9N5py9fODIe7UPxWGBbEhGZnf4bcHrGpsO44WS3aSycypnQ3Lb8oqbge++pAIWQi7JlA==
   dependencies:
     ansi-colors "4.1.1"
     clone "2.1.2"
@@ -522,39 +522,40 @@
     reflect-metadata "0.1.13"
     strip-json-comments "3.1.1"
 
-"@mikro-orm/entity-generator@^4.4.3":
-  version "4.4.3"
-  resolved "https://registry.yarnpkg.com/@mikro-orm/entity-generator/-/entity-generator-4.4.3.tgz#78ee7e6d38feb2852e0559e22646659cbeabf766"
-  integrity sha512-iW4dIRLRAaBRYTgIKN8paNd+joCAHhw9zKR0n7eL8cCDXdfLbRjts7WZdP8CJVQRvLgzZibeM8ia0rRMwBt8jQ==
+"@mikro-orm/entity-generator@^4.4.4":
+  version "4.4.4"
+  resolved "https://registry.yarnpkg.com/@mikro-orm/entity-generator/-/entity-generator-4.4.4.tgz#1a33434f7e372495bd4ae0c36e2351a682f8c0b2"
+  integrity sha512-MZPIIhO7OLHqfSkKeAkhhThYKAZU8cR+oFNYN9KGljHzw+ijsdZy84zxmRDJ/H+S5UUqSpkxTiw04tHQhM1o6w==
   dependencies:
-    "@mikro-orm/knex" "^4.4.3"
+    "@mikro-orm/knex" "^4.4.4"
     fs-extra "9.1.0"
 
-"@mikro-orm/knex@^4.4.3":
-  version "4.4.3"
-  resolved "https://registry.yarnpkg.com/@mikro-orm/knex/-/knex-4.4.3.tgz#b041c878c5e4e371ba0e5b015faba4699ad4838a"
-  integrity sha512-7KRyAmUjd7Arlw8i8mz6jGicT0z51zYWPNi7UPYa10fALi1Kd/JupdK0F0L0zm96CMN/LGX7i0Ev+tPfvgxCyA==
+"@mikro-orm/knex@^4.4.4":
+  version "4.4.4"
+  resolved "https://registry.yarnpkg.com/@mikro-orm/knex/-/knex-4.4.4.tgz#942f538965104784f12c39bbec9170c6e07021fa"
+  integrity sha512-dJVL1aURd17qmWsodJgyf9EQ2dyNwV4feAQzAgtwDD+OYapGaMfzKFMn5fomcQpE/IclMPwBxx07l43L275jtg==
   dependencies:
     fs-extra "9.1.0"
     knex "0.21.17"
     sqlstring "2.3.2"
 
-"@mikro-orm/migrations@^4.4.3":
-  version "4.4.3"
-  resolved "https://registry.yarnpkg.com/@mikro-orm/migrations/-/migrations-4.4.3.tgz#0d59f538da7fa41b000527e3a2523dae3cc66e05"
-  integrity sha512-uRPwPoruZ40G/J1cFYFOZnnhmL3+kiHZFkVBujfjvqRGEpO8AnRHgae7hIswRMG0BeIL9R469lqQyOv3eERMSw==
+"@mikro-orm/migrations@^4.4.4":
+  version "4.4.4"
+  resolved "https://registry.yarnpkg.com/@mikro-orm/migrations/-/migrations-4.4.4.tgz#8f23717f1915bc4ee64372f50a72da9f559f92c0"
+  integrity sha512-1G+tM8w6j5uHfgFVa8gdwlw6stLRf/D0LdEEfkH+zKM7xa4sV1cgh3tQxkFTEYx2xvnkoJbqnab/hIWIKslIuw==
   dependencies:
-    "@mikro-orm/knex" "^4.4.3"
+    "@mikro-orm/knex" "^4.4.4"
     "@types/umzug" "2.3.0"
     fs-extra "9.1.0"
+    knex "0.21.17"
     umzug "2.3.0"
 
-"@mikro-orm/postgresql@^4.4.3":
-  version "4.4.3"
-  resolved "https://registry.yarnpkg.com/@mikro-orm/postgresql/-/postgresql-4.4.3.tgz#d75427d477a69bb3306349379a2830cee27f5a85"
-  integrity sha512-C0H1G6xtYX63euYy5BHH5ot/q4wMi/0FUlfQBsdAx6pQ9g36TXJyGGkN7L+w8ZNKSW5iPPMbM4tnV0X1sUVH5Q==
+"@mikro-orm/postgresql@^4.4.4":
+  version "4.4.4"
+  resolved "https://registry.yarnpkg.com/@mikro-orm/postgresql/-/postgresql-4.4.4.tgz#2fc2bfce80796ca537d2b1589f534c7407b30c8f"
+  integrity sha512-o30y5yopqmgyJltRLKoRi1xz/p67Mu1PvQkV2v10Lk/MhfxvxUQWi7Vn10zOucwKMM57ZjFY/dZUNwEzxoYNHw==
   dependencies:
-    "@mikro-orm/knex" "^4.4.3"
+    "@mikro-orm/knex" "^4.4.4"
     pg "8.5.1"
 
 "@mikro-orm/sql-highlighter@^1.0.1":
@@ -1584,7 +1585,7 @@ char-regex@^1.0.2:
   resolved "https://registry.yarnpkg.com/char-regex/-/char-regex-1.0.2.tgz#d744358226217f981ed58f479b1d6bcc29545dcf"
   integrity sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==
 
-chokidar@^3.4.0:
+chokidar@^3.5.1:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.5.1.tgz#ee9ce7bbebd2b79f49f304799d5468e31e14e68a"
   integrity sha512-9+s+Od+W0VJJzawDma/gvBNQqkTiqYTWLuZoyAsivsI4AaWTCzHG06/TMjsf1cYe9Cb97UCEhjz7HvnPk2p/tw==
@@ -5943,10 +5944,10 @@ trim-newlines@^1.0.0:
   resolved "https://registry.yarnpkg.com/trim-newlines/-/trim-newlines-1.0.0.tgz#5887966bb582a4503a41eb524f7d35011815a613"
   integrity sha1-WIeWa7WCpFA6QetST301ARgVphM=
 
-ts-jest@^26.5.1:
-  version "26.5.1"
-  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-26.5.1.tgz#4d53ee4481552f57c1624f0bd3425c8b17996150"
-  integrity sha512-G7Rmo3OJMvlqE79amJX8VJKDiRcd7/r61wh9fnvvG8cAjhA9edklGw/dCxRSQmfZ/z8NDums5srSVgwZos1qfg==
+ts-jest@^26.5.2:
+  version "26.5.2"
+  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-26.5.2.tgz#5281d6b44c2f94f71205728a389edc3d7995b0c4"
+  integrity sha512-bwyJ2zJieSugf7RB+o8fgkMeoMVMM2KPDE0UklRLuACxjwJsOrZNo6chrcScmK33YavPSwhARffy8dZx5LJdUQ==
   dependencies:
     "@types/jest" "26.x"
     bs-logger "0.x"
@@ -5960,12 +5961,12 @@ ts-jest@^26.5.1:
     semver "7.x"
     yargs-parser "20.x"
 
-ts-node-dev@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/ts-node-dev/-/ts-node-dev-1.1.1.tgz#b7602929395b1616b4aa99a3be0a4e121742283d"
-  integrity sha512-kAO8LUZgXZSY0+PucMPsQ0Bbdv0x+lgbN7j8gcD4PuTI4uKC6YchekaspmYTBNilkiu+rQYkWJA7cK+Q8/B0tQ==
+ts-node-dev@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/ts-node-dev/-/ts-node-dev-1.1.3.tgz#96112f4a52c27410fd4419e2d81b52b7b1229501"
+  integrity sha512-z+nRf+lnB9JnChBUrjMVhOO53lNcjfSsdoB53n8ErYQJsBwySkW2BHbuF/RZousu34ILUIa7gzyh2RI+SamP0w==
   dependencies:
-    chokidar "^3.4.0"
+    chokidar "^3.5.1"
     dateformat "~1.0.4-1.2.3"
     dynamic-dedupe "^0.3.0"
     minimist "^1.2.5"
@@ -6075,10 +6076,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@^4.1.5:
-  version "4.1.5"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.1.5.tgz#123a3b214aaff3be32926f0d8f1f6e704eb89a72"
-  integrity sha512-6OSu9PTIzmn9TCDiovULTnET6BgXtDYL4Gg4szY+cGsc3JP1dQL8qvE8kShTRx1NIw4Q9IBHlwODjkjWEtMUyA==
+typescript@^4.2.2:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.2.tgz#1450f020618f872db0ea17317d16d8da8ddb8c4c"
+  integrity sha512-tbb+NVrLfnsJy3M59lsDgrzWIflR4d4TIUjz+heUnHZwdF7YsrMTKoRERiIvI2lvBG95dfpLxB21WZhys1bgaQ==
 
 umzug@2.3.0:
   version "2.3.0"
