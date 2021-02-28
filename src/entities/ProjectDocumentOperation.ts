@@ -1,4 +1,11 @@
-import { Entity, PrimaryKey, Property, ManyToOne, Enum } from '@mikro-orm/core';
+import {
+  Entity,
+  PrimaryKey,
+  Property,
+  ManyToOne,
+  Enum,
+  wrap,
+} from '@mikro-orm/core';
 
 import { ProjectCollection } from './ProjectCollection';
 
@@ -64,9 +71,52 @@ export class ProjectDocumentOperation {
   @Property()
   value?: string;
 
-  @ManyToOne(() => ProjectCollection)
+  @ManyToOne(() => ProjectCollection, { hidden: true })
   collection: ProjectCollection;
 
   @Property()
   createdDate: Date = new Date();
+
+  toJSON() {
+    const {
+      id: operationId,
+      timestamp,
+      op,
+      documentId: id,
+      attribute,
+      value,
+    } = wrap(this).toObject();
+
+    const ref = { type: this.collection.id, id };
+    const meta = { id: operationId, timestamp };
+
+    switch (op) {
+      case DocumentOperationType.addDocument:
+        return {
+          op: 'add',
+          ref,
+          data: ref,
+          meta,
+        };
+      case DocumentOperationType.removeDocument:
+        return {
+          op: 'remove',
+          ref,
+          data: ref,
+          meta,
+        };
+      case DocumentOperationType.replaceAttribute:
+        return {
+          op: 'update',
+          ref,
+          data: {
+            ...ref,
+            attributes: {
+              [attribute]: value,
+            },
+          },
+          meta,
+        };
+    }
+  }
 }

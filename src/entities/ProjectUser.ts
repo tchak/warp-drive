@@ -7,6 +7,7 @@ import {
   Collection,
   Cascade,
   Unique,
+  wrap,
 } from '@mikro-orm/core';
 import { v4 as uuid } from 'uuid';
 
@@ -41,11 +42,12 @@ export class ProjectUser {
   @Property({ nullable: true })
   name?: string;
 
-  @ManyToOne(() => Project)
+  @ManyToOne(() => Project, { hidden: true })
   project: Project;
 
   @OneToMany(() => ProjectTeamMember, ({ user }) => user, {
     cascade: [Cascade.ALL],
+    hidden: true,
   })
   memberships = new Collection<ProjectTeamMember>(this);
 
@@ -54,4 +56,16 @@ export class ProjectUser {
 
   @Property({ onUpdate: () => new Date() })
   updatedDate: Date = new Date();
+
+  toJSON() {
+    const { id, ...attributes } = wrap(this).toObject();
+    return {
+      id,
+      type: 'user',
+      attributes,
+      relationships: {
+        project: { data: { id: this.project.id, type: 'project' } },
+      },
+    };
+  }
 }

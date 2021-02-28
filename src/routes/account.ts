@@ -15,47 +15,47 @@ export function account() {
   router.get(
     '/',
     wrapHandler(async (context, _, res) => {
-      const data = await getAccount({ context });
+      const account = await getAccount({ context });
 
-      res.ok({ data });
+      res.ok(account);
     })
   );
 
   router.get(
     '/sessions',
     wrapHandler(async (context, _, res) => {
-      const data = await listAccountSessions({ context });
+      const sessions = await listAccountSessions({ context });
 
-      res.ok({ data });
+      res.ok(sessions);
     })
   );
 
   router.get(
     '/logs',
     wrapHandler(async (context, _, res) => {
-      const data = await listAccountLogs({ context });
+      const events = await listAccountLogs({ context });
 
-      res.ok({ data });
+      res.ok(events);
     })
   );
 
   router.post(
     '/',
-    wrapHandler(async (context, req, res) => {
-      const { email, password, name } = req.params;
-      const data = await createAccount({ context, email, password, name });
+    wrapHandler(async (context, { body }, res) => {
+      const { email, password, name } = body;
+      const account = await createAccount({ context, email, password, name });
 
-      res.created({ data });
+      res.created(account);
     })
   );
 
   router.post(
     '/sessions',
-    wrapHandler(async (context, req, res) => {
-      const { email, password } = req.params;
-      const data = await createAccountSession({ context, email, password });
+    wrapHandler(async (context, { body }, res) => {
+      const { email, password } = body;
+      const session = await createAccountSession({ context, email, password });
 
-      res.created({ data });
+      res.created(session);
     })
   );
 

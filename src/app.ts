@@ -15,7 +15,7 @@ import { database } from './routes/database';
 import { dashboard } from './routes/dashboard';
 
 import { contextStorage, ormStorage } from './local-storage';
-import { createContext } from './lib/context';
+import { createAPIContext, createConsoleContext } from './lib/context';
 import { Clock } from './lib/hlc';
 
 export function setup(app: Application, orm: MikroORM<PostgreSqlDriver>) {
@@ -39,13 +39,16 @@ export function setup(app: Application, orm: MikroORM<PostgreSqlDriver>) {
   app.use((req, res, next) => {
     ormStorage.run(orm.em.fork(true, true), next);
   });
-  app.use((req, _, next) => {
-    createContext(orm.em, clock, req)
-      .then((context) => contextStorage.run(context, next))
-      .catch((error) => next(error));
-  });
 
-  app.use('/v1/dashboard', dashboard());
+  app.use(
+    '/v1/dashboard',
+    (req, _, next) => {
+      createConsoleContext(orm.em, clock, req)
+        .then((context) => contextStorage.run(context, next))
+        .catch((error) => next(error));
+    },
+    dashboard()
+  );
 
   const api = Router();
   api.use('/account', account());
@@ -53,7 +56,15 @@ export function setup(app: Application, orm: MikroORM<PostgreSqlDriver>) {
   api.use('/teams', teams());
   api.use('/database', database());
 
-  app.use('/v1/:projectId', api);
+  app.use(
+    '/v1/:projectId',
+    (req, _, next) => {
+      createAPIContext(orm.em, clock, req)
+        .then((context) => contextStorage.run(context, next))
+        .catch((error) => next(error));
+    },
+    api
+  );
 
   return app;
 }

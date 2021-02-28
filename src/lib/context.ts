@@ -113,7 +113,7 @@ export class Context {
   }
 }
 
-export async function createContext(
+export async function createAPIContext(
   em: EntityManager,
   clock: Clock,
   req: Request
@@ -124,27 +124,14 @@ export async function createContext(
   const userAgent = req.headers['user-agent'] ?? 'unknown';
   const context = new Context(audience, em, clock, userAgent);
 
-  if (projectId) {
-    context.project = em.getReference(Project, projectId);
-  }
-
   if (!token) {
+    if (projectId) {
+      context.project = em.getReference(Project, projectId);
+    }
     return context;
   }
 
   switch (audience) {
-    case 'admin':
-      if (projectId) {
-        const admin = await em.findOneOrFail(User, {
-          id: token.sub,
-          projects: [projectId],
-        });
-        context.admin = admin;
-      } else {
-        const admin = await em.findOneOrFail(User, { id: token.sub });
-        context.admin = admin;
-      }
-      break;
     case 'client':
       const user = await em.findOneOrFail(ProjectUser, {
         id: token.sub,
@@ -159,6 +146,36 @@ export async function createContext(
       });
       context.accessToken = accessToken;
       break;
+  }
+
+  return context;
+}
+
+export async function createConsoleContext(
+  em: EntityManager,
+  clock: Clock,
+  req: Request
+): Promise<Context> {
+  const token = extractTokenFomRequest(req, getEnvValue('AUTH_SECRET'));
+  if (!token || token.aud != 'admin') {
+    throw new UnauthorizedError('Unauthorized audience');
+  }
+  const audience = token.aud;
+  const projectId =
+    req.method == 'post' && req.body?.data?.relationships?.project?.data?.id;
+  const userAgent = req.headers['user-agent'] ?? 'unknown';
+  const context = new Context(audience, em, clock, userAgent);
+
+  if (projectId) {
+    const admin = await em.findOneOrFail(User, {
+      id: token.sub,
+      projects: [projectId],
+    });
+    context.project = em.getReference(Project, projectId);
+    context.admin = admin;
+  } else {
+    const admin = await em.findOneOrFail(User, { id: token.sub });
+    context.admin = admin;
   }
 
   return context;

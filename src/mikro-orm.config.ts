@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import type { Options } from '@mikro-orm/core';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 

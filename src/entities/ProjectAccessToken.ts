@@ -1,4 +1,11 @@
-import { Entity, PrimaryKey, Property, ManyToOne, Enum } from '@mikro-orm/core';
+import {
+  Entity,
+  PrimaryKey,
+  Property,
+  ManyToOne,
+  Enum,
+  wrap,
+} from '@mikro-orm/core';
 import { v4 as uuid } from 'uuid';
 
 import { Project } from './Project';
@@ -54,7 +61,7 @@ export class ProjectAccessToken {
   @Enum({ items: () => AccessTokenScope, array: true })
   scope: AccessTokenScope[];
 
-  @ManyToOne(() => Project)
+  @ManyToOne(() => Project, { hidden: true })
   project: Project;
 
   @Property()
@@ -62,4 +69,16 @@ export class ProjectAccessToken {
 
   @Property({ onUpdate: () => new Date() })
   updatedDate: Date = new Date();
+
+  toJSON() {
+    const { id, ...attributes } = wrap(this).toObject();
+    return {
+      id,
+      type: 'key',
+      attributes,
+      relationships: {
+        project: { data: { id: this.project.id, type: 'project' } },
+      },
+    };
+  }
 }

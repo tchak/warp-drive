@@ -5,6 +5,7 @@ import {
   ManyToOne,
   Enum,
   JsonType,
+  wrap,
 } from '@mikro-orm/core';
 import { v4 as uuid } from 'uuid';
 
@@ -98,9 +99,18 @@ export class ProjectEvent {
   @Property({ type: JsonType, nullable: true })
   payload: unknown;
 
-  @ManyToOne(() => Project)
+  @ManyToOne(() => Project, { hidden: true })
   project: Project;
 
   @Property()
   createdDate: Date = new Date();
+
+  toJSON() {
+    const { id, ...attributes } = wrap(this).toObject();
+    return {
+      id,
+      type: 'log',
+      attributes,
+    };
+  }
 }

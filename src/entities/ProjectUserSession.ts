@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property, ManyToOne, wrap } from '@mikro-orm/core';
 import { v4 as uuid } from 'uuid';
 
 import { ProjectUser } from './ProjectUser';
@@ -16,9 +16,21 @@ export class ProjectUserSession {
   @Property()
   userAgent: string;
 
-  @ManyToOne(() => ProjectUser)
+  @ManyToOne(() => ProjectUser, { hidden: true })
   user: ProjectUser;
 
   @Property()
   createdDate: Date = new Date();
+
+  toJSON() {
+    const { id, ...attributes } = wrap(this).toObject();
+    return {
+      id,
+      type: 'session',
+      attributes,
+      relationships: {
+        user: { data: { id: this.user.id, type: 'user' } },
+      },
+    };
+  }
 }

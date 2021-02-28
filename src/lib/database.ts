@@ -30,6 +30,27 @@ export async function createCollection({
   return collection;
 }
 
+export interface UpdateCollectionParams {
+  context: Context;
+  collectionId: string;
+  name: string;
+}
+
+export async function updateCollection({
+  context: { em, project, scope },
+  collectionId,
+  name,
+}: UpdateCollectionParams): Promise<void> {
+  authorizeCollections(scope, 'write');
+
+  const collection = await em.findOneOrFail(ProjectCollection, {
+    id: collectionId,
+    project,
+  });
+  collection.name = name;
+  await em.flush();
+}
+
 export interface DeleteCollectionParams {
   context: Context;
   collectionId: string;

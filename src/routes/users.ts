@@ -9,21 +9,21 @@ export function users() {
   router.get(
     '/',
     wrapHandler(async (context, _, res) => {
-      const data = await listUsers({ context });
+      const users = await listUsers({ context });
 
-      res.ok({ data });
+      res.ok(users);
     })
   );
 
   router.get(
     '/:id',
-    wrapHandler(async (context, req, res) => {
-      const data = await getUser({
+    wrapHandler(async (context, { params }, res) => {
+      const user = await getUser({
         context,
-        userId: req.params.id,
+        userId: params.id,
       });
 
-      res.ok({ data });
+      res.ok(user);
     })
   );
 
@@ -35,18 +35,18 @@ export function users() {
 
   router.post(
     '/',
-    wrapHandler(async (context, req, res) => {
-      const { email, password, name } = req.params;
-      const data = await createUser({ context, email, password, name });
+    wrapHandler(async (context, { body }, res) => {
+      const { email, password, name } = body.data.attributes;
+      const user = await createUser({ context, email, password, name });
 
-      res.ok({ data });
+      res.ok(user);
     })
   );
 
   router.delete(
     '/:id',
-    wrapHandler(async (context, req, res) => {
-      await deleteUser({ context, userId: req.params.id });
+    wrapHandler(async (context, { params }, res) => {
+      await deleteUser({ context, userId: params.id });
 
       res.noContent();
     })

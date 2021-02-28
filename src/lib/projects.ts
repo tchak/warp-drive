@@ -1,19 +1,26 @@
 import type { Context } from './context';
+import type { RelatedFields } from '../entities/AnyEntity';
 import { Project } from '../entities/Project';
 
 export interface GetProjectParams {
   context: Context;
   projectId: string;
+  include?: RelatedFields<Project>[];
 }
 
 export async function getProject({
   context: { em, admin },
   projectId,
+  include,
 }: GetProjectParams): Promise<Project> {
-  const project = await em.findOneOrFail(Project, {
-    id: projectId,
-    owners: admin,
-  });
+  const project = await em.findOneOrFail(
+    Project,
+    {
+      id: projectId,
+      owners: admin,
+    },
+    include
+  );
 
   return project;
 }

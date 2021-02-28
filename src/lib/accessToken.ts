@@ -46,21 +46,15 @@ export async function listAccessTokens({
 
 export interface CreateAccessTokenParams {
   context: Context;
-  projectId: string;
   name: string;
   scope: AccessTokenScope[];
 }
 
 export async function createAccessToken({
-  context: { em, admin },
-  projectId,
+  context: { em, project },
   name,
   scope,
 }: CreateAccessTokenParams): Promise<ProjectAccessToken> {
-  const project = await em.findOneOrFail(Project, {
-    id: projectId,
-    owners: admin,
-  });
   const token = new ProjectAccessToken(project, name, scope);
   await em.persistAndFlush(token);
   return token;

@@ -20,23 +20,17 @@ describe('projects', () => {
   let user: User;
   let project: Project;
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     orm = await MikroORM.init<PostgreSqlDriver>();
-    const schema = orm.getSchemaGenerator();
-    await schema.dropSchema();
-    await schema.createSchema();
-    user = new User('test@test.com', uuid());
+    user = new User('projects@test.com', uuid());
     await orm.em.persistAndFlush(user);
-    done();
   });
-  afterAll((done) => {
-    orm.close().then(done);
-  });
-  beforeEach(async (done) => {
+  afterAll(() => orm.close());
+
+  beforeEach(async () => {
     context = new Context('admin', orm.em, new Clock(uuid()), 'test');
     context.admin = user;
     project = await createProject({ context, name: 'hello world' });
-    done();
   });
 
   it('create project', () => {
@@ -69,17 +63,13 @@ describe('projects', () => {
   describe('wrong user', () => {
     let otherUser: User;
 
-    beforeEach(async (done) => {
-      otherUser = new User('test2@test.com', uuid());
+    beforeEach(async () => {
+      otherUser = new User('projects2@test.com', uuid());
       await orm.em.persistAndFlush(otherUser);
       context.admin = otherUser;
-      done();
     });
 
-    afterEach(async (done) => {
-      await orm.em.removeAndFlush(otherUser);
-      done();
-    });
+    afterEach(() => orm.em.removeAndFlush(otherUser));
 
     it('get project', async () => {
       await expect(

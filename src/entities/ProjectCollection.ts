@@ -4,6 +4,7 @@ import {
   Property,
   ManyToOne,
   ArrayType,
+  wrap,
 } from '@mikro-orm/core';
 import { v4 as uuid } from 'uuid';
 
@@ -30,7 +31,7 @@ export class ProjectCollection {
   @Property({ type: ArrayType })
   write: string[];
 
-  @ManyToOne(() => Project)
+  @ManyToOne(() => Project, { hidden: true })
   project: Project;
 
   @Property()
@@ -38,4 +39,16 @@ export class ProjectCollection {
 
   @Property({ onUpdate: () => new Date() })
   updatedDate: Date = new Date();
+
+  toJSON() {
+    const { id, ...attributes } = wrap(this).toObject();
+    return {
+      id,
+      type: 'collection',
+      attributes,
+      relationships: {
+        project: { data: { id: this.project.id, type: 'project' } },
+      },
+    };
+  }
 }

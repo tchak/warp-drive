@@ -11,6 +11,7 @@ import {
   createDocument,
   deleteCollection,
   deleteDocument,
+  updateCollection,
 } from '../lib/database';
 
 export function database() {
@@ -19,52 +20,54 @@ export function database() {
   router.get(
     '/collections',
     wrapHandler(async (context, _, res) => {
-      const data = await listCollections({ context });
+      const collections = await listCollections({ context });
 
-      res.ok({ data });
+      res.ok(collections);
     })
   );
   router.get(
     '/collections/:id',
-    wrapHandler(async (context, req, res) => {
-      const { id } = req.params;
-      const data = await getCollection({ context, collectionId: id });
+    wrapHandler(async (context, { params }, res) => {
+      const collection = await getCollection({
+        context,
+        collectionId: params.id,
+      });
 
-      res.ok({ data });
+      res.ok(collection);
     })
   );
   router.get(
     '/collections/:id/documents',
-    wrapHandler(async (context, req, res) => {
-      const { id } = req.params;
-      const data = await listDocuments({ context, collectionId: id });
+    wrapHandler(async (context, { params }, res) => {
+      const documents = await listDocuments({
+        context,
+        collectionId: params.id,
+      });
 
-      res.ok({ data });
+      res.ok(documents);
     })
   );
 
   router.get(
     '/documents/:id',
-    wrapHandler(async (context, req, res) => {
-      const { id } = req.params;
-      const data = await getDocument({
+    wrapHandler(async (context, { params }, res) => {
+      const document = await getDocument({
         context,
-        documentId: id,
+        documentId: params.id,
       });
 
-      res.ok({ data });
+      res.ok(document);
     })
   );
   router.get(
     '/documents/:id/operations',
-    wrapHandler(async (context, req, res) => {
-      const { id } = req.params;
-      const data = await listDocumentOperations({
+    wrapHandler(async (context, { params }, res) => {
+      const operations = await listDocumentOperations({
         context,
-        documentId: id,
+        documentId: params.id,
       });
 
-      res.ok({ 'atomic:operations': data });
+      res.ok(operations);
     })
   );
 
@@ -75,18 +78,26 @@ export function database() {
 
   router.post(
     '/collections',
-    wrapHandler(async (context, req, res) => {
-      const name = (req.body as any).data.attributes.name;
-      const data = await createCollection({ context, name });
+    wrapHandler(async (context, { body }, res) => {
+      const name = body.data.attributes.name;
+      const collection = await createCollection({ context, name });
 
-      res.ok({ data });
+      res.created(collection);
+    })
+  );
+  router.patch(
+    '/collections/:id',
+    wrapHandler(async (context, { params, body }, res) => {
+      const name = body.data.attributes.name;
+      await updateCollection({ context, collectionId: params.id, name });
+
+      res.noContent();
     })
   );
   router.delete(
     '/collections/:id',
-    wrapHandler(async (context, req, res) => {
-      const { id } = req.params;
-      await deleteCollection({ context, collectionId: id });
+    wrapHandler(async (context, { params }, res) => {
+      await deleteCollection({ context, collectionId: params.id });
 
       res.noContent();
     })
@@ -94,31 +105,27 @@ export function database() {
 
   router.post(
     '/documents',
-    wrapHandler(async (context, req, res) => {
-      const type = (req.body as any).data.type;
-      const attributes = (req.body as any).data.attributes;
-      const data = await createDocument({
+    wrapHandler(async (context, { body }, res) => {
+      const { type, attributes } = body.data;
+      const document = await createDocument({
         context,
         collectionId: type,
         attributes,
       });
 
-      res.created({ data });
+      res.created(document);
     })
   );
   router.patch(
     '/documents/:id',
     wrapHandler(async (context, req, res) => {
-      const { id } = req.params;
-
       res.noContent();
     })
   );
   router.delete(
     '/documents/:id',
-    wrapHandler(async (context, req, res) => {
-      const { id } = req.params;
-      await deleteDocument({ context, documentId: id });
+    wrapHandler(async (context, { params }, res) => {
+      await deleteDocument({ context, documentId: params.id });
 
       res.noContent();
     })
