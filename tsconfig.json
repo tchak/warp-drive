@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "lib": ["es2020", "esnext.asynciterable"],
+    "outDir": "dist",
+    "baseUrl": ".",
+    "removeComments": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importsNotUsedAsValues": "error",
+    "skipLibCheck": true
+  },
+  "include": [
+    "src"
+  ]
+}
