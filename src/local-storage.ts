@@ -2,7 +2,6 @@ import type { EntityManager } from '@mikro-orm/postgresql';
 import type { Handler, Request, Response } from 'express';
 import { AsyncLocalStorage } from 'async_hooks';
 
-import type { AnyEntity, RelatedFields } from './entities/AnyEntity';
 import type { Context } from './lib/context';
 import { UnauthorizedError } from './lib/errors';
 
@@ -24,18 +23,15 @@ class Res {
     this.#res = res;
   }
 
-  created<T extends AnyEntity>(
+  created<T>(
     payload: T | T[],
-    options?: { include?: RelatedFields<T>[]; meta?: unknown }
+    options?: { include?: (keyof T)[]; meta?: unknown }
   ) {
     this.#res.set('content-type', 'application/vnd.api+json; charset=utf-8');
     this.#res.status(201).json(dataWithIncluded(payload, options));
   }
 
-  ok<T extends AnyEntity>(
-    payload: T | T[],
-    options?: { include?: RelatedFields<T>[]; meta?: unknown }
-  ) {
+  ok<T>(payload: T | T[], options?: { include?: (keyof T)[]; meta?: unknown }) {
     this.#res.set('content-type', 'application/vnd.api+json; charset=utf-8');
     this.#res.json(dataWithIncluded(payload, options));
   }
@@ -45,9 +41,9 @@ class Res {
   }
 }
 
-export function dataWithIncluded<T extends AnyEntity>(
+export function dataWithIncluded<T>(
   data: T | T[],
-  options?: { include?: RelatedFields<T>[]; meta?: unknown }
+  options?: { include?: (keyof T)[]; meta?: unknown }
 ) {
   if (options?.include?.length) {
     const included = options.include.reduce((included, include) => {

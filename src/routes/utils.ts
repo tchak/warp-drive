@@ -1,16 +1,14 @@
 import type { ParsedQs } from 'qs';
 
-import type { AnyEntity, RelatedFields } from '../entities/AnyEntity';
-
-export function parseInclude<T extends AnyEntity>(
+export function parseInclude<T>(
   include?: ParsedQs | ParsedQs[] | string | string[]
-): RelatedFields<T>[] {
+): (keyof T)[] {
   if (Array.isArray(include)) {
-    return include as RelatedFields<T>[];
+    return include as (keyof T)[];
   } else if (include) {
     return (include as string)
       .split(',')
-      .map((include) => include.trim()) as RelatedFields<T>[];
+      .map((include) => include.trim()) as (keyof T)[];
   }
   return [];
 }
