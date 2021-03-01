@@ -8,8 +8,14 @@ import rateLimit from 'express-rate-limit';
 import ms from 'ms';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
+import { buildSchema } from 'type-graphql';
 
 import { setup } from './app';
+
+import { CollectionResolver } from './resolvers/CollectionResolver';
+import { ProjectResolver } from './resolvers/ProjectResolver';
+import { TeamResolver } from './resolvers/TeamResolver';
+import { UserResolver } from './resolvers/UserResolver';
 
 function secs(value: string) {
   return ms(value) / 1000;
@@ -28,6 +34,16 @@ async function main() {
     cors: CORS_CONFIG,
   });
   const orm = await MikroORM.init<PostgreSqlDriver>();
+  const schema = await buildSchema({
+    resolvers: [
+      CollectionResolver,
+      ProjectResolver,
+      TeamResolver,
+      UserResolver,
+    ],
+    emitSchemaFile: true,
+    dateScalarMode: 'isoDate',
+  });
 
   Sentry.init({
     enabled: !!process.env['SENTRY_DSN'],
@@ -59,7 +75,7 @@ async function main() {
   // TracingHandler creates a trace for every incoming request
   app.use(Sentry.Handlers.tracingHandler());
 
-  setup(app, orm);
+  setup(app, orm, schema);
 
   app.use((_, res) => res.status(404).json({ message: 'No route found' }));
 

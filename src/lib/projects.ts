@@ -1,11 +1,10 @@
 import type { Context } from './context';
-import type { RelatedFields } from '../entities/AnyEntity';
 import { Project } from '../entities/Project';
 
 export interface GetProjectParams {
   context: Context;
   projectId: string;
-  include?: RelatedFields<Project>[];
+  include?: ('users' | 'teams' | 'collections')[];
 }
 
 export async function getProject({
@@ -64,13 +63,14 @@ export async function updateProject({
   context: { em, admin },
   projectId,
   name,
-}: UpdateProjectParams): Promise<void> {
+}: UpdateProjectParams): Promise<Project> {
   const project = await em.findOneOrFail(Project, {
     id: projectId,
     owners: admin,
   });
   project.name = name;
   await em.flush();
+  return project;
 }
 
 export interface DeleteProjectParams {

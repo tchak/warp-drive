@@ -1,11 +1,5 @@
-import {
-  Entity,
-  PrimaryKey,
-  Property,
-  ManyToOne,
-  Enum,
-  wrap,
-} from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property, ManyToOne, Enum } from '@mikro-orm/core';
+import { ObjectType, Field, ID, registerEnumType } from 'type-graphql';
 import { v4 as uuid } from 'uuid';
 
 import { Project } from './Project';
@@ -31,6 +25,8 @@ export enum AccessTokenScope {
   filesRead = 'files.read',
   // Access to create, update, and delete your project's storage files
   filesWrite = 'files.write',
+  // Access to read your project's health status
+  healthRead = 'health.read',
 }
 
 export interface AccessToken {
@@ -38,13 +34,17 @@ export interface AccessToken {
   project: Project;
 }
 
+registerEnumType(AccessTokenScope, {
+  name: 'Scope',
+});
+
 // 'functions.read'	Access to read your project's functions and code tags
 // 'functions.write'	Access to create, update, and delete your project's functions and code tags
 // 'execution.read'	Access to read your project's execution logs
 // 'execution.write'	Access to execute your project's functions
-// 'health.read'	Access to read your project's health status
 
 @Entity()
+@ObjectType('APIKey')
 export class ProjectAccessToken {
   constructor(project: Project, name: string, scope: AccessTokenScope[] = []) {
     this.project = project;
@@ -52,33 +52,26 @@ export class ProjectAccessToken {
     this.scope = scope;
   }
 
+  @Field(() => ID)
   @PrimaryKey({ type: 'uuid' })
   id: string = uuid();
 
+  @Field()
   @Property()
   name: string;
 
+  @Field(() => [AccessTokenScope])
   @Enum({ items: () => AccessTokenScope, array: true })
   scope: AccessTokenScope[];
 
   @ManyToOne(() => Project, { hidden: true })
   project: Project;
 
+  @Field()
   @Property()
   createdDate: Date = new Date();
 
+  @Field()
   @Property({ onUpdate: () => new Date() })
   updatedDate: Date = new Date();
-
-  toJSON() {
-    const { id, ...attributes } = wrap(this).toObject();
-    return {
-      id,
-      type: 'key',
-      attributes,
-      relationships: {
-        project: { data: { id: this.project.id, type: 'project' } },
-      },
-    };
-  }
 }

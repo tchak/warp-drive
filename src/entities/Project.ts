@@ -5,8 +5,8 @@ import {
   ManyToMany,
   OneToMany,
   Collection,
-  wrap,
 } from '@mikro-orm/core';
+import { ObjectType, Field, ID } from 'type-graphql';
 import { v4 as uuid } from 'uuid';
 
 import { User } from './User';
@@ -16,14 +16,17 @@ import { ProjectTeam } from './ProjectTeam';
 import { ProjectCollection } from './ProjectCollection';
 
 @Entity()
+@ObjectType()
 export class Project {
   constructor(name: string) {
     this.name = name;
   }
 
+  @Field(() => ID)
   @PrimaryKey({ type: 'uuid' })
   id: string = uuid();
 
+  @Field()
   @Property()
   name: string;
 
@@ -46,55 +49,11 @@ export class Project {
   })
   collections = new Collection<ProjectCollection>(this);
 
+  @Field()
   @Property()
   createdDate: Date = new Date();
 
+  @Field()
   @Property({ onUpdate: () => new Date() })
   updatedDate: Date = new Date();
-
-  toJSON() {
-    const { id, ...attributes } = wrap(this).toObject();
-    const { users, teams, collections, keys } = this;
-    const relationships: Record<string, unknown> = {};
-
-    if (users.isInitialized()) {
-      relationships.users = {
-        data: [...users].map(({ id }: { id: string }) => ({
-          id,
-          type: 'user',
-        })),
-      };
-    }
-    if (teams.isInitialized()) {
-      relationships.teams = {
-        data: [...teams].map(({ id }: { id: string }) => ({
-          id,
-          type: 'team',
-        })),
-      };
-    }
-    if (collections.isInitialized()) {
-      relationships.collections = {
-        data: [...collections].map(({ id }: { id: string }) => ({
-          id,
-          type: 'collection',
-        })),
-      };
-    }
-    if (keys.isInitialized()) {
-      relationships.keys = {
-        data: [...keys].map(({ id }: { id: string }) => ({
-          id,
-          type: 'key',
-        })),
-      };
-    }
-
-    return {
-      id,
-      type: 'project',
-      attributes,
-      relationships,
-    };
-  }
 }

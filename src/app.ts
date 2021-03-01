@@ -1,4 +1,4 @@
-import { Application, Router } from 'express';
+import { Application, Router, static as serveStatic } from 'express';
 import type { MikroORM } from '@mikro-orm/core';
 import type { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { json } from 'body-parser';
@@ -7,18 +7,24 @@ import pino from 'pino-http';
 import compression from 'compression';
 import responseTime from 'response-time';
 import { v4 as uuid } from 'uuid';
+import { ApolloServer } from 'apollo-server-express';
+import type { GraphQLSchema } from 'graphql';
 
 import { account } from './routes/account';
 import { users } from './routes/users';
 import { teams } from './routes/teams';
 import { database } from './routes/database';
-import { dashboard } from './routes/dashboard';
+import { ui } from './routes/ui';
 
 import { contextStorage, ormStorage } from './local-storage';
 import { createAPIContext, createConsoleContext } from './lib/context';
 import { Clock } from './lib/hlc';
 
-export function setup(app: Application, orm: MikroORM<PostgreSqlDriver>) {
+export function setup(
+  app: Application,
+  orm: MikroORM<PostgreSqlDriver>,
+  schema: GraphQLSchema
+) {
   const clock = new Clock(uuid());
 
   app.use(helmet({ contentSecurityPolicy: false }));
@@ -35,20 +41,26 @@ export function setup(app: Application, orm: MikroORM<PostgreSqlDriver>) {
       },
     })
   );
+  app.use(serveStatic('../ui/dist'));
   app.use(json());
   app.use((req, res, next) => {
     ormStorage.run(orm.em.fork(true, true), next);
   });
 
-  app.use(
-    '/v1/dashboard',
-    (req, _, next) => {
-      createConsoleContext(orm.em, clock, req)
-        .then((context) => contextStorage.run(context, next))
-        .catch((error) => next(error));
+  const apollo = new ApolloServer({
+    schema,
+    introspection: true,
+    playground: {
+      settings: {
+        'request.credentials': 'include',
+      },
     },
-    dashboard()
-  );
+    async context({ req }) {
+      return { context: await createConsoleContext(orm.em, clock, req) };
+    },
+  });
+
+  apollo.applyMiddleware({ app, path: '/v1/console', cors: false });
 
   const api = Router();
   api.use('/account', account());
@@ -65,6 +77,8 @@ export function setup(app: Application, orm: MikroORM<PostgreSqlDriver>) {
     },
     api
   );
+
+  app.use(ui());
 
   return app;
 }

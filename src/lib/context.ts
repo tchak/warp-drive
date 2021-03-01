@@ -62,6 +62,11 @@ export class Context {
     throw new UnauthorizedError('Unknown user');
   }
 
+  set user(user: ProjectUser) {
+    this.#project = user.project;
+    this.#user = user;
+  }
+
   get admin() {
     if (this.audience == 'admin' && this.#admin) {
       return this.#admin;
@@ -69,11 +74,19 @@ export class Context {
     throw new UnauthorizedError('Unknown admin');
   }
 
+  set admin(admin: User) {
+    this.#admin = admin;
+  }
+
   get project() {
     if (this.#project) {
       return this.#project;
     }
     throw new UnauthorizedError('');
+  }
+
+  set project(project: Project) {
+    this.#project = project;
   }
 
   get scope(): AccessTokenScope[] {
@@ -92,19 +105,6 @@ export class Context {
       ];
     }
     throw new UnauthorizedError('Unknown scope');
-  }
-
-  set project(project: Project) {
-    this.#project = project;
-  }
-
-  set user(user: ProjectUser) {
-    this.#project = user.project;
-    this.#user = user;
-  }
-
-  set admin(admin: User) {
-    this.#admin = admin;
   }
 
   set accessToken(accessToken: ProjectAccessToken) {
@@ -161,22 +161,9 @@ export async function createConsoleContext(
     throw new UnauthorizedError('Unauthorized audience');
   }
   const audience = token.aud;
-  const projectId =
-    req.method == 'post' && req.body?.data?.relationships?.project?.data?.id;
   const userAgent = req.headers['user-agent'] ?? 'unknown';
   const context = new Context(audience, em, clock, userAgent);
-
-  if (projectId) {
-    const admin = await em.findOneOrFail(User, {
-      id: token.sub,
-      projects: [projectId],
-    });
-    context.project = em.getReference(Project, projectId);
-    context.admin = admin;
-  } else {
-    const admin = await em.findOneOrFail(User, { id: token.sub });
-    context.admin = admin;
-  }
+  context.admin = await em.findOneOrFail(User, { id: token.sub });
 
   return context;
 }

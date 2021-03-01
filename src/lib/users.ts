@@ -124,20 +124,20 @@ export async function deleteUser({
 
 export interface DeleteUserSessionParams {
   context: Context;
-  userId: string;
   sessionId: string;
 }
 
 export async function deleteUserSession({
-  context: { em, scope },
-  userId,
+  context: { em, project, scope },
   sessionId,
 }: DeleteUserSessionParams): Promise<void> {
   authorizeUsers(scope, 'write');
 
   const session = await em.findOneOrFail(ProjectUserSession, {
     id: sessionId,
-    user: userId,
+    user: {
+      project,
+    },
   });
 
   await em.removeAndFlush(session);
@@ -149,13 +149,16 @@ export interface DeleteUserSessionsParam {
 }
 
 export async function deleteUserSessions({
-  context: { em, scope },
+  context: { em, project, scope },
   userId,
 }: DeleteUserSessionsParam): Promise<void> {
   authorizeUsers(scope, 'write');
 
   const sessions = await em.find(ProjectUserSession, {
-    user: userId,
+    user: {
+      id: userId,
+      project,
+    },
   });
 
   await em.removeAndFlush(sessions);

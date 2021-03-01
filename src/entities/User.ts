@@ -4,7 +4,6 @@ import {
   Property,
   ManyToMany,
   Collection,
-  wrap,
 } from '@mikro-orm/core';
 import { v4 as uuid } from 'uuid';
 
@@ -41,13 +40,4 @@ export class User {
 
   @Property({ onUpdate: () => new Date() })
   updatedDate: Date = new Date();
-
-  toJSON() {
-    const { id, ...attributes } = wrap(this).toObject();
-    return {
-      id,
-      type: 'admin',
-      attributes,
-    };
-  }
 }

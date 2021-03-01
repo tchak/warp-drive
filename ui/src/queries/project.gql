@@ -1,0 +1,74 @@
+query getProject($id: ID!) {
+  project(id: $id) {
+    id
+    name
+    createdDate
+  }
+}
+
+query listProjects {
+  projects {
+    id
+    name
+    createdDate
+  }
+}
+
+query listUsers($projectId: ID!) {
+  project(id: $projectId) {
+    id
+    users {
+      id
+      email
+      name
+      createdDate
+    }
+  }
+}
+
+query listTeams($projectId: ID!) {
+  project(id: $projectId) {
+    id
+    teams {
+      id
+      name
+      createdDate
+    }
+  }
+}
+
+query listCollections($projectId: ID!) {
+  project(id: $projectId) {
+    id
+    collections {
+      id
+      name
+      createdDate
+    }
+  }
+}
+
+query listAPIKeys($projectId: ID!) {
+  project(id: $projectId) {
+    id
+    keys {
+      id
+      name
+      createdDate
+    }
+  }
+}
+
+mutation createProject($name: String!) {
+  createProject(name: $name) {
+    id
+    name
+    createdDate
+  }
+}
+
+mutation deleteProject($id: ID!) {
+  deleteProject(id: $id) {
+    id
+  }
+}

@@ -9,12 +9,14 @@ import {
   ArrayType,
   wrap,
 } from '@mikro-orm/core';
+import { ObjectType, Field, ID } from 'type-graphql';
 import { v4 as uuid } from 'uuid';
 
 import { Project } from './Project';
 import { ProjectTeamMember } from './ProjectTeamMember';
 
 @Entity()
+@ObjectType('Team')
 export class ProjectTeam {
   constructor(project: Project, name: string, roles: string[] = []) {
     this.project = project;
@@ -23,9 +25,11 @@ export class ProjectTeam {
     this.roles = [...new Set([...roles, 'owner'])];
   }
 
+  @Field(() => ID)
   @PrimaryKey({ type: 'uuid' })
   id: string = uuid();
 
+  @Field()
   @Property()
   name: string;
 
@@ -41,9 +45,11 @@ export class ProjectTeam {
   })
   memberships = new Collection<ProjectTeamMember>(this);
 
+  @Field()
   @Property()
   createdDate: Date = new Date();
 
+  @Field()
   @Property({ onUpdate: () => new Date() })
   updatedDate: Date = new Date();
 
@@ -53,9 +59,6 @@ export class ProjectTeam {
       id,
       type: 'team',
       attributes,
-      relationships: {
-        project: { data: { id: this.project.id, type: 'project' } },
-      },
     };
   }
 }
