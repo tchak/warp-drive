@@ -32,6 +32,7 @@ async function main() {
   const server = createServer(app);
   const io = new Server(server, {
     cors: CORS_CONFIG,
+    serveClient: false,
   });
   const orm = await MikroORM.init<PostgreSqlDriver>();
   const schema = await buildSchema({
