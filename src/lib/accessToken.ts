@@ -4,7 +4,6 @@ import {
   ProjectAccessToken,
   AccessTokenScope,
 } from '../entities/ProjectAccessToken';
-import { Project } from '../entities/Project';
 
 export interface GetAccessTokenParams {
   context: Context;
