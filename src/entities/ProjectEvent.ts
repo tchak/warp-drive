@@ -10,8 +10,10 @@ import {
 import { v4 as uuid } from 'uuid';
 
 import { Project } from './Project';
+import { ProjectUser } from './ProjectUser';
+import type { ProjectCollection } from './ProjectCollection';
+import type { ProjectDocumentOperation } from './ProjectDocumentOperation';
 import type { ProjectTeam } from './ProjectTeam';
-import type { ProjectUser } from './ProjectUser';
 import type { ProjectUserSession } from './ProjectUserSession';
 
 export enum EventType {
@@ -45,49 +47,113 @@ export enum EventType {
 }
 
 export function logAccountCreate(user: ProjectUser) {
-  return new ProjectEvent(user.project, EventType.accountCreate);
+  return new ProjectEvent(EventType.accountCreate, user.project, user);
 }
 
 export function logAccountDelete(user: ProjectUser) {
-  return new ProjectEvent(user.project, EventType.accountDelete);
+  return new ProjectEvent(EventType.accountDelete, user.project, user);
 }
 
 export function logAccountSessionsCreate(session: ProjectUserSession) {
   return new ProjectEvent(
+    EventType.accountSessionsCreate,
     session.user.project,
-    EventType.accountSessionsCreate
+    session.user
   );
 }
 
 export function logAccountSessionsDelete(session: ProjectUserSession) {
   return new ProjectEvent(
+    EventType.accountSessionsDelete,
     session.user.project,
-    EventType.accountSessionsDelete
+    session.user
   );
 }
 
 export function logUsersCreate(user: ProjectUser) {
-  return new ProjectEvent(user.project, EventType.usersCreate);
+  return new ProjectEvent(EventType.usersCreate, user.project);
 }
 
 export function logUsersDelete(user: ProjectUser) {
-  return new ProjectEvent(user.project, EventType.usersDelete);
+  return new ProjectEvent(EventType.usersDelete, user.project);
 }
 
-export function logTeamsCreate(team: ProjectTeam) {
-  return new ProjectEvent(team.project, EventType.teamsCreate);
+export function logUsersSessionsDelete(session: ProjectUserSession) {
+  return new ProjectEvent(EventType.usersSessionsDelete, session.user.project);
 }
 
-export function logTeamsDelete(team: ProjectTeam) {
-  return new ProjectEvent(team.project, EventType.teamsDelete);
+export function logTeamsCreate(team: ProjectTeam, user?: ProjectUser) {
+  return new ProjectEvent(EventType.teamsCreate, team.project, user);
+}
+
+export function logTeamsUpdate(team: ProjectTeam, user?: ProjectUser) {
+  return new ProjectEvent(EventType.teamsUpdate, team.project, user);
+}
+
+export function logTeamsDelete(team: ProjectTeam, user?: ProjectUser) {
+  return new ProjectEvent(EventType.teamsDelete, team.project, user);
+}
+
+export function logCollectionCreate(collection: ProjectCollection) {
+  return new ProjectEvent(
+    EventType.databaseCollectionsCreate,
+    collection.project
+  );
+}
+
+export function logCollectionUpdate(collection: ProjectCollection) {
+  return new ProjectEvent(
+    EventType.databaseCollectionsUpdate,
+    collection.project
+  );
+}
+
+export function logCollectionDelete(collection: ProjectCollection) {
+  return new ProjectEvent(
+    EventType.databaseCollectionsDelete,
+    collection.project
+  );
+}
+
+export function logDocumentCreate(
+  document: ProjectDocumentOperation,
+  user?: ProjectUser
+) {
+  return new ProjectEvent(
+    EventType.databaseDocumentsCreate,
+    document.collection.project,
+    user
+  );
+}
+
+export function logDocumentUpdate(
+  document: ProjectDocumentOperation,
+  user?: ProjectUser
+) {
+  return new ProjectEvent(
+    EventType.databaseDocumentsUpdate,
+    document.collection.project,
+    user
+  );
+}
+
+export function logDocumentDelete(
+  document: ProjectDocumentOperation,
+  user?: ProjectUser
+) {
+  return new ProjectEvent(
+    EventType.databaseDocumentsDelete,
+    document.collection.project,
+    user
+  );
 }
 
 @Entity()
 export class ProjectEvent {
-  constructor(project: Project, type: EventType, payload?: unknown) {
+  constructor(type: EventType, project: Project, user?: ProjectUser) {
     this.project = project;
     this.type = type;
-    this.payload = payload;
+    this.user = user;
   }
 
   @PrimaryKey({ type: 'uuid' })
@@ -96,11 +162,14 @@ export class ProjectEvent {
   @Enum(() => EventType)
   type: EventType;
 
-  @Property({ type: JsonType, nullable: true })
-  payload: unknown;
-
   @ManyToOne(() => Project, { hidden: true })
   project: Project;
+
+  @ManyToOne(() => ProjectUser, { hidden: true, nullable: true })
+  user?: ProjectUser;
+
+  @Property({ type: JsonType, nullable: true })
+  payload?: unknown;
 
   @Property()
   createdDate: Date = new Date();

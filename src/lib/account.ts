@@ -3,13 +3,7 @@ import { verify, hash } from 'argon2';
 import type { Context } from './context';
 import { ProjectUser } from '../entities/ProjectUser';
 import { ProjectUserSession } from '../entities/ProjectUserSession';
-import {
-  ProjectEvent,
-  logAccountCreate,
-  logAccountDelete,
-  logAccountSessionsCreate,
-  logAccountSessionsDelete,
-} from '../entities/ProjectEvent';
+import { ProjectEvent } from '../entities/ProjectEvent';
 
 export interface CreateAccountParams {
   context: Context;
@@ -26,8 +20,7 @@ export async function createAccount({
 }: CreateAccountParams): Promise<ProjectUser> {
   const passwordHash = await hash(password);
   const user = new ProjectUser(project, email, passwordHash, name);
-  const event = logAccountCreate(user);
-  await em.persistAndFlush([user, event]);
+  await em.persistAndFlush(user);
   return user;
 }
 
@@ -49,8 +42,7 @@ export async function createAccountSession({
 
   if (ok) {
     const session = new ProjectUserSession(user, userAgent);
-    const event = logAccountSessionsCreate(session);
-    await em.persistAndFlush([session, event]);
+    await em.persistAndFlush(session);
     return session;
   }
   throw new Error('');
@@ -65,9 +57,7 @@ export interface DeleteAccountParams {
 export async function deleteAccount({
   context: { em, user },
 }: DeleteAccountParams): Promise<void> {
-  const event = logAccountDelete(user);
-  em.remove(user);
-  await em.persistAndFlush([user, event]);
+  await em.removeAndFlush(user);
 }
 
 export interface GetAccountParams {
@@ -93,9 +83,7 @@ export async function deleteAccountSession({
     user,
     id: sessionId,
   });
-  em.remove(session);
-  const event = logAccountSessionsDelete(session);
-  await em.persistAndFlush([session, event]);
+  await em.removeAndFlush(session);
 }
 
 export interface DeleteAccountSessionsParams {
@@ -130,10 +118,10 @@ export interface ListAccountLogsParams {
 }
 
 export async function listAccountLogs({
-  context: { em, project },
+  context: { em, user },
 }: ListAccountLogsParams): Promise<ProjectEvent[]> {
   const logs = await em.find(ProjectEvent, {
-    project,
+    user,
   });
 
   return logs;
