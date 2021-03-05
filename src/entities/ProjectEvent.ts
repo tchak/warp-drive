@@ -12,7 +12,7 @@ import { v4 as uuid } from 'uuid';
 import { Project } from './Project';
 import { ProjectUser } from './ProjectUser';
 import type { ProjectCollection } from './ProjectCollection';
-import type { ProjectDocumentOperation } from './ProjectDocumentOperation';
+import type { Document } from './Document';
 import type { ProjectTeam } from './ProjectTeam';
 import type { ProjectUserSession } from './ProjectUserSession';
 
@@ -115,10 +115,7 @@ export function logCollectionDelete(collection: ProjectCollection) {
   );
 }
 
-export function logDocumentCreate(
-  document: ProjectDocumentOperation,
-  user?: ProjectUser
-) {
+export function logDocumentCreate(document: Document, user?: ProjectUser) {
   return new ProjectEvent(
     EventType.databaseDocumentsCreate,
     document.collection.project,
@@ -126,10 +123,7 @@ export function logDocumentCreate(
   );
 }
 
-export function logDocumentUpdate(
-  document: ProjectDocumentOperation,
-  user?: ProjectUser
-) {
+export function logDocumentUpdate(document: Document, user?: ProjectUser) {
   return new ProjectEvent(
     EventType.databaseDocumentsUpdate,
     document.collection.project,
@@ -137,10 +131,7 @@ export function logDocumentUpdate(
   );
 }
 
-export function logDocumentDelete(
-  document: ProjectDocumentOperation,
-  user?: ProjectUser
-) {
+export function logDocumentDelete(document: Document, user?: ProjectUser) {
   return new ProjectEvent(
     EventType.databaseDocumentsDelete,
     document.collection.project,

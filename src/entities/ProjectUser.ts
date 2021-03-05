@@ -14,6 +14,7 @@ import { v4 as uuid } from 'uuid';
 
 import { Project } from './Project';
 import { ProjectTeamMember } from './ProjectTeamMember';
+import { ProjectUserSession } from './ProjectUserSession';
 
 @Entity()
 @ObjectType('User')
@@ -55,6 +56,12 @@ export class ProjectUser {
     hidden: true,
   })
   memberships = new Collection<ProjectTeamMember>(this);
+
+  @OneToMany(() => ProjectUserSession, ({ user }) => user, {
+    cascade: [Cascade.ALL],
+    hidden: true,
+  })
+  sessions = new Collection<ProjectUserSession>(this);
 
   @Field()
   @Property()

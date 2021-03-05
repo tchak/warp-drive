@@ -5,6 +5,7 @@ import {
   ManyToMany,
   OneToMany,
   Collection,
+  Cascade,
 } from '@mikro-orm/core';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { v4 as uuid } from 'uuid';
@@ -35,17 +36,25 @@ export class Project {
 
   @OneToMany(() => ProjectAccessToken, ({ project }) => project, {
     hidden: true,
+    cascade: [Cascade.ALL],
   })
   keys = new Collection<ProjectAccessToken>(this);
 
-  @OneToMany(() => ProjectUser, ({ project }) => project, { hidden: true })
+  @OneToMany(() => ProjectUser, ({ project }) => project, {
+    hidden: true,
+    cascade: [Cascade.ALL],
+  })
   users = new Collection<ProjectUser>(this);
 
-  @OneToMany(() => ProjectTeam, ({ project }) => project, { hidden: true })
+  @OneToMany(() => ProjectTeam, ({ project }) => project, {
+    hidden: true,
+    cascade: [Cascade.ALL],
+  })
   teams = new Collection<ProjectTeam>(this);
 
   @OneToMany(() => ProjectCollection, ({ project }) => project, {
     hidden: true,
+    cascade: [Cascade.ALL],
   })
   collections = new Collection<ProjectCollection>(this);
 

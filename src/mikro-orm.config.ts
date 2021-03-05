@@ -2,15 +2,19 @@ import 'dotenv/config';
 import type { Options } from '@mikro-orm/core';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 
+import { AttributeOperation } from './entities/AttributeOperation';
+import { CollectionAttribute } from './entities/CollectionAttribute';
+import { CollectionRelationship } from './entities/CollectionRelationship';
+import { Document } from './entities/Document';
 import { Project } from './entities/Project';
 import { ProjectAccessToken } from './entities/ProjectAccessToken';
-import { ProjectCollection } from './entities/ProjectCollection';
-import { ProjectDocumentOperation } from './entities/ProjectDocumentOperation';
+import { ProjectCollection, Permissions } from './entities/ProjectCollection';
 import { ProjectEvent } from './entities/ProjectEvent';
 import { ProjectTeam } from './entities/ProjectTeam';
 import { ProjectTeamMember } from './entities/ProjectTeamMember';
 import { ProjectUser } from './entities/ProjectUser';
 import { ProjectUserSession } from './entities/ProjectUserSession';
+import { RelationshipOperation } from './entities/RelationshipOperation';
 import { User } from './entities/User';
 
 import { ormStorage } from './local-storage';
@@ -82,15 +86,20 @@ function optionsFor(
 const options: Options = {
   type: 'postgresql',
   entities: [
+    AttributeOperation,
+    CollectionAttribute,
+    CollectionRelationship,
+    Document,
+    Permissions,
     Project,
     ProjectAccessToken,
     ProjectCollection,
-    ProjectDocumentOperation,
     ProjectEvent,
     ProjectTeam,
     ProjectTeamMember,
     ProjectUser,
     ProjectUserSession,
+    RelationshipOperation,
     User,
   ],
   highlighter: new SqlHighlighter(),
