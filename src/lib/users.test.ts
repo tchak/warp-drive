@@ -26,7 +26,7 @@ describe('users', () => {
   afterAll(() => orm.close());
 
   beforeEach(async () => {
-    context = new Context('admin', orm.em, new Clock(uuid()), 'test');
+    context = new Context('admin', orm.em, 'test');
     context.admin = admin;
     project = await createProject({ context, name: 'hello world' });
     context.project = project;

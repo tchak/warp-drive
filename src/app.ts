@@ -6,7 +6,6 @@ import helmet from 'helmet';
 import pino from 'pino-http';
 import compression from 'compression';
 import responseTime from 'response-time';
-import { v4 as uuid } from 'uuid';
 import { ApolloServer } from 'apollo-server-express';
 import type { GraphQLSchema } from 'graphql';
 
@@ -25,8 +24,6 @@ export function setup(
   orm: MikroORM<PostgreSqlDriver>,
   schema: GraphQLSchema
 ) {
-  const clock = new Clock(uuid());
-
   app.use(helmet({ contentSecurityPolicy: false }));
   app.use(compression());
   app.use(responseTime());
@@ -56,7 +53,7 @@ export function setup(
       },
     },
     async context({ req }) {
-      return { context: await createConsoleContext(orm.em, clock, req) };
+      return { context: await createConsoleContext(orm.em, req) };
     },
   });
 
@@ -71,7 +68,7 @@ export function setup(
   app.use(
     '/v1/:projectId',
     (req, _, next) => {
-      createAPIContext(orm.em, clock, req)
+      createAPIContext(orm.em, req)
         .then((context) => contextStorage.run(context, next))
         .catch((error) => next(error));
     },

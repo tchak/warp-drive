@@ -22,7 +22,7 @@ describe('accessToken', () => {
     orm = await MikroORM.init<PostgreSqlDriver>();
     admin = new User('token@test.com', uuid());
     await orm.em.persistAndFlush(admin);
-    context = new Context('admin', orm.em, new Clock(uuid()), 'test');
+    context = new Context('admin', orm.em, 'test');
     context.admin = admin;
     project = await createProject({ context, name: 'hello world' });
     context.project = project;

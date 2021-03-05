@@ -1,3 +1,5 @@
+import { v4 as uuid } from 'uuid';
+
 export interface HLC {
   ts: number;
   count: number;
@@ -103,4 +105,12 @@ export class Clock {
   validate(maxDrift?: number) {
     return validate(this.#hlc, Date.now(), maxDrift);
   }
+}
+
+let __clock: Clock;
+export function getClock() {
+  if (!__clock) {
+    __clock = new Clock(uuid());
+  }
+  return __clock;
 }

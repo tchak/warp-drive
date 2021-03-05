@@ -1,6 +1,7 @@
 import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
 import { v4 as uuid } from 'uuid';
 
+import { getClock } from '../lib/hlc';
 import { Document } from './Document';
 import { CollectionAttribute } from './CollectionAttribute';
 
@@ -22,7 +23,7 @@ export class AttributeOperation {
     this.value = value;
 
     this.id = options?.id ?? uuid();
-    this.timestamp = options?.timestamp ?? '';
+    this.timestamp = options?.timestamp ?? getClock().inc();
   }
 
   @PrimaryKey({ type: 'uuid' })

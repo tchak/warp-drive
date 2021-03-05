@@ -9,7 +9,6 @@ import { User } from '../entities/User';
 import { ProjectUser } from '../entities/ProjectUser';
 import { Project } from '../entities/Project';
 
-import type { Clock } from './hlc';
 import { getEnvValue } from './env';
 import { extractTokenFomRequest } from './auth';
 import { UnauthorizedError } from './errors';
@@ -20,23 +19,16 @@ export class Context {
   #audience: ContextAudience;
   #userAgent: string;
   #em: EntityManager;
-  #clock: Clock;
 
   #project?: Project;
   #user?: ProjectUser;
   #accessToken?: ProjectAccessToken;
   #admin?: User;
 
-  constructor(
-    audience: ContextAudience,
-    em: EntityManager,
-    clock: Clock,
-    userAgent: string
-  ) {
+  constructor(audience: ContextAudience, em: EntityManager, userAgent: string) {
     this.#audience = audience;
     this.#userAgent = userAgent;
     this.#em = em;
-    this.#clock = clock;
   }
 
   get em(): EntityManager {
@@ -49,10 +41,6 @@ export class Context {
 
   get userAgent(): string {
     return this.#userAgent;
-  }
-
-  get clock(): Clock {
-    return this.#clock;
   }
 
   get user() {
@@ -115,14 +103,13 @@ export class Context {
 
 export async function createAPIContext(
   em: EntityManager,
-  clock: Clock,
   req: Request
 ): Promise<Context> {
   const token = extractTokenFomRequest(req, getEnvValue('AUTH_SECRET'));
   const audience = token?.aud ?? 'guest';
   const projectId = req.params['projectId'];
   const userAgent = req.headers['user-agent'] ?? 'unknown';
-  const context = new Context(audience, em, clock, userAgent);
+  const context = new Context(audience, em, userAgent);
 
   if (!token) {
     if (projectId) {
@@ -153,7 +140,6 @@ export async function createAPIContext(
 
 export async function createConsoleContext(
   em: EntityManager,
-  clock: Clock,
   req: Request
 ): Promise<Context> {
   const token = extractTokenFomRequest(req, getEnvValue('AUTH_SECRET'));
@@ -162,7 +148,7 @@ export async function createConsoleContext(
   }
   const audience = token.aud;
   const userAgent = req.headers['user-agent'] ?? 'unknown';
-  const context = new Context(audience, em, clock, userAgent);
+  const context = new Context(audience, em, userAgent);
   context.admin = await em.findOneOrFail(User, { id: token.sub });
 
   return context;

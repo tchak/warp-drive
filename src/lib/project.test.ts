@@ -3,7 +3,6 @@ import type { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { v4 as uuid } from 'uuid';
 
 import { Context } from './context';
-import { Clock } from './hlc';
 import { User } from '../entities/User';
 import {
   createProject,
@@ -28,7 +27,7 @@ describe('projects', () => {
   afterAll(() => orm.close());
 
   beforeEach(async () => {
-    context = new Context('admin', orm.em, new Clock(uuid()), 'test');
+    context = new Context('admin', orm.em, 'test');
     context.admin = user;
     project = await createProject({ context, name: 'hello world' });
   });

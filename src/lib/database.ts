@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid';
 
 import type { Context } from './context';
 import { authorizeCollections, authorizeDocuments } from './authorize';
-import type { Clock } from './hlc';
+import { getClock } from './hlc';
 
 import {
   ProjectCollection,
@@ -262,7 +262,7 @@ export async function createDocument({
     authorizeDocuments(context.scope, 'write');
   }
 
-  const { em, project, clock } = context;
+  const { em, project } = context;
   const collection = await em.findOneOrFail(
     ProjectCollection,
     {
@@ -272,10 +272,9 @@ export async function createDocument({
     ['attributes', 'relationships']
   );
   const document = new Document(collection, {
-    addOperationTimestamp: clock.inc(),
     permissions,
   });
-  const operations = buildAttributeOperations(clock, document, attributes);
+  const operations = buildAttributeOperations(document, attributes);
   await em.persistAndFlush([document, ...operations]);
 
   return document;
@@ -296,14 +295,14 @@ export async function updateDocument({
     authorizeDocuments(context.scope, 'write');
   }
 
-  const { em, project, clock } = context;
+  const { em, project } = context;
   const document = await em.findOneOrFail(Document, {
     id: documentId,
     collection: { project },
     removeOperationId: null,
   });
 
-  const operations = buildAttributeOperations(clock, document, attributes);
+  const operations = buildAttributeOperations(document, attributes);
   await em.persistAndFlush(operations);
 }
 
@@ -320,7 +319,7 @@ export async function deleteDocument({
     authorizeDocuments(context.scope, 'write');
   }
 
-  const { em, project, clock } = context;
+  const { em, project } = context;
   const document = await em.findOneOrFail(Document, {
     id: documentId,
     collection: { project },
@@ -328,7 +327,7 @@ export async function deleteDocument({
   });
 
   document.removeOperationId = uuid();
-  document.removeOperationTimestamp = clock.inc();
+  document.removeOperationTimestamp = getClock().inc();
   await em.flush();
 }
 
@@ -421,7 +420,6 @@ export async function listDocuments({
 }
 
 function buildAttributeOperations(
-  clock: Clock,
   document: Document,
   attributes?: DocumentAttributes
 ): AttributeOperation[] {
@@ -436,7 +434,7 @@ function buildAttributeOperations(
             `${value}`,
             {
               id: uuid(),
-              timestamp: clock.inc(),
+              timestamp: getClock().inc(),
             }
           )
       )

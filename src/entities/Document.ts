@@ -12,6 +12,7 @@ import {
 } from '@mikro-orm/core';
 import { v4 as uuid } from 'uuid';
 
+import { getClock } from '../lib/hlc';
 import {
   ProjectCollection,
   Permissions,
@@ -49,8 +50,8 @@ export type DocumentRelationships = Record<
 export interface DocumentOptions {
   id?: string;
   permissions?: PermissionsOptions;
-  addOperationTimestamp?: string;
-  addOperationId?: string;
+  timestamp?: string;
+  operationId?: string;
 }
 
 @Entity()
@@ -58,8 +59,8 @@ export class Document {
   constructor(collection: ProjectCollection, options?: DocumentOptions) {
     this.collection = collection;
     this.id = options?.id ?? uuid();
-    this.addOperationId = options?.addOperationId ?? uuid();
-    this.addOperationTimestamp = options?.addOperationTimestamp ?? '';
+    this.addOperationId = options?.operationId ?? uuid();
+    this.addOperationTimestamp = options?.timestamp ?? getClock().inc();
     this.permissions = new Permissions(options?.permissions);
   }
 

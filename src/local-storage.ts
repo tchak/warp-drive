@@ -1,5 +1,5 @@
 import type { EntityManager } from '@mikro-orm/postgresql';
-import type { Handler, Request, Response } from 'express';
+import type { Handler, Request, Response as ExpressResponse } from 'express';
 import { AsyncLocalStorage } from 'async_hooks';
 
 import type { Context } from './lib/context';
@@ -16,10 +16,10 @@ function getContextFromLocalStorage(): Context {
   throw new UnauthorizedError('Unknown context');
 }
 
-class Res {
-  #res: Response;
+class Response {
+  #res: ExpressResponse;
 
-  constructor(res: Response) {
+  constructor(res: ExpressResponse) {
     this.#res = res;
   }
 
@@ -71,11 +71,13 @@ export function dataWithIncluded<T>(
 }
 
 export function wrapHandler(
-  action: (context: Context, req: Request, res: Res) => Promise<void>
+  action: (context: Context, req: Request, res: Response) => Promise<void>
 ): Handler {
   return (req, res, next) => {
-    action(getContextFromLocalStorage(), req, new Res(res)).catch((error) =>
-      next(error)
-    );
+    action(
+      getContextFromLocalStorage(),
+      req,
+      new Response(res)
+    ).catch((error) => next(error));
   };
 }
