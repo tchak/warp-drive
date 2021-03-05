@@ -3,7 +3,6 @@ import type { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { v4 as uuid } from 'uuid';
 
 import { Context } from './context';
-import { Clock } from './hlc';
 import { User } from '../entities/User';
 import type { Project } from '../entities/Project';
 import type { ProjectAccessToken } from '../entities/ProjectAccessToken';
@@ -12,6 +11,7 @@ import { createProject } from './projects';
 import { createAccessToken } from './accessToken';
 
 describe('accessToken', () => {
+  const email = `${uuid()}@test.com`;
   let orm: MikroORM<PostgreSqlDriver>;
   let context: Context;
   let admin: User;
@@ -20,14 +20,17 @@ describe('accessToken', () => {
 
   beforeAll(async () => {
     orm = await MikroORM.init<PostgreSqlDriver>();
-    admin = new User('token@test.com', uuid());
+    admin = new User(email, uuid());
     await orm.em.persistAndFlush(admin);
     context = new Context('admin', orm.em, 'test');
     context.admin = admin;
     project = await createProject({ context, name: 'hello world' });
     context.project = project;
   });
-  afterAll(() => orm.close());
+  afterAll(async () => {
+    await orm.em.removeAndFlush([admin, project]);
+    await orm.close();
+  });
 
   describe('as client', () => {
     beforeEach(async () => {

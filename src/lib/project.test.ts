@@ -14,6 +14,7 @@ import {
 import type { Project } from 'src/entities/Project';
 
 describe('projects', () => {
+  const email = `${uuid()}@test.com`;
   let orm: MikroORM<PostgreSqlDriver>;
   let context: Context;
   let user: User;
@@ -21,16 +22,20 @@ describe('projects', () => {
 
   beforeAll(async () => {
     orm = await MikroORM.init<PostgreSqlDriver>();
-    user = new User('projects@test.com', uuid());
+    user = new User(email, uuid());
     await orm.em.persistAndFlush(user);
   });
-  afterAll(() => orm.close());
+  afterAll(async () => {
+    await orm.em.removeAndFlush(user);
+    await orm.close();
+  });
 
   beforeEach(async () => {
     context = new Context('admin', orm.em, 'test');
     context.admin = user;
     project = await createProject({ context, name: 'hello world' });
   });
+  afterEach(() => orm.em.removeAndFlush(project));
 
   it('create project', () => {
     expect(project.name).toEqual('hello world');
@@ -60,10 +65,11 @@ describe('projects', () => {
   });
 
   describe('wrong user', () => {
+    const otherEmail = `${uuid()}@test.com`;
     let otherUser: User;
 
     beforeEach(async () => {
-      otherUser = new User('projects2@test.com', uuid());
+      otherUser = new User(otherEmail, uuid());
       await orm.em.persistAndFlush(otherUser);
       context.admin = otherUser;
     });

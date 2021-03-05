@@ -3,7 +3,6 @@ import type { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { v4 as uuid } from 'uuid';
 
 import { Context } from './context';
-import { Clock } from './hlc';
 import { User } from '../entities/User';
 import type { Project } from 'src/entities/Project';
 import type { ProjectUser } from 'src/entities/ProjectUser';
@@ -12,6 +11,7 @@ import { createProject } from './projects';
 import { createUser, getUser, listUsers, deleteUser } from './users';
 
 describe('users', () => {
+  const email = `${uuid()}@test.com`;
   let orm: MikroORM<PostgreSqlDriver>;
   let context: Context;
   let admin: User;
@@ -20,16 +20,16 @@ describe('users', () => {
 
   beforeAll(async () => {
     orm = await MikroORM.init<PostgreSqlDriver>();
-    admin = new User('users@test.com', uuid());
-    return orm.em.persistAndFlush(admin);
-  });
-  afterAll(() => orm.close());
-
-  beforeEach(async () => {
+    admin = new User(email, uuid());
+    await orm.em.persistAndFlush(admin);
     context = new Context('admin', orm.em, 'test');
     context.admin = admin;
     project = await createProject({ context, name: 'hello world' });
     context.project = project;
+  });
+  afterAll(async () => {
+    await orm.em.removeAndFlush([admin, project]);
+    await orm.close();
   });
 
   describe('as admin', () => {
@@ -37,7 +37,7 @@ describe('users', () => {
       user = await createUser({
         context,
         name: 'Paul',
-        email: 'users@test.com',
+        email,
         password: uuid(),
       });
     });
@@ -46,7 +46,7 @@ describe('users', () => {
     it('create user', async () => {
       expect(user).toMatchObject({
         name: 'Paul',
-        email: 'users@test.com',
+        email,
       });
     });
 
@@ -54,7 +54,7 @@ describe('users', () => {
       user = await getUser({ context, userId: user.id });
       expect(user).toMatchObject({
         name: 'Paul',
-        email: 'users@test.com',
+        email,
       });
     });
 
@@ -62,7 +62,7 @@ describe('users', () => {
       [user] = await listUsers({ context });
       expect(user).toMatchObject({
         name: 'Paul',
-        email: 'users@test.com',
+        email,
       });
     });
 

@@ -98,7 +98,6 @@
     "start": "node ./dist/index.js",
     "schema:drop": "mikro-orm schema:drop  --fk-checks -r",
     "schema:update": "mikro-orm schema:update --fk-checks -r",
-    "pretest": "NODE_ENV=test yarn schema:drop && NODE_ENV=test yarn schema:update",
     "test": "jest",
     "lint": "eslint . --ext .ts,.tsx"
   },

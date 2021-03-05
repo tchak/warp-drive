@@ -11,18 +11,21 @@ import { createProject } from './projects';
 import { createAccount } from './account';
 
 describe('account', () => {
+  const email = `${uuid()}@test.com`;
   let orm: MikroORM<PostgreSqlDriver>;
   let context: Context;
   let admin: User;
   let project: Project;
-  let user: ProjectUser;
 
   beforeAll(async () => {
     orm = await MikroORM.init<PostgreSqlDriver>();
-    admin = new User('account@test.com', uuid());
+    admin = new User(email, uuid());
     return orm.em.persistAndFlush(admin);
   });
-  afterAll(() => orm.close());
+  afterAll(async () => {
+    await orm.em.removeAndFlush([admin, project]);
+    await orm.close();
+  });
 
   beforeEach(async () => {
     context = new Context('admin', orm.em, 'test');
@@ -33,20 +36,20 @@ describe('account', () => {
   });
 
   describe('as client', () => {
+    let user: ProjectUser;
     beforeEach(async () => {
       user = await createAccount({
         context,
         name: 'Paul',
-        email: 'account@test.com',
+        email,
         password: uuid(),
       });
     });
-    afterEach(() => orm.em.removeAndFlush(user));
 
     test('create account', async () => {
       expect(user).toMatchObject({
         name: 'Paul',
-        email: 'account@test.com',
+        email,
       });
     });
   });
