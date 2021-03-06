@@ -32,7 +32,7 @@ describe('accessToken', () => {
     await orm.close();
   });
 
-  describe('as client', () => {
+  describe('as admin', () => {
     beforeEach(async () => {
       token = await createAccessToken({
         context,
@@ -42,7 +42,7 @@ describe('accessToken', () => {
     });
     afterEach(() => orm.em.removeAndFlush(token));
 
-    test('create account', async () => {
+    test('create token', async () => {
       expect(token).toMatchObject({
         name: 'my token',
         scope: [],

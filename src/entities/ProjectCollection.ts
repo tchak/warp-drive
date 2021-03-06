@@ -43,8 +43,8 @@ export interface CollectionSchema {
   relationships: Record<
     string,
     {
-      collection: string;
-      type: RelationshipType;
+      kind: RelationshipType;
+      type: string;
       inverse?: string;
     }
   >;
@@ -52,9 +52,9 @@ export interface CollectionSchema {
 
 @Embeddable()
 export class Permissions {
-  constructor(settings?: PermissionsOptions) {
-    this.read = settings?.read ?? [];
-    this.write = settings?.write ?? [];
+  constructor(options?: PermissionsOptions) {
+    this.read = options?.read ?? [];
+    this.write = options?.write ?? [];
   }
 
   @Property({ type: ArrayType })
@@ -74,7 +74,7 @@ export class ProjectCollection {
   ) {
     this.project = project;
     this.name = name;
-    this.permissions = new Permissions(permissions);
+    //this.permissions = new Permissions(permissions);
   }
 
   @Field(() => ID)
@@ -85,8 +85,8 @@ export class ProjectCollection {
   @Property()
   name: string;
 
-  @Embedded(() => Permissions, { prefix: false })
-  permissions: Permissions;
+  // @Embedded(() => Permissions, { prefix: false })
+  // permissions: Permissions;
 
   @ManyToOne(() => Project, { hidden: true })
   project: Project;
@@ -139,8 +139,8 @@ export class ProjectCollection {
     for (const { name, type, relatedCollection, inverse } of this
       .relationships) {
       schema.relationships[name] = {
-        type,
-        collection: relatedCollection.name,
+        kind: type,
+        type: relatedCollection.name,
         ...(inverse ? { inverse } : undefined),
       };
     }

@@ -8,6 +8,7 @@ import { getClock } from './hlc';
 import {
   ProjectCollection,
   PermissionsOptions,
+  CollectionSchema,
 } from '../entities/ProjectCollection';
 import {
   AttributeType,
@@ -24,11 +25,7 @@ import {
 } from '../entities/Document';
 import { AttributeOperation } from '../entities/AttributeOperation';
 
-export enum RelationshipCombinedType {
-  oneToOne = 'oneToOne',
-  oneToMany = 'oneToMany',
-  manyToMany = 'manyToMany',
-}
+export type RelationshipLink = [RelationshipType, RelationshipType];
 
 export interface CreateCollectionParams {
   context: Context;
@@ -73,19 +70,19 @@ export async function updateCollection({
   await em.flush();
 }
 
-export interface AddAttributeToCollectionParams {
+export interface CreateCollectionAttributeParams {
   context: Context;
   collectionId: string;
   name: string;
   type: AttributeType;
 }
 
-export async function addAttributeToCollection({
+export async function createCollectionAttribute({
   context: { em, project },
   collectionId,
   name,
   type,
-}: AddAttributeToCollectionParams): Promise<CollectionAttribute> {
+}: CreateCollectionAttributeParams): Promise<CollectionAttribute> {
   const collection = await em.findOneOrFail(ProjectCollection, {
     id: collectionId,
     project,
@@ -95,41 +92,59 @@ export async function addAttributeToCollection({
   return attribute;
 }
 
-export interface RemoveAttributeFromCollectionParams {
+export interface RenameCollectionAttributeParams {
+  context: Context;
+  attributeId: string;
+  name: string;
+}
+
+export async function renameCollectionAttribute({
+  context: { em, project },
+  attributeId,
+  name,
+}: RenameCollectionAttributeParams): Promise<CollectionAttribute> {
+  const attribute = await em.findOneOrFail(CollectionAttribute, {
+    id: attributeId,
+    collection: { project },
+  });
+  attribute.name = name;
+  await em.flush();
+  return attribute;
+}
+
+export interface DeleteCollectionAttributeParams {
   context: Context;
   attributeId: string;
 }
 
-export async function removeAttributeFromCollection({
+export async function deleteCollectionAttribute({
   context: { em, project },
   attributeId,
-}: RemoveAttributeFromCollectionParams): Promise<void> {
+}: DeleteCollectionAttributeParams): Promise<void> {
   const attribute = await em.findOneOrFail(CollectionAttribute, {
     id: attributeId,
-    collection: {
-      project,
-    },
+    collection: { project },
   });
   await em.removeAndFlush(attribute);
 }
 
-export interface AddRelationshipToCollectionParams {
+export interface CreateCollectionRelationshipParams {
   context: Context;
   collectionId: string;
   name: string;
-  type: RelationshipCombinedType;
+  relationship: RelationshipLink;
   relatedCollectionId: string;
   inverse?: string;
 }
 
-export async function addRelationshipToCollection({
+export async function createCollectionRelationship({
   context: { em, project },
   collectionId,
   name,
-  type,
+  relationship: [from, to],
   relatedCollectionId,
   inverse,
-}: AddRelationshipToCollectionParams) {
+}: CreateCollectionRelationshipParams) {
   const collection = await em.findOneOrFail(ProjectCollection, {
     id: collectionId,
     project,
@@ -138,24 +153,22 @@ export async function addRelationshipToCollection({
     id: relatedCollectionId,
     project,
   });
+  const inverseOwner =
+    from == RelationshipType.hasMany && to == RelationshipType.hasOne;
   const relationship = new CollectionRelationship(
     collection,
     name,
-    type == RelationshipCombinedType.manyToMany
-      ? RelationshipType.hasMany
-      : RelationshipType.hasOne,
+    from,
     relatedCollection,
-    inverse
+    { inverse, owner: !inverseOwner }
   );
   if (inverse) {
     const inverseRelationship = new CollectionRelationship(
       relatedCollection,
       inverse,
-      type == RelationshipCombinedType.oneToOne
-        ? RelationshipType.hasOne
-        : RelationshipType.hasMany,
+      to,
       collection,
-      name
+      { inverse: name, owner: inverseOwner }
     );
     em.persist(inverseRelationship);
   }
@@ -163,29 +176,85 @@ export async function addRelationshipToCollection({
   return relationship;
 }
 
-export interface RemoveRelationshipFromCollectionParams {
+export interface RenameCollectionRelationshipParams {
+  context: Context;
+  relationshipId: string;
+  name: string;
+}
+
+export async function renameCollectionRelationship({
+  context: { em, project },
+  relationshipId,
+  name,
+}: RenameCollectionRelationshipParams): Promise<CollectionRelationship> {
+  const relationship = await em.findOneOrFail(CollectionRelationship, {
+    id: relationshipId,
+    collection: { project },
+    owner: true,
+  });
+  relationship.name = name;
+  if (relationship.inverse) {
+    const inverseRelationship = await em.findOneOrFail(CollectionRelationship, {
+      name: relationship.inverse,
+      collection: { id: relationship.collection.id, project },
+    });
+    inverseRelationship.inverse = name;
+  }
+  await em.flush();
+  return relationship;
+}
+
+export interface RenameCollectionRelationshipInverseParams {
+  context: Context;
+  relationshipId: string;
+  inverse: string;
+}
+
+export async function renameCollectionRelationshipInverse({
+  context: { em, project },
+  relationshipId,
+  inverse,
+}: RenameCollectionRelationshipInverseParams): Promise<CollectionRelationship> {
+  const relationship = await em.findOneOrFail(CollectionRelationship, {
+    id: relationshipId,
+    collection: { project },
+    owner: true,
+  });
+  if (relationship.inverse) {
+    const inverseRelationship = await em.findOneOrFail(CollectionRelationship, {
+      name: relationship.inverse,
+      collection: { id: relationship.collection.id, project },
+    });
+    if (inverse) {
+      inverseRelationship.name = inverse;
+    } else {
+      em.remove(inverseRelationship);
+    }
+  }
+  relationship.inverse = inverse;
+  await em.flush();
+  return relationship;
+}
+
+export interface DeleteCollectionRelationshipParams {
   context: Context;
   relationshipId: string;
 }
 
-export async function removeRelationshipFromCollection({
+export async function deleteCollectionRelationship({
   context: { em, project },
   relationshipId,
-}: RemoveRelationshipFromCollectionParams) {
+}: DeleteCollectionRelationshipParams) {
   const relationship = await em.findOneOrFail(CollectionRelationship, {
     id: relationshipId,
-    collection: {
-      project,
-    },
+    collection: { project },
+    owner: true,
   });
   if (relationship.inverse) {
     const inverseRelationship = await em.findOne(CollectionRelationship, {
-      id: relationship.relatedCollection.id,
       name: relationship.inverse,
       inverse: relationship.name,
-      collection: {
-        project,
-      },
+      collection: { id: relationship.relatedCollection.id, project },
     });
     if (inverseRelationship) {
       em.remove(inverseRelationship);
@@ -223,10 +292,14 @@ export async function getCollection({
 }: GetCollectionParams): Promise<ProjectCollection> {
   authorizeCollections(scope, 'read');
 
-  const collection = await em.findOneOrFail(ProjectCollection, {
-    id: collectionId,
-    project,
-  });
+  const collection = await em.findOneOrFail(
+    ProjectCollection,
+    {
+      id: collectionId,
+      project,
+    },
+    ['attributes', 'relationships']
+  );
   return collection;
 }
 
@@ -239,10 +312,29 @@ export async function listCollections({
 }: ListCollectionsParams): Promise<ProjectCollection[]> {
   authorizeCollections(scope, 'read');
 
-  const collections = await em.find(ProjectCollection, {
-    project,
-  });
+  const collections = await em.find(ProjectCollection, { project }, [
+    'attributes',
+    'relationships',
+  ]);
   return collections;
+}
+
+export interface GetDatabaseSchemaParams {
+  context: Context;
+}
+
+export async function getDatabaseSchema({
+  context: { em, project, scope },
+}: GetDatabaseSchemaParams): Promise<Record<string, CollectionSchema>> {
+  authorizeCollections(scope, 'read');
+
+  const collections = await em.find(ProjectCollection, { project }, [
+    'attributes',
+    'relationships',
+  ]);
+  return Object.fromEntries(
+    collections.map(({ name, schema }) => [name, schema])
+  );
 }
 
 export interface CreateDocumentParams {
@@ -327,7 +419,7 @@ export async function deleteDocument({
   });
 
   document.removeOperationId = uuid();
-  document.removeOperationTimestamp = getClock().inc();
+  document.removeTimestamp = getClock().inc();
   await em.flush();
 }
 

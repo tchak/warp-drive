@@ -59,16 +59,16 @@ export class Document {
   constructor(collection: ProjectCollection, options?: DocumentOptions) {
     this.collection = collection;
     this.id = options?.id ?? uuid();
-    this.addOperationId = options?.operationId ?? uuid();
-    this.addOperationTimestamp = options?.timestamp ?? getClock().inc();
-    this.permissions = new Permissions(options?.permissions);
+    this.operationId = options?.operationId ?? uuid();
+    this.timestamp = options?.timestamp ?? getClock().inc();
+    //this.permissions = new Permissions(options?.permissions);
   }
 
   @PrimaryKey({ type: 'uuid' })
   id: string;
 
-  @Embedded(() => Permissions, { prefix: false })
-  permissions: Permissions;
+  // @Embedded(() => Permissions, { prefix: false })
+  // permissions: Permissions;
 
   @ManyToOne(() => ProjectCollection, { hidden: true, eager: true })
   collection: ProjectCollection;
@@ -147,9 +147,9 @@ export class Document {
     const {
       id,
       collection,
-      addOperationTimestamp,
-      addOperationId,
-      removeOperationTimestamp,
+      timestamp,
+      operationId,
+      removeTimestamp,
       removeOperationId,
       attributeOperations,
       relationshipOperations,
@@ -157,14 +157,14 @@ export class Document {
 
     const ref = { id, type: collection.name };
 
-    if (removeOperationTimestamp && removeOperationId) {
+    if (removeTimestamp && removeOperationId) {
       return [
         {
           op: 'remove',
           ref,
           meta: {
             id: removeOperationId,
-            timestamp: removeOperationTimestamp,
+            timestamp: removeTimestamp,
           },
         },
       ];
@@ -218,8 +218,8 @@ export class Document {
           op: 'add',
           ref,
           meta: {
-            id: addOperationId,
-            timestamp: addOperationTimestamp,
+            id: operationId,
+            timestamp,
           },
         },
         ...operations,
@@ -231,15 +231,15 @@ export class Document {
   createdDate: Date = new Date();
 
   @Property()
-  addOperationTimestamp: string;
+  timestamp: string;
 
-  @Property()
-  addOperationId: string;
+  @Property({ type: 'uuid' })
+  operationId: string;
 
-  @Property()
-  removeOperationTimestamp?: string;
+  @Property({ nullable: true })
+  removeTimestamp?: string;
 
-  @Property()
+  @Property({ type: 'uuid', nullable: true })
   removeOperationId?: string;
 
   toJSON() {

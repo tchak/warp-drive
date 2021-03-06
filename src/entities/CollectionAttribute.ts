@@ -6,7 +6,7 @@ import {
   Enum,
   Unique,
 } from '@mikro-orm/core';
-import { ObjectType, Field, ID } from 'type-graphql';
+import { ObjectType, Field, ID, registerEnumType } from 'type-graphql';
 import { v4 as uuid } from 'uuid';
 
 import { ProjectCollection } from './ProjectCollection';
@@ -18,6 +18,8 @@ export enum AttributeType {
   datetime = 'datetime',
   date = 'date',
 }
+
+registerEnumType(AttributeType, { name: 'AttributeType' });
 
 @Entity()
 @Unique({ properties: ['collection', 'name'] })
@@ -37,7 +39,7 @@ export class CollectionAttribute {
   @PrimaryKey({ type: 'uuid' })
   id: string = uuid();
 
-  @Field()
+  @Field(() => AttributeType)
   @Enum(() => AttributeType)
   type: AttributeType;
 
@@ -47,4 +49,7 @@ export class CollectionAttribute {
 
   @ManyToOne(() => ProjectCollection)
   collection: ProjectCollection;
+
+  @Property()
+  createdDate: Date = new Date();
 }

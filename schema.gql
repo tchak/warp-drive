@@ -11,10 +11,26 @@ type APIKey {
   updatedDate: DateTime!
 }
 
+type Attribute {
+  id: ID!
+  name: String!
+  type: AttributeType!
+}
+
+enum AttributeType {
+  boolean
+  date
+  datetime
+  number
+  string
+}
+
 type Collection {
+  attributes: [Attribute!]!
   createdDate: DateTime!
   id: ID!
   name: String!
+  relationships: [Relationship!]!
   updatedDate: DateTime!
 }
 
@@ -23,11 +39,19 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 """
 scalar DateTime
 
+type DeletedAttribute {
+  id: ID!
+}
+
 type DeletedCollection {
   id: ID!
 }
 
 type DeletedProject {
+  id: ID!
+}
+
+type DeletedRelationship {
   id: ID!
 }
 
@@ -44,15 +68,23 @@ type DeletedUser {
 }
 
 type Mutation {
+  createAttribute(collectionId: ID!, name: String!, type: AttributeType!): Attribute!
   createCollection(name: String!): Collection!
+  createManyToOneRelationship(collectionId: ID!, inverse: String, name: String!, relatedCollectionId: ID!): Relationship!
+  createOneToOneRelationship(collectionId: ID!, inverse: String, name: String!, relatedCollectionId: ID!): Relationship!
   createProject(name: String!): Project!
   createTeam(name: String!): Team!
   createUser(email: String!, name: String, password: String!): User!
+  deleteAttribute(id: ID!): DeletedAttribute!
   deleteCollection(id: ID!): DeletedCollection!
   deleteProject(id: ID!): DeletedProject!
+  deleteRelationship(id: ID!): DeletedRelationship!
   deleteSession(id: ID!): DeletedSession!
   deleteTeam(id: ID!): DeletedTeam!
   deleteUser(id: ID!): DeletedUser!
+  renameAttribute(id: ID!, name: String!): Attribute!
+  renameRelationship(id: ID!, name: String!): Relationship!
+  renameRelationshipInverse(id: ID!, inverse: String!): Relationship!
 }
 
 type Project {
@@ -69,6 +101,19 @@ type Project {
 type Query {
   project(id: ID!): Project!
   projects: [Project!]!
+}
+
+type Relationship {
+  id: ID!
+  inverse: String
+  name: String!
+  relatedCollection: Collection!
+  type: RelationshipType!
+}
+
+enum RelationshipType {
+  hasMany
+  hasOne
 }
 
 enum Scope {
