@@ -3,12 +3,12 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from 'urql';
 
 import { TabularList } from '../TabularList';
-import { ListUsersDocument } from '../../graphql-operations';
+import { ListCollectionsDocument } from '../../graphql-operations';
 
-export default function UsersPage() {
+export default function ProjectDatabasePage() {
   const { id } = useParams();
   const [{ data, fetching, error }] = useQuery({
-    query: ListUsersDocument,
+    query: ListCollectionsDocument,
     variables: { projectId: id },
   });
 
@@ -18,15 +18,15 @@ export default function UsersPage() {
   if (error) {
     return <>Error: {(error as Error).message}</>;
   }
-  const users = data?.project.users ?? [];
+  const collections = data?.project.collections ?? [];
 
   return (
     <>
       <h2 className="max-w-6xl mx-auto mt-8 px-4 text-lg leading-6 font-medium text-gray-900 sm:px-6 lg:px-8">
-        Users
+        Database
       </h2>
 
-      <TabularList data={users} columns={['email', 'createdDate']} />
+      <TabularList data={collections} columns={['name', 'createdDate']} />
     </>
   );
 }

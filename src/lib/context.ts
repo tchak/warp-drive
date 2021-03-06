@@ -143,13 +143,15 @@ export async function createConsoleContext(
   req: Request
 ): Promise<Context> {
   const token = extractTokenFomRequest(req, getEnvValue('AUTH_SECRET'));
-  if (!token || token.aud != 'admin') {
+  if (token && token.aud != 'admin') {
     throw new UnauthorizedError('Unauthorized audience');
   }
-  const audience = token.aud;
+  const audience = token?.aud ?? 'guest';
   const userAgent = req.headers['user-agent'] ?? 'unknown';
   const context = new Context(audience, em, userAgent);
-  context.admin = await em.findOneOrFail(User, { id: token.sub });
+  if (token) {
+    context.admin = await em.findOneOrFail(User, { id: token.sub });
+  }
 
   return context;
 }

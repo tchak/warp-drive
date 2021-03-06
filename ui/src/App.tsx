@@ -12,6 +12,7 @@ import { refocusExchange } from '@urql/exchange-refocus';
 
 import { ProjectLayout } from './components/ProjectLayout';
 import {
+  ProjectListPage,
   ProjectOverviewPage,
   ProjectDatabasePage,
   ProjectUsersPage,
@@ -20,6 +21,8 @@ import {
   ProjectAPIKeysPage,
   ProjectSettingsPage,
   HelpPage,
+  SignInPage,
+  SignUpPage,
 } from './components/pages';
 
 const client = createClient({
@@ -38,6 +41,9 @@ function App() {
     <URQLProvider value={client}>
       <ErrorBoundary fallback={({ error }) => <div>{error.message}</div>}>
         <Routes>
+          <Route path="/" element={<ProjectListPage />} />
+          <Route path="/signin" element={<SignInPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
           <Route path="/p/:id" element={<ProjectLayout />}>
             <Route path="/" element={<ProjectOverviewPage />} />
             <Route path="database" element={<ProjectDatabasePage />} />

@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { HiOutlineSearch } from 'react-icons/hi';
+import { useSearchParams } from 'react-router-dom';
 
 export function SearchField() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchText, setSearchText] = useState(
+    () => searchParams.get('q') ?? ''
+  );
+
   return (
     <form className="w-full flex md:ml-0" action="#" method="GET">
       <label htmlFor="search_field" className="sr-only">
@@ -18,11 +24,13 @@ export function SearchField() {
           id="search_field"
           name="search_field"
           className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 focus:border-transparent sm:text-sm"
-          placeholder="Search transactions"
+          placeholder="Search"
           type="search"
           autoCapitalize={'off'}
           autoCorrect={'off'}
           autoComplete={'off'}
+          value={searchText}
+          onChange={({ currentTarget: { value } }) => setSearchText(value)}
         />
       </div>
     </form>

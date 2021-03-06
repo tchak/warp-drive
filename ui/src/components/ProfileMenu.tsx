@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { HiOutlineChevronDown } from 'react-icons/hi';
 import Avatar from 'react-avatar';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-export function ProfileMenu() {
+export function ProfileMenu({ name, email }: { name?: string; email: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -16,9 +16,10 @@ export function ProfileMenu() {
           id="user-menu"
           aria-haspopup="true"
         >
-          <Avatar name="Paul Chavard" size="30" round={true} />
+          <Avatar name={name ?? email} size="30" round={true} />
           <span className="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
-            <span className="sr-only">Open user menu for </span>Paul Chavard
+            <span className="sr-only">Open user menu for </span>
+            {name ?? email}
           </span>
           <HiOutlineChevronDown className="hidden flex-shrink-0 ml-1 h-5 w-5 text-gray-400 lg:block" />
         </button>
@@ -40,27 +41,27 @@ To: "transform opacity-0 scale-95"
           aria-orientation="vertical"
           aria-labelledby="user-menu"
         >
-          <NavLink
+          <Link
             to="/account"
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             role="menuitem"
           >
             Your Profile
-          </NavLink>
-          <NavLink
+          </Link>
+          <Link
             to="/settings"
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             role="menuitem"
           >
             Settings
-          </NavLink>
-          <NavLink
+          </Link>
+          <Link
             to="/logout"
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             role="menuitem"
           >
             Logout
-          </NavLink>
+          </Link>
         </div>
       )}
     </>

@@ -3,11 +3,14 @@ import {
   HiX,
   HiOutlineBell,
   HiMenuAlt1,
-  HiOfficeBuilding,
   HiCheckCircle,
+  HiOutlineSparkles,
 } from 'react-icons/hi';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet, useParams } from 'react-router-dom';
 import Avatar from 'react-avatar';
+import { useQuery } from 'urql';
+
+import { GetProjectDocument, MeDocument } from '../graphql-operations';
 
 import { ProfileMenu } from './ProfileMenu';
 import { SearchField } from './SearchField';
@@ -15,6 +18,12 @@ import { SidebarNav } from './SidebarNav';
 
 export function ProjectLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { id } = useParams();
+  const [{ data }] = useQuery({
+    query: GetProjectDocument,
+    variables: { id },
+  });
+  const [{ data: profile }] = useQuery({ query: MeDocument });
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
@@ -58,7 +67,11 @@ export function ProjectLayout() {
                   <HiX className="h-6 w-6 text-white" />
                 </button>
               </div>
-              <div className="flex-shrink-0 flex items-center px-4">Logo</div>
+              <div className="flex-shrink-0 flex items-center px-4">
+                <Link to="/">
+                  <HiOutlineSparkles className="text-green-100 text-3xl" />
+                </Link>
+              </div>
               <SidebarNav />
             </div>
 
@@ -70,7 +83,11 @@ export function ProjectLayout() {
       <div className="hidden lg:flex lg:flex-shrink-0">
         <div className="flex flex-col w-64">
           <div className="flex flex-col flex-grow bg-green-700 pt-5 pb-4 overflow-y-auto">
-            <div className="flex items-center flex-shrink-0 px-4">Logo</div>
+            <div className="flex items-center flex-shrink-0 px-4">
+              <Link to="/">
+                <HiOutlineSparkles className="text-green-100 text-3xl" />
+              </Link>
+            </div>
             <SidebarNav />
           </div>
         </div>
@@ -97,7 +114,12 @@ export function ProjectLayout() {
               </button>
 
               <div className="ml-3 relative">
-                <ProfileMenu />
+                {profile ? (
+                  <ProfileMenu
+                    name={profile.me.name}
+                    email={profile.me.email}
+                  />
+                ) : null}
               </div>
             </div>
           </div>
@@ -111,7 +133,7 @@ export function ProjectLayout() {
                   <div className="flex items-center">
                     <span className="hidden sm:block">
                       <Avatar
-                        name="Shoppinglist"
+                        name={data?.project.name}
                         size="64"
                         round={true}
                         className="hidden sm:block"
@@ -121,26 +143,21 @@ export function ProjectLayout() {
                       <div className="flex items-center">
                         <span className="sm:hidden">
                           <Avatar
-                            name="Shoppinglist"
+                            name={data?.project.name}
                             size="64"
                             round={true}
                             className="sm:hidden"
                           />
                         </span>
                         <h1 className="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
-                          Shoppinglist
+                          {data?.project.name}
                         </h1>
                       </div>
                       <dl className="mt-6 flex flex-col sm:ml-3 sm:mt-1 sm:flex-row sm:flex-wrap">
-                        <dt className="sr-only">Company</dt>
-                        <dd className="flex items-center text-sm text-gray-500 font-medium capitalize sm:mr-6">
-                          <HiOfficeBuilding className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
-                          Duke street studio
-                        </dd>
-                        <dt className="sr-only">Account status</dt>
+                        <dt className="sr-only">Project status</dt>
                         <dd className="mt-3 flex items-center text-sm text-gray-500 font-medium sm:mr-6 sm:mt-0 capitalize">
-                          <HiCheckCircle className="flex-shrink-0 mr-1.5 h-5 w-5 text-green-400" />
-                          Verified account
+                          <HiCheckCircle className="flex-shrink-0 mr-1.5 h-5 w-5 text-yellow-400" />
+                          Unpublished
                         </dd>
                       </dl>
                     </div>

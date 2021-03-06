@@ -1,0 +1,18 @@
+mutation signIn($email: String!, $password: String!) {
+  signIn(email: $email, password: $password) {
+    token
+  }
+}
+
+mutation signUp($email: String!, $password: String!) {
+  signUp(email: $email, password: $password) {
+    token
+  }
+}
+
+query me {
+  me {
+    name
+    email
+  }
+}

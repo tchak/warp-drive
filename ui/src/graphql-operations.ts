@@ -26,18 +26,54 @@ export type ApiKey = {
   updatedDate: Scalars['DateTime'];
 };
 
-export type Collection = {
-  createdDate: Scalars['DateTime'];
+export type Attribute = {
   id: Scalars['ID'];
   name: Scalars['String'];
+  required: Scalars['Boolean'];
+  type: AttributeType;
+};
+
+export enum AttributeType {
+  Boolean = 'boolean',
+  Date = 'date',
+  Datetime = 'datetime',
+  Float = 'float',
+  Int = 'int',
+  String = 'string',
+}
+
+export type BooleanAttribute = {
+  name: Scalars['String'];
+  value: Scalars['Boolean'];
+};
+
+export type Collection = {
+  attributes: Array<Attribute>;
+  createdDate: Scalars['DateTime'];
+  documents: Array<Document>;
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  relationships: Array<Relationship>;
   updatedDate: Scalars['DateTime'];
+};
+
+export type DeletedAttribute = {
+  id: Scalars['ID'];
 };
 
 export type DeletedCollection = {
   id: Scalars['ID'];
 };
 
+export type DeletedDocument = {
+  id: Scalars['ID'];
+};
+
 export type DeletedProject = {
+  id: Scalars['ID'];
+};
+
+export type DeletedRelationship = {
   id: Scalars['ID'];
 };
 
@@ -53,20 +89,71 @@ export type DeletedUser = {
   id: Scalars['ID'];
 };
 
+export type Document = {
+  attributes: Array<TypedAttribute>;
+  collection: Collection;
+  id: Scalars['ID'];
+};
+
+export type FloatAttribute = {
+  name: Scalars['String'];
+  value: Scalars['Float'];
+};
+
+export type IntAttribute = {
+  name: Scalars['String'];
+  value: Scalars['Int'];
+};
+
 export type Mutation = {
+  createAttribute: Attribute;
   createCollection: Collection;
+  createManyToOneRelationship: Relationship;
+  createOneToOneRelationship: Relationship;
   createProject: Project;
   createTeam: Team;
   createUser: User;
+  deleteAttribute: DeletedAttribute;
   deleteCollection: DeletedCollection;
+  deleteDocument: DeletedDocument;
   deleteProject: DeletedProject;
+  deleteRelationship: DeletedRelationship;
   deleteSession: DeletedSession;
   deleteTeam: DeletedTeam;
   deleteUser: DeletedUser;
+  renameAttribute: Attribute;
+  renameRelationship: Relationship;
+  renameRelationshipInverse: Relationship;
+  signIn: SignInPayload;
+  signUp: SignUpPayload;
+  updateBooleanAttribute: BooleanAttribute;
+  updateFloatAttribute: FloatAttribute;
+  updateIntAttribute: IntAttribute;
+  updateStringAttribute: StringAttribute;
+};
+
+export type MutationCreateAttributeArgs = {
+  collectionId: Scalars['ID'];
+  name: Scalars['String'];
+  type: AttributeType;
 };
 
 export type MutationCreateCollectionArgs = {
   name: Scalars['String'];
+};
+
+export type MutationCreateManyToOneRelationshipArgs = {
+  collectionId: Scalars['ID'];
+  inverse?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
+  relatedCollectionId: Scalars['ID'];
+};
+
+export type MutationCreateOneToOneRelationshipArgs = {
+  collectionId: Scalars['ID'];
+  inverse?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
+  relatedCollectionId: Scalars['ID'];
 };
 
 export type MutationCreateProjectArgs = {
@@ -83,11 +170,23 @@ export type MutationCreateUserArgs = {
   password: Scalars['String'];
 };
 
+export type MutationDeleteAttributeArgs = {
+  id: Scalars['ID'];
+};
+
 export type MutationDeleteCollectionArgs = {
   id: Scalars['ID'];
 };
 
+export type MutationDeleteDocumentArgs = {
+  id: Scalars['ID'];
+};
+
 export type MutationDeleteProjectArgs = {
+  id: Scalars['ID'];
+};
+
+export type MutationDeleteRelationshipArgs = {
   id: Scalars['ID'];
 };
 
@@ -103,6 +202,64 @@ export type MutationDeleteUserArgs = {
   id: Scalars['ID'];
 };
 
+export type MutationRenameAttributeArgs = {
+  id: Scalars['ID'];
+  name: Scalars['String'];
+};
+
+export type MutationRenameRelationshipArgs = {
+  id: Scalars['ID'];
+  name: Scalars['String'];
+};
+
+export type MutationRenameRelationshipInverseArgs = {
+  id: Scalars['ID'];
+  inverse: Scalars['String'];
+};
+
+export type MutationSignInArgs = {
+  email: Scalars['String'];
+  password: Scalars['String'];
+};
+
+export type MutationSignUpArgs = {
+  email: Scalars['String'];
+  password: Scalars['String'];
+};
+
+export type MutationUpdateBooleanAttributeArgs = {
+  documentId: Scalars['ID'];
+  name: Scalars['String'];
+  value: Scalars['Boolean'];
+};
+
+export type MutationUpdateFloatAttributeArgs = {
+  documentId: Scalars['ID'];
+  name: Scalars['String'];
+  value: Scalars['Float'];
+};
+
+export type MutationUpdateIntAttributeArgs = {
+  documentId: Scalars['ID'];
+  name: Scalars['String'];
+  value: Scalars['Int'];
+};
+
+export type MutationUpdateStringAttributeArgs = {
+  documentId: Scalars['ID'];
+  name: Scalars['String'];
+  value: Scalars['String'];
+};
+
+export type NullAttribute = {
+  name: Scalars['String'];
+};
+
+export type Profile = {
+  email: Scalars['String'];
+  name?: Maybe<Scalars['String']>;
+};
+
 export type Project = {
   collections: Array<Collection>;
   createdDate: Scalars['DateTime'];
@@ -115,6 +272,7 @@ export type Project = {
 };
 
 export type Query = {
+  me: Profile;
   project: Project;
   projects: Array<Project>;
 };
@@ -122,6 +280,19 @@ export type Query = {
 export type QueryProjectArgs = {
   id: Scalars['ID'];
 };
+
+export type Relationship = {
+  id: Scalars['ID'];
+  inverse?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
+  relatedCollection: Collection;
+  type: RelationshipType;
+};
+
+export enum RelationshipType {
+  HasMany = 'hasMany',
+  HasOne = 'hasOne',
+}
 
 export enum Scope {
   CollectionsRead = 'collectionsRead',
@@ -143,12 +314,32 @@ export type Session = {
   userAgent: Scalars['String'];
 };
 
+export type SignInPayload = {
+  token: Scalars['String'];
+};
+
+export type SignUpPayload = {
+  token: Scalars['String'];
+};
+
+export type StringAttribute = {
+  name: Scalars['String'];
+  value: Scalars['String'];
+};
+
 export type Team = {
   createdDate: Scalars['DateTime'];
   id: Scalars['ID'];
   name: Scalars['String'];
   updatedDate: Scalars['DateTime'];
 };
+
+export type TypedAttribute =
+  | BooleanAttribute
+  | FloatAttribute
+  | IntAttribute
+  | NullAttribute
+  | StringAttribute;
 
 export type User = {
   createdDate: Scalars['DateTime'];
@@ -158,6 +349,24 @@ export type User = {
   sessions: Array<Session>;
   updatedDate: Scalars['DateTime'];
 };
+
+export type SignInMutationVariables = Exact<{
+  email: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+export type SignInMutation = { signIn: Pick<SignInPayload, 'token'> };
+
+export type SignUpMutationVariables = Exact<{
+  email: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+export type SignUpMutation = { signUp: Pick<SignUpPayload, 'token'> };
+
+export type MeQueryVariables = Exact<{ [key: string]: never }>;
+
+export type MeQuery = { me: Pick<Profile, 'name' | 'email'> };
 
 export type GetProjectQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -229,6 +438,184 @@ export type DeleteProjectMutation = {
   deleteProject: Pick<DeletedProject, 'id'>;
 };
 
+export const SignInDocument: DocumentNode<
+  SignInMutation,
+  SignInMutationVariables
+> = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'signIn' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'email' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'password' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'signIn' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'email' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'email' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'password' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'password' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'token' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
+export const SignUpDocument: DocumentNode<
+  SignUpMutation,
+  SignUpMutationVariables
+> = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'signUp' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'email' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'password' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'signUp' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'email' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'email' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'password' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'password' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'token' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
+export const MeDocument: DocumentNode<MeQuery, MeQueryVariables> = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'me' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'me' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'email' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
 export const GetProjectDocument: DocumentNode<
   GetProjectQuery,
   GetProjectQueryVariables

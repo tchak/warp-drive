@@ -17,6 +17,7 @@ import { DocumentResolver } from './resolvers/DocumentResolver';
 import { ProjectResolver } from './resolvers/ProjectResolver';
 import { TeamResolver } from './resolvers/TeamResolver';
 import { UserResolver } from './resolvers/UserResolver';
+import { ConsoleResolver } from './resolvers/ConsoleResolver';
 
 function secs(value: string) {
   return ms(value) / 1000;
@@ -43,6 +44,7 @@ async function main() {
       ProjectResolver,
       TeamResolver,
       UserResolver,
+      ConsoleResolver,
     ],
     emitSchemaFile: true,
     dateScalarMode: 'isoDate',

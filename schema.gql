@@ -114,6 +114,8 @@ type Mutation {
   renameAttribute(id: ID!, name: String!): Attribute!
   renameRelationship(id: ID!, name: String!): Relationship!
   renameRelationshipInverse(id: ID!, inverse: String!): Relationship!
+  signIn(email: String!, password: String!): SignInPayload!
+  signUp(email: String!, password: String!): SignUpPayload!
   updateBooleanAttribute(documentId: ID!, name: String!, value: Boolean!): BooleanAttribute!
   updateFloatAttribute(documentId: ID!, name: String!, value: Float!): FloatAttribute!
   updateIntAttribute(documentId: ID!, name: String!, value: Int!): IntAttribute!
@@ -122,6 +124,11 @@ type Mutation {
 
 type NullAttribute {
   name: String!
+}
+
+type Profile {
+  email: String!
+  name: String
 }
 
 type Project {
@@ -136,6 +143,7 @@ type Project {
 }
 
 type Query {
+  me: Profile!
   project(id: ID!): Project!
   projects: [Project!]!
 }
@@ -171,6 +179,14 @@ type Session {
   createdDate: DateTime!
   id: ID!
   userAgent: String!
+}
+
+type SignInPayload {
+  token: String!
+}
+
+type SignUpPayload {
+  token: String!
 }
 
 type StringAttribute {

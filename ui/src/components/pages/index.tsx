@@ -1,14 +1,18 @@
 import React, { Suspense, lazy, FunctionComponent } from 'react';
 import { FaSpinner } from 'react-icons/fa';
 
-const OverviewLazyPage = lazy(() => import('./OverviewPage'));
-const DatabaseLazyPage = lazy(() => import('./DatabasePage'));
-const UsersLazyPage = lazy(() => import('./UsersPage'));
-const FunctionsLazyPage = lazy(() => import('./FunctionsPage'));
-const WebhooksLazyPage = lazy(() => import('./WebhooksPage'));
-const APIKeysLazyPage = lazy(() => import('./APIKeys'));
-const SettingsLazyPage = lazy(() => import('./SettingsPage'));
+const ProjectListLazyPage = lazy(() => import('./ProjectListPage'));
+const SignInLazyPage = lazy(() => import('./SignInPage'));
+const SignUpLazyPage = lazy(() => import('./SignUpPage'));
 const HelpLazyPage = lazy(() => import('./HelpPage'));
+
+const ProjectOverviewLazyPage = lazy(() => import('./ProjectOverviewPage'));
+const DatabaseLazyPage = lazy(() => import('./ProjectDatabasePage'));
+const UsersLazyPage = lazy(() => import('./ProjectUsersPage'));
+const FunctionsLazyPage = lazy(() => import('./ProjectFunctionsPage'));
+const WebhooksLazyPage = lazy(() => import('./ProjectWebhooksPage'));
+const APIKeysLazyPage = lazy(() => import('./ProjectKeys'));
+const SettingsLazyPage = lazy(() => import('./ProjectSettingsPage'));
 
 const Loader: FunctionComponent = ({ children }) => (
   <Suspense fallback={<FaSpinner size="1em" className="animate-spin" />}>
@@ -16,9 +20,14 @@ const Loader: FunctionComponent = ({ children }) => (
   </Suspense>
 );
 
+export const ProjectListPage = () => (
+  <Loader>
+    <ProjectListLazyPage />
+  </Loader>
+);
 export const ProjectOverviewPage = () => (
   <Loader>
-    <OverviewLazyPage />
+    <ProjectOverviewLazyPage />
   </Loader>
 );
 export const ProjectDatabasePage = () => (
@@ -54,5 +63,15 @@ export const ProjectSettingsPage = () => (
 export const HelpPage = () => (
   <Loader>
     <HelpLazyPage />
+  </Loader>
+);
+export const SignInPage = () => (
+  <Loader>
+    <SignInLazyPage />
+  </Loader>
+);
+export const SignUpPage = () => (
+  <Loader>
+    <SignUpLazyPage />
   </Loader>
 );
