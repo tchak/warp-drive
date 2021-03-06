@@ -75,12 +75,20 @@ describe('database', () => {
         context,
         collectionId: collection.id,
         name: 'count',
-        type: AttributeType.number,
+        type: AttributeType.int,
+      });
+      await createCollectionAttribute({
+        context,
+        collectionId: collection.id,
+        name: 'checked',
+        type: AttributeType.boolean,
+        required: true,
       });
       expect(collection.schema).toMatchObject({
         attributes: {
           title: { type: AttributeType.string, required: false },
-          count: { type: AttributeType.number, required: false },
+          count: { type: AttributeType.int, required: false },
+          checked: { type: AttributeType.boolean, required: true },
         },
         relationships: {},
       } as CollectionSchema);

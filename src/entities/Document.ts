@@ -11,6 +11,7 @@ import {
   wrap,
 } from '@mikro-orm/core';
 import { v4 as uuid } from 'uuid';
+import { ObjectType, Field, ID } from 'type-graphql';
 
 import { getClock } from '../lib/hlc';
 import {
@@ -55,6 +56,7 @@ export interface DocumentOptions {
 }
 
 @Entity()
+@ObjectType()
 export class Document {
   constructor(collection: ProjectCollection, options?: DocumentOptions) {
     this.collection = collection;
@@ -64,12 +66,14 @@ export class Document {
     //this.permissions = new Permissions(options?.permissions);
   }
 
+  @Field(() => ID)
   @PrimaryKey({ type: 'uuid' })
   id: string;
 
   // @Embedded(() => Permissions, { prefix: false })
   // permissions: Permissions;
 
+  @Field(() => ProjectCollection)
   @ManyToOne(() => ProjectCollection, { hidden: true, eager: true })
   collection: ProjectCollection;
 
@@ -110,10 +114,12 @@ export class Document {
   @Property({ persist: false })
   get relationships(): DocumentRelationships {
     const relationships: DocumentRelationships = Object.fromEntries(
-      [...this.collection.relationships].map(({ name, type }) => [
-        name,
-        type == RelationshipType.hasMany ? { data: [] } : { data: null },
-      ])
+      [...this.collection.relationships]
+        .filter(({ owner }) => owner)
+        .map(({ name, type }) => [
+          name,
+          type == RelationshipType.hasMany ? { data: [] } : { data: null },
+        ])
     );
     for (const {
       relationship: { name },

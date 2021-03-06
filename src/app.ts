@@ -17,7 +17,6 @@ import { ui } from './routes/ui';
 
 import { contextStorage, ormStorage } from './local-storage';
 import { createAPIContext, createConsoleContext } from './lib/context';
-import { Clock } from './lib/hlc';
 
 export function setup(
   app: Application,

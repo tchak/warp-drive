@@ -13,7 +13,8 @@ import { ProjectCollection } from './ProjectCollection';
 
 export enum AttributeType {
   string = 'string',
-  number = 'number',
+  int = 'int',
+  float = 'float',
   boolean = 'boolean',
   datetime = 'datetime',
   date = 'date',

@@ -14,6 +14,7 @@ type APIKey {
 type Attribute {
   id: ID!
   name: String!
+  required: Boolean!
   type: AttributeType!
 }
 
@@ -21,13 +22,20 @@ enum AttributeType {
   boolean
   date
   datetime
-  number
+  float
+  int
   string
+}
+
+type BooleanAttribute {
+  name: String!
+  value: Boolean!
 }
 
 type Collection {
   attributes: [Attribute!]!
   createdDate: DateTime!
+  documents: [Document!]!
   id: ID!
   name: String!
   relationships: [Relationship!]!
@@ -44,6 +52,10 @@ type DeletedAttribute {
 }
 
 type DeletedCollection {
+  id: ID!
+}
+
+type DeletedDocument {
   id: ID!
 }
 
@@ -67,6 +79,22 @@ type DeletedUser {
   id: ID!
 }
 
+type Document {
+  attributes: [TypedAttribute!]!
+  collection: Collection!
+  id: ID!
+}
+
+type FloatAttribute {
+  name: String!
+  value: Float!
+}
+
+type IntAttribute {
+  name: String!
+  value: Int!
+}
+
 type Mutation {
   createAttribute(collectionId: ID!, name: String!, type: AttributeType!): Attribute!
   createCollection(name: String!): Collection!
@@ -77,6 +105,7 @@ type Mutation {
   createUser(email: String!, name: String, password: String!): User!
   deleteAttribute(id: ID!): DeletedAttribute!
   deleteCollection(id: ID!): DeletedCollection!
+  deleteDocument(id: ID!): DeletedDocument!
   deleteProject(id: ID!): DeletedProject!
   deleteRelationship(id: ID!): DeletedRelationship!
   deleteSession(id: ID!): DeletedSession!
@@ -85,6 +114,14 @@ type Mutation {
   renameAttribute(id: ID!, name: String!): Attribute!
   renameRelationship(id: ID!, name: String!): Relationship!
   renameRelationshipInverse(id: ID!, inverse: String!): Relationship!
+  updateBooleanAttribute(documentId: ID!, name: String!, value: Boolean!): BooleanAttribute!
+  updateFloatAttribute(documentId: ID!, name: String!, value: Float!): FloatAttribute!
+  updateIntAttribute(documentId: ID!, name: String!, value: Int!): IntAttribute!
+  updateStringAttribute(documentId: ID!, name: String!, value: String!): StringAttribute!
+}
+
+type NullAttribute {
+  name: String!
 }
 
 type Project {
@@ -136,12 +173,19 @@ type Session {
   userAgent: String!
 }
 
+type StringAttribute {
+  name: String!
+  value: String!
+}
+
 type Team {
   createdDate: DateTime!
   id: ID!
   name: String!
   updatedDate: DateTime!
 }
+
+union TypedAttribute = BooleanAttribute | FloatAttribute | IntAttribute | NullAttribute | StringAttribute
 
 type User {
   createdDate: DateTime!

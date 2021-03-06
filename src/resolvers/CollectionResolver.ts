@@ -11,6 +11,7 @@ import {
 } from 'type-graphql';
 
 import { ProjectCollection } from '../entities/ProjectCollection';
+import { Document } from '../entities/Document';
 import {
   AttributeType,
   CollectionAttribute,
@@ -163,6 +164,12 @@ export class CollectionResolver {
   ): Promise<DeletedRelationship> {
     await deleteCollectionRelationship({ context, relationshipId });
     return { id: relationshipId };
+  }
+
+  @FieldResolver(() => [Document])
+  async documents(@Root() collection: ProjectCollection): Promise<Document[]> {
+    await collection.documents.loadItems();
+    return [...collection.documents];
   }
 
   @FieldResolver(() => [CollectionAttribute])
