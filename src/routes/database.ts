@@ -12,6 +12,7 @@ import {
   deleteCollection,
   deleteDocument,
   updateCollection,
+  updateDocument,
 } from '../lib/database';
 
 export function database() {
@@ -80,7 +81,8 @@ export function database() {
     '/collections',
     wrapHandler(async (context, { body }, res) => {
       const name = body.data.attributes.name;
-      const collection = await createCollection({ context, name });
+      const { permissions } = body.meta;
+      const collection = await createCollection({ context, name, permissions });
 
       res.created(collection);
     })
@@ -107,10 +109,12 @@ export function database() {
     '/documents',
     wrapHandler(async (context, { body }, res) => {
       const { type, attributes } = body.data;
+      const { permissions } = body.meta;
       const document = await createDocument({
         context,
         collectionId: type,
         attributes,
+        permissions,
       });
 
       res.created(document);
@@ -118,7 +122,10 @@ export function database() {
   );
   router.patch(
     '/documents/:id',
-    wrapHandler(async (context, req, res) => {
+    wrapHandler(async (context, { params, body }, res) => {
+      const { attributes } = body.data;
+      await updateDocument({ context, documentId: params.id, attributes });
+
       res.noContent();
     })
   );
