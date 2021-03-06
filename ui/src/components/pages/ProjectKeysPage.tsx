@@ -1,25 +1,22 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
-import { LogsList } from './LogsList';
-import { useListLogs } from '../hooks';
+import { useListKeys } from '../../hooks';
 
-export function RecentActivity() {
+export default function ProjectKeysPage() {
   const { id } = useParams();
-  const [{ data, fetching, error }] = useListLogs(id);
+  const [{ data, fetching, error }] = useListKeys(id);
 
   if (error) {
     return <>Error: {(error as Error).message}</>;
   }
-  const logs = fetching ? [] : data?.project.logs ?? [];
+  const keys = fetching ? [] : data?.project.keys ?? [];
 
   return (
     <>
       <h2 className="max-w-6xl mx-auto mt-8 px-4 text-lg leading-6 font-medium text-gray-900 sm:px-6 lg:px-8">
-        Recent activity
+        API Keys
       </h2>
-
-      <LogsList logs={logs} />
     </>
   );
 }

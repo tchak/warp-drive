@@ -1,5 +1,6 @@
 import type { Context } from './context';
 import { Project } from '../entities/Project';
+import { ProjectEvent } from '../entities/ProjectEvent';
 
 export interface GetProjectParams {
   context: Context;
@@ -36,6 +37,29 @@ export async function listProjects({
   });
 
   return projects;
+}
+
+export interface ListProjectLogsParams {
+  context: Context;
+  projectId: string;
+}
+
+export async function listProjectLogs({
+  context: { em, admin },
+  projectId,
+}: ListProjectLogsParams): Promise<ProjectEvent[]> {
+  const logs = await em.find(
+    ProjectEvent,
+    {
+      project: {
+        id: projectId,
+        owners: admin,
+      },
+    },
+    { limit: 50 }
+  );
+
+  return logs;
 }
 
 export interface CreateProjectParams {

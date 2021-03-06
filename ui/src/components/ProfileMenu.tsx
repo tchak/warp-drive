@@ -4,7 +4,13 @@ import Avatar from 'react-avatar';
 import { Transition, Menu } from '@headlessui/react';
 import { Link } from 'react-router-dom';
 
-export function ProfileMenu({ email, name }: { email: string; name?: string }) {
+export function ProfileMenu({
+  email,
+  name,
+}: {
+  email: string;
+  name?: string | null;
+}) {
   return (
     <Menu>
       {({ open }) => (

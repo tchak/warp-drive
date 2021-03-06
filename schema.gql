@@ -85,6 +85,36 @@ type Document {
   id: ID!
 }
 
+enum EventType {
+  accountCreate
+  accountDelete
+  accountRecoveryCreate
+  accountRecoveryUpdate
+  accountSessionsCreate
+  accountSessionsDelete
+  accountUpdateEmail
+  accountUpdateName
+  accountUpdatePassword
+  accountVerificationCreate
+  accountVerificationUpdate
+  databaseCollectionsCreate
+  databaseCollectionsDelete
+  databaseCollectionsUpdate
+  databaseDocumentsCreate
+  databaseDocumentsDelete
+  databaseDocumentsUpdate
+  teamsCreate
+  teamsDelete
+  teamsMembershipsCreate
+  teamsMembershipsDelete
+  teamsMembershipsStatus
+  teamsUpdate
+  usersCreate
+  usersDelete
+  usersSessionsDelete
+  usersUpdateStatus
+}
+
 type FloatAttribute {
   name: String!
   value: Float!
@@ -95,9 +125,16 @@ type IntAttribute {
   value: Int!
 }
 
+type Log {
+  createdDate: DateTime!
+  id: ID!
+  type: EventType!
+}
+
 type Mutation {
   createAttribute(collectionId: ID!, name: String!, type: AttributeType!): Attribute!
   createCollection(name: String!): Collection!
+  createDocument(collectionId: ID!): Document!
   createManyToOneRelationship(collectionId: ID!, inverse: String, name: String!, relatedCollectionId: ID!): Relationship!
   createOneToOneRelationship(collectionId: ID!, inverse: String, name: String!, relatedCollectionId: ID!): Relationship!
   createProject(name: String!): Project!
@@ -136,6 +173,7 @@ type Project {
   createdDate: DateTime!
   id: ID!
   keys: [APIKey!]!
+  logs: [Log!]!
   name: String!
   teams: [Team!]!
   updatedDate: DateTime!

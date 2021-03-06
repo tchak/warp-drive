@@ -1,35 +1,50 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { HiOutlineChevronRight } from 'react-icons/hi';
 import { useTable, Column } from 'react-table';
+import { Link } from 'react-router-dom';
 
+import { User } from '../graphql-operations';
 import { ListPagination, TablePagination } from './Pagination';
 
-export function TabularList<T>({
-  data,
+const columns: Column<Partial<User>>[] = [
+  {
+    id: 'email',
+    accessor: 'email',
+    Header: 'email',
+    Cell: ({ value }: { value: unknown }) => {
+      return value;
+    },
+  },
+  {
+    id: 'name',
+    accessor: 'name',
+    Header: 'name',
+    Cell: ({ value }: { value: unknown }) => {
+      return value;
+    },
+  },
+  {
+    id: 'createdDate',
+    accessor: 'createdDate',
+    Header: 'created date',
+    Cell: ({ value }: { value: unknown }) => {
+      return value;
+    },
+  },
+];
+
+export function UsersList({
+  users,
   offset,
   total,
-  columns,
 }: {
-  data: T[];
-  columns: string[];
+  users: Partial<User>[];
   offset?: number;
   total?: number;
 }) {
-  const expandedColumns = useMemo(
-    () =>
-      columns.map<Column<any>>((column) => ({
-        id: column,
-        accessor: column,
-        Header: column,
-        Cell: ({ value }: { value: unknown }) => {
-          return value;
-        },
-      })),
-    [columns.join(',')]
-  );
-  const tableInstance = useTable<any>({
-    columns: expandedColumns,
-    data,
+  const table = useTable<Partial<User>>({
+    columns,
+    data: users,
   });
   const {
     getTableProps,
@@ -37,9 +52,9 @@ export function TabularList<T>({
     headerGroups,
     rows,
     prepareRow,
-  } = tableInstance;
+  } = table;
 
-  const size = data.length;
+  const size = users.length;
   const from = size == 0 ? 0 : (offset ?? 0) + 1;
   const to = (offset ?? 0) + size;
 
@@ -51,17 +66,17 @@ export function TabularList<T>({
             prepareRow(row);
             return (
               <li {...row.getRowProps()}>
-                <a
-                  href="#"
+                <Link
+                  to={`${row.values['id']}`}
                   className="block px-4 py-4 bg-white hover:bg-gray-50"
                 >
                   <span className="flex items-center space-x-4">
                     <span className="flex-1 flex space-x-2 truncate">
-                      Value
+                      {row.values['email']}
                     </span>
                     <HiOutlineChevronRight className="flex-shrink-0 h-5 w-5 text-gray-400" />
                   </span>
-                </a>
+                </Link>
               </li>
             );
           })}

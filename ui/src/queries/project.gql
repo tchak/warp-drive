@@ -59,6 +59,17 @@ query listAPIKeys($projectId: ID!) {
   }
 }
 
+query listLogs($projectId: ID!) {
+  project(id: $projectId) {
+    id
+    logs {
+      id
+      type
+      createdDate
+    }
+  }
+}
+
 mutation createProject($name: String!) {
   createProject(name: $name) {
     id

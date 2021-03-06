@@ -95,6 +95,36 @@ export type Document = {
   id: Scalars['ID'];
 };
 
+export enum EventType {
+  AccountCreate = 'accountCreate',
+  AccountDelete = 'accountDelete',
+  AccountRecoveryCreate = 'accountRecoveryCreate',
+  AccountRecoveryUpdate = 'accountRecoveryUpdate',
+  AccountSessionsCreate = 'accountSessionsCreate',
+  AccountSessionsDelete = 'accountSessionsDelete',
+  AccountUpdateEmail = 'accountUpdateEmail',
+  AccountUpdateName = 'accountUpdateName',
+  AccountUpdatePassword = 'accountUpdatePassword',
+  AccountVerificationCreate = 'accountVerificationCreate',
+  AccountVerificationUpdate = 'accountVerificationUpdate',
+  DatabaseCollectionsCreate = 'databaseCollectionsCreate',
+  DatabaseCollectionsDelete = 'databaseCollectionsDelete',
+  DatabaseCollectionsUpdate = 'databaseCollectionsUpdate',
+  DatabaseDocumentsCreate = 'databaseDocumentsCreate',
+  DatabaseDocumentsDelete = 'databaseDocumentsDelete',
+  DatabaseDocumentsUpdate = 'databaseDocumentsUpdate',
+  TeamsCreate = 'teamsCreate',
+  TeamsDelete = 'teamsDelete',
+  TeamsMembershipsCreate = 'teamsMembershipsCreate',
+  TeamsMembershipsDelete = 'teamsMembershipsDelete',
+  TeamsMembershipsStatus = 'teamsMembershipsStatus',
+  TeamsUpdate = 'teamsUpdate',
+  UsersCreate = 'usersCreate',
+  UsersDelete = 'usersDelete',
+  UsersSessionsDelete = 'usersSessionsDelete',
+  UsersUpdateStatus = 'usersUpdateStatus',
+}
+
 export type FloatAttribute = {
   name: Scalars['String'];
   value: Scalars['Float'];
@@ -105,9 +135,16 @@ export type IntAttribute = {
   value: Scalars['Int'];
 };
 
+export type Log = {
+  createdDate: Scalars['DateTime'];
+  id: Scalars['ID'];
+  type: EventType;
+};
+
 export type Mutation = {
   createAttribute: Attribute;
   createCollection: Collection;
+  createDocument: Document;
   createManyToOneRelationship: Relationship;
   createOneToOneRelationship: Relationship;
   createProject: Project;
@@ -140,6 +177,10 @@ export type MutationCreateAttributeArgs = {
 
 export type MutationCreateCollectionArgs = {
   name: Scalars['String'];
+};
+
+export type MutationCreateDocumentArgs = {
+  collectionId: Scalars['ID'];
 };
 
 export type MutationCreateManyToOneRelationshipArgs = {
@@ -265,6 +306,7 @@ export type Project = {
   createdDate: Scalars['DateTime'];
   id: Scalars['ID'];
   keys: Array<ApiKey>;
+  logs: Array<Log>;
   name: Scalars['String'];
   teams: Array<Team>;
   updatedDate: Scalars['DateTime'];
@@ -368,6 +410,22 @@ export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type MeQuery = { me: Pick<Profile, 'name' | 'email'> };
 
+export type CreateCollectionMutationVariables = Exact<{
+  name: Scalars['String'];
+}>;
+
+export type CreateCollectionMutation = {
+  createCollection: Pick<Collection, 'id' | 'name' | 'createdDate'>;
+};
+
+export type DeleteCollectionMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type DeleteCollectionMutation = {
+  deleteCollection: Pick<DeletedCollection, 'id'>;
+};
+
 export type GetProjectQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -422,6 +480,16 @@ export type ListApiKeysQuery = {
   };
 };
 
+export type ListLogsQueryVariables = Exact<{
+  projectId: Scalars['ID'];
+}>;
+
+export type ListLogsQuery = {
+  project: Pick<Project, 'id'> & {
+    logs: Array<Pick<Log, 'id' | 'type' | 'createdDate'>>;
+  };
+};
+
 export type CreateProjectMutationVariables = Exact<{
   name: Scalars['String'];
 }>;
@@ -437,6 +505,22 @@ export type DeleteProjectMutationVariables = Exact<{
 export type DeleteProjectMutation = {
   deleteProject: Pick<DeletedProject, 'id'>;
 };
+
+export type CreateUserMutationVariables = Exact<{
+  email: Scalars['String'];
+  password: Scalars['String'];
+  name?: Maybe<Scalars['String']>;
+}>;
+
+export type CreateUserMutation = {
+  createUser: Pick<User, 'id' | 'name' | 'email' | 'createdDate'>;
+};
+
+export type DeleteUserMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type DeleteUserMutation = { deleteUser: Pick<DeletedUser, 'id'> };
 
 export const SignInDocument: DocumentNode<
   SignInMutation,
@@ -608,6 +692,107 @@ export const MeDocument: DocumentNode<MeQuery, MeQueryVariables> = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'email' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
+export const CreateCollectionDocument: DocumentNode<
+  CreateCollectionMutation,
+  CreateCollectionMutationVariables
+> = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'createCollection' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'name' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createCollection' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'name' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'name' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdDate' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
+export const DeleteCollectionDocument: DocumentNode<
+  DeleteCollectionMutation,
+  DeleteCollectionMutationVariables
+> = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'deleteCollection' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteCollection' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
               ],
             },
           },
@@ -961,6 +1146,72 @@ export const ListApiKeysDocument: DocumentNode<
     },
   ],
 };
+export const ListLogsDocument: DocumentNode<
+  ListLogsQuery,
+  ListLogsQueryVariables
+> = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'listLogs' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'projectId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'project' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'projectId' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'logs' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'createdDate' },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
 export const CreateProjectDocument: DocumentNode<
   CreateProjectMutation,
   CreateProjectMutationVariables
@@ -1040,6 +1291,146 @@ export const DeleteProjectDocument: DocumentNode<
           {
             kind: 'Field',
             name: { kind: 'Name', value: 'deleteProject' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
+export const CreateUserDocument: DocumentNode<
+  CreateUserMutation,
+  CreateUserMutationVariables
+> = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'createUser' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'email' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'password' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'name' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createUser' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'email' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'email' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'password' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'password' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'name' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'name' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'email' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdDate' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
+export const DeleteUserDocument: DocumentNode<
+  DeleteUserMutation,
+  DeleteUserMutationVariables
+> = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'deleteUser' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteUser' },
             arguments: [
               {
                 kind: 'Argument',

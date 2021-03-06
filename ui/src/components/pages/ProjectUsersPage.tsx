@@ -1,24 +1,17 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useQuery } from 'urql';
 
-import { TabularList } from '../TabularList';
-import { ListUsersDocument } from '../../graphql-operations';
+import { UsersList } from '../UsersList';
+import { useListUsers } from '../../hooks';
 
 export default function ProjectUsersPage() {
   const { id } = useParams();
-  const [{ data, fetching, error }] = useQuery({
-    query: ListUsersDocument,
-    variables: { projectId: id },
-  });
+  const [{ data, fetching, error }] = useListUsers(id);
 
-  if (fetching) {
-    return <>Loading...</>;
-  }
   if (error) {
     return <>Error: {(error as Error).message}</>;
   }
-  const users = data?.project.users ?? [];
+  const users = fetching ? [] : data?.project.users ?? [];
 
   return (
     <>
@@ -26,7 +19,7 @@ export default function ProjectUsersPage() {
         Users
       </h2>
 
-      <TabularList data={users} columns={['email', 'createdDate']} />
+      <UsersList users={users} />
     </>
   );
 }

@@ -18,7 +18,7 @@ import {
   ProjectUsersPage,
   ProjectFunctionsPage,
   ProjectWebhooksPage,
-  ProjectAPIKeysPage,
+  ProjectKeysPage,
   ProjectSettingsPage,
   HelpPage,
   SignInPage,
@@ -50,7 +50,7 @@ function App() {
             <Route path="users" element={<ProjectUsersPage />} />
             <Route path="functions" element={<ProjectFunctionsPage />} />
             <Route path="webhooks" element={<ProjectWebhooksPage />} />
-            <Route path="apikeys" element={<ProjectAPIKeysPage />} />
+            <Route path="keys" element={<ProjectKeysPage />} />
             <Route path="settings" element={<ProjectSettingsPage />} />
           </Route>
           <Route path="/help" element={<HelpPage />} />

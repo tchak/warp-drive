@@ -49,10 +49,10 @@ export function SidebarNav() {
           Users
         </NavLink>
 
-        {/* <NavLink
+        <NavLink
           to={`/p/${id}/functions`}
           activeClassName="bg-green-800 text-white"
-          className="text-green-100 hover:text-white hover:bg-green-600 group flex items-center px-2 py-2 text-base font-medium rounded-md"
+          className="hidden text-green-100 hover:text-white hover:bg-green-600 group flex items-center px-2 py-2 text-base font-medium rounded-md"
         >
           <HiOutlineLightningBolt className="mr-4 h-6 w-6 text-green-200" />
           Functions
@@ -61,14 +61,14 @@ export function SidebarNav() {
         <NavLink
           to={`/p/${id}/webhooks`}
           activeClassName="bg-green-800 text-white"
-          className="text-green-100 hover:text-white hover:bg-green-600 group flex items-center px-2 py-2 text-base font-medium rounded-md"
+          className="hidden text-green-100 hover:text-white hover:bg-green-600 group flex items-center px-2 py-2 text-base font-medium rounded-md"
         >
           <HiOutlineLink className="mr-4 h-6 w-6 text-green-200" />
           Webhooks
-        </NavLink> */}
+        </NavLink>
 
         <NavLink
-          to={`/p/${id}/apikeys`}
+          to={`/p/${id}/keys`}
           activeClassName="bg-green-800 text-white"
           className="text-green-100 hover:text-white hover:bg-green-600 group flex items-center px-2 py-2 text-base font-medium rounded-md"
         >

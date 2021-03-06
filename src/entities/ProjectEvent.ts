@@ -7,6 +7,7 @@ import {
   JsonType,
   wrap,
 } from '@mikro-orm/core';
+import { ObjectType, Field, ID, registerEnumType } from 'type-graphql';
 import { v4 as uuid } from 'uuid';
 
 import { Project } from './Project';
@@ -45,6 +46,8 @@ export enum EventType {
   teamsMembershipsStatus = 'teams.memberships.update.status',
   teamsMembershipsDelete = 'teams.memberships.delete',
 }
+
+registerEnumType(EventType, { name: 'EventType' });
 
 export function logAccountCreate(user: ProjectUser) {
   return new ProjectEvent(EventType.accountCreate, user.project, user);
@@ -140,6 +143,7 @@ export function logDocumentDelete(document: Document, user?: ProjectUser) {
 }
 
 @Entity()
+@ObjectType('Log')
 export class ProjectEvent {
   constructor(type: EventType, project: Project, user?: ProjectUser) {
     this.project = project;
@@ -147,9 +151,11 @@ export class ProjectEvent {
     this.user = user;
   }
 
+  @Field(() => ID)
   @PrimaryKey({ type: 'uuid' })
   id: string = uuid();
 
+  @Field(() => EventType)
   @Enum(() => EventType)
   type: EventType;
 
@@ -162,6 +168,7 @@ export class ProjectEvent {
   @Property({ type: JsonType, nullable: true })
   payload?: unknown;
 
+  @Field()
   @Property()
   createdDate: Date = new Date();
 

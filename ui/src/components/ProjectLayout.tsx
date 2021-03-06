@@ -8,9 +8,8 @@ import {
 } from 'react-icons/hi';
 import { Link, Outlet, useParams } from 'react-router-dom';
 import Avatar from 'react-avatar';
-import { useQuery } from 'urql';
 
-import { GetProjectDocument, MeDocument } from '../graphql-operations';
+import { useProfile, useProject } from '../hooks';
 
 import { ProfileMenu } from './ProfileMenu';
 import { SearchField } from './SearchField';
@@ -19,11 +18,8 @@ import { SidebarNav } from './SidebarNav';
 export function ProjectLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { id } = useParams();
-  const [{ data }] = useQuery({
-    query: GetProjectDocument,
-    variables: { id },
-  });
-  const [{ data: profile }] = useQuery({ query: MeDocument });
+  const project = useProject(id);
+  const profile = useProfile();
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
@@ -108,17 +104,17 @@ export function ProjectLayout() {
               <SearchField />
             </div>
             <div className="ml-4 flex items-center md:ml-6">
-              <button className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+              <button
+                type="button"
+                className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              >
                 <span className="sr-only">View notifications</span>
                 <HiOutlineBell className="h-6 w-6" />
               </button>
 
               <div className="ml-3 relative">
                 {profile ? (
-                  <ProfileMenu
-                    name={profile.me.name}
-                    email={profile.me.email}
-                  />
+                  <ProfileMenu name={profile.name} email={profile.email} />
                 ) : null}
               </div>
             </div>
@@ -133,7 +129,7 @@ export function ProjectLayout() {
                   <div className="flex items-center">
                     <span className="hidden sm:block">
                       <Avatar
-                        name={data?.project.name}
+                        name={project?.name}
                         size="64"
                         round={true}
                         className="hidden sm:block"
@@ -143,14 +139,14 @@ export function ProjectLayout() {
                       <div className="flex items-center">
                         <span className="sm:hidden">
                           <Avatar
-                            name={data?.project.name}
+                            name={project?.name}
                             size="64"
                             round={true}
                             className="sm:hidden"
                           />
                         </span>
                         <h1 className="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
-                          {data?.project.name}
+                          {project?.name}
                         </h1>
                       </div>
                       <dl className="mt-6 flex flex-col sm:ml-3 sm:mt-1 sm:flex-row sm:flex-wrap">

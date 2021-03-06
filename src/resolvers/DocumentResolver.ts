@@ -17,7 +17,11 @@ import { Document } from '../entities/Document';
 import { AttributeType } from '../entities/CollectionAttribute';
 
 import { Context } from '../lib/context';
-import { deleteDocument, updateDocument } from '../lib/database';
+import {
+  createDocument,
+  deleteDocument,
+  updateDocument,
+} from '../lib/database';
 
 @ObjectType()
 export class TypedAttributeClass {
@@ -97,6 +101,14 @@ class DeletedDocument {
 
 @Resolver(Document)
 export class DocumentResolver {
+  @Mutation(() => Document)
+  async createDocument(
+    @Ctx('context') context: Context,
+    @Arg('collectionId', () => ID) collectionId: string
+  ): Promise<Document> {
+    return createDocument({ context, collectionId });
+  }
+
   @Mutation(() => DeletedDocument)
   async deleteDocument(
     @Ctx('context') context: Context,

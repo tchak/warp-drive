@@ -16,6 +16,7 @@ import { ProjectUser } from '../entities/ProjectUser';
 import { ProjectTeam } from '../entities/ProjectTeam';
 import { ProjectCollection } from '../entities/ProjectCollection';
 import { ProjectAccessToken } from '../entities/ProjectAccessToken';
+import { ProjectEvent } from '../entities/ProjectEvent';
 
 import { Context } from '../lib/context';
 import {
@@ -23,6 +24,7 @@ import {
   listProjects,
   createProject,
   deleteProject,
+  listProjectLogs,
 } from '../lib/projects';
 import { listUsers } from '../lib/users';
 import { listTeams } from '../lib/teams';
@@ -100,5 +102,13 @@ export class ProjectResolver {
     @Ctx('context') context: Context
   ): Promise<ProjectAccessToken[]> {
     return listAccessTokens({ context, projectId: project.id });
+  }
+
+  @FieldResolver(() => [ProjectEvent])
+  async logs(
+    @Root() project: Project,
+    @Ctx('context') context: Context
+  ): Promise<ProjectEvent[]> {
+    return listProjectLogs({ context, projectId: project.id });
   }
 }

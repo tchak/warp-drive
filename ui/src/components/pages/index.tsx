@@ -1,18 +1,18 @@
 import React, { Suspense, lazy, FunctionComponent } from 'react';
 import { FaSpinner } from 'react-icons/fa';
 
-const ProjectListLazyPage = lazy(() => import('./ProjectListPage'));
 const SignInLazyPage = lazy(() => import('./SignInPage'));
 const SignUpLazyPage = lazy(() => import('./SignUpPage'));
 const HelpLazyPage = lazy(() => import('./HelpPage'));
 
+const ProjectListLazyPage = lazy(() => import('./ProjectListPage'));
 const ProjectOverviewLazyPage = lazy(() => import('./ProjectOverviewPage'));
-const DatabaseLazyPage = lazy(() => import('./ProjectDatabasePage'));
-const UsersLazyPage = lazy(() => import('./ProjectUsersPage'));
-const FunctionsLazyPage = lazy(() => import('./ProjectFunctionsPage'));
-const WebhooksLazyPage = lazy(() => import('./ProjectWebhooksPage'));
-const APIKeysLazyPage = lazy(() => import('./ProjectKeys'));
-const SettingsLazyPage = lazy(() => import('./ProjectSettingsPage'));
+const ProjectDatabaseLazyPage = lazy(() => import('./ProjectDatabasePage'));
+const ProjectUsersLazyPage = lazy(() => import('./ProjectUsersPage'));
+const ProjectFunctionsLazyPage = lazy(() => import('./ProjectFunctionsPage'));
+const ProjectWebhooksLazyPage = lazy(() => import('./ProjectWebhooksPage'));
+const ProjectKeysLazyPage = lazy(() => import('./ProjectKeysPage'));
+const ProjectSettingsLazyPage = lazy(() => import('./ProjectSettingsPage'));
 
 const Loader: FunctionComponent = ({ children }) => (
   <Suspense fallback={<FaSpinner size="1em" className="animate-spin" />}>
@@ -32,32 +32,32 @@ export const ProjectOverviewPage = () => (
 );
 export const ProjectDatabasePage = () => (
   <Loader>
-    <DatabaseLazyPage />
+    <ProjectDatabaseLazyPage />
   </Loader>
 );
 export const ProjectUsersPage = () => (
   <Loader>
-    <UsersLazyPage />
+    <ProjectUsersLazyPage />
   </Loader>
 );
 export const ProjectFunctionsPage = () => (
   <Loader>
-    <FunctionsLazyPage />
+    <ProjectFunctionsLazyPage />
   </Loader>
 );
 export const ProjectWebhooksPage = () => (
   <Loader>
-    <WebhooksLazyPage />
+    <ProjectWebhooksLazyPage />
   </Loader>
 );
-export const ProjectAPIKeysPage = () => (
+export const ProjectKeysPage = () => (
   <Loader>
-    <APIKeysLazyPage />
+    <ProjectKeysLazyPage />
   </Loader>
 );
 export const ProjectSettingsPage = () => (
   <Loader>
-    <SettingsLazyPage />
+    <ProjectSettingsLazyPage />
   </Loader>
 );
 export const HelpPage = () => (
