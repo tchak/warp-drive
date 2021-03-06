@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid';
 import type { Context } from './context';
 import { authorizeCollections, authorizeDocuments } from './authorize';
 import { getClock } from './hlc';
+import { ValidationError } from './errors';
 
 import {
   ProjectCollection,
@@ -24,8 +25,6 @@ import {
   DocumentOperation,
 } from '../entities/Document';
 import { AttributeOperation } from '../entities/AttributeOperation';
-
-export type RelationshipLink = [RelationshipType, RelationshipType];
 
 export interface CreateCollectionParams {
   context: Context;
@@ -75,6 +74,7 @@ export interface CreateCollectionAttributeParams {
   collectionId: string;
   name: string;
   type: AttributeType;
+  required?: boolean;
 }
 
 export async function createCollectionAttribute({
@@ -82,12 +82,15 @@ export async function createCollectionAttribute({
   collectionId,
   name,
   type,
+  required,
 }: CreateCollectionAttributeParams): Promise<CollectionAttribute> {
   const collection = await em.findOneOrFail(ProjectCollection, {
     id: collectionId,
     project,
   });
-  const attribute = new CollectionAttribute(collection, name, type);
+  const attribute = new CollectionAttribute(collection, name, type, {
+    required,
+  });
   await em.persistAndFlush(attribute);
   return attribute;
 }
@@ -132,7 +135,7 @@ export interface CreateCollectionRelationshipParams {
   context: Context;
   collectionId: string;
   name: string;
-  relationship: RelationshipLink;
+  relationship: [RelationshipType, RelationshipType];
   relatedCollectionId: string;
   inverse?: string;
 }
@@ -366,6 +369,15 @@ export async function createDocument({
   const document = new Document(collection, {
     permissions,
   });
+  const requiredAttributes = [...collection.attributes]
+    .filter(({ required }) => required)
+    .map(({ name }) => name);
+  const isValid = requiredAttributes.every(
+    (name) => attributes && !!attributes[name]
+  );
+  if (!isValid) {
+    throw new ValidationError('Required attributes are not provided');
+  }
   const operations = buildAttributeOperations(document, attributes);
   await em.persistAndFlush([document, ...operations]);
 
@@ -388,11 +400,15 @@ export async function updateDocument({
   }
 
   const { em, project } = context;
-  const document = await em.findOneOrFail(Document, {
-    id: documentId,
-    collection: { project },
-    removeOperationId: null,
-  });
+  const document = await em.findOneOrFail(
+    Document,
+    {
+      id: documentId,
+      collection: { project },
+      removeOperationId: null,
+    },
+    ['collection.attributes', 'collection.relationships']
+  );
 
   const operations = buildAttributeOperations(document, attributes);
   await em.persistAndFlush(operations);

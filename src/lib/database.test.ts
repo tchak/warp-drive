@@ -79,8 +79,8 @@ describe('database', () => {
       });
       expect(collection.schema).toMatchObject({
         attributes: {
-          title: { type: AttributeType.string },
-          count: { type: AttributeType.number },
+          title: { type: AttributeType.string, required: false },
+          count: { type: AttributeType.number, required: false },
         },
         relationships: {},
       } as CollectionSchema);

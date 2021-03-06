@@ -39,7 +39,7 @@ export interface PermissionsOptions {
 }
 
 export interface CollectionSchema {
-  attributes: Record<string, { type: AttributeType }>;
+  attributes: Record<string, { type: AttributeType; required: boolean }>;
   relationships: Record<
     string,
     {
@@ -133,8 +133,8 @@ export class ProjectCollection {
       attributes: {},
       relationships: {},
     };
-    for (const { name, type } of this.attributes) {
-      schema.attributes[name] = { type };
+    for (const { name, type, required } of this.attributes) {
+      schema.attributes[name] = { type, required };
     }
     for (const { name, type, relatedCollection, inverse } of this
       .relationships) {

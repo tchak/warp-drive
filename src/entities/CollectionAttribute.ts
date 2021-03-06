@@ -21,6 +21,10 @@ export enum AttributeType {
 
 registerEnumType(AttributeType, { name: 'AttributeType' });
 
+export interface CollectionAttributeOptions {
+  required?: boolean;
+}
+
 @Entity()
 @Unique({ properties: ['collection', 'name'] })
 @ObjectType('Attribute')
@@ -28,11 +32,13 @@ export class CollectionAttribute {
   constructor(
     collection: ProjectCollection,
     name: string,
-    type: AttributeType
+    type: AttributeType,
+    options?: CollectionAttributeOptions
   ) {
     this.collection = collection;
     this.name = name;
     this.type = type;
+    this.required = options?.required == true;
   }
 
   @Field(() => ID)
@@ -46,6 +52,10 @@ export class CollectionAttribute {
   @Field()
   @Property()
   name: string;
+
+  @Field()
+  @Property()
+  required: boolean;
 
   @ManyToOne(() => ProjectCollection)
   collection: ProjectCollection;

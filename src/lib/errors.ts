@@ -7,3 +7,5 @@ export class UnauthorizedScopeError extends Error {
 export class DocumentNotFound extends Error {}
 
 export class UnauthorizedError extends Error {}
+
+export class ValidationError extends Error {}
