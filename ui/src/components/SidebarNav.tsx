@@ -11,8 +11,14 @@ import {
 } from 'react-icons/hi';
 import { NavLink, useParams } from 'react-router-dom';
 
-export function SidebarNav() {
+const desktopItemClassName =
+  'group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-green-100 hover:text-white hover:bg-green-600';
+const mobileItemClassName =
+  'text-green-100 hover:text-white hover:bg-green-600 group flex items-center px-2 py-2 text-base font-medium rounded-md';
+
+export function SidebarNav({ desktop = true }: { desktop?: boolean }) {
   const { id } = useParams();
+  const itemClassName = desktop ? desktopItemClassName : mobileItemClassName;
 
   return (
     <nav
@@ -24,53 +30,52 @@ export function SidebarNav() {
           to={`/p/${id}`}
           end
           activeClassName="bg-green-800 text-white"
-          className="text-green-100 hover:text-white hover:bg-green-600 group flex items-center px-2 py-2 text-base font-medium rounded-md"
-          aria-current="page"
+          className={itemClassName}
         >
           <HiOutlineHome className="mr-4 h-6 w-6 text-green-200" />
           Home
         </NavLink>
 
         <NavLink
-          to={`/p/${id}/database`}
+          to="database"
           activeClassName="bg-green-800 text-white"
-          className="text-green-100 hover:text-white hover:bg-green-600 group flex items-center px-2 py-2 text-base font-medium rounded-md"
+          className={itemClassName}
         >
           <HiOutlineDatabase className="mr-4 h-6 w-6 text-green-200" />
           Database
         </NavLink>
 
         <NavLink
-          to={`/p/${id}/users`}
+          to="users"
           activeClassName="bg-green-800 text-white"
-          className="text-green-100 hover:text-white hover:bg-green-600 group flex items-center px-2 py-2 text-base font-medium rounded-md"
+          className={itemClassName}
         >
           <HiOutlineUserGroup className="mr-4 h-6 w-6 text-green-200" />
           Users
         </NavLink>
 
         <NavLink
-          to={`/p/${id}/functions`}
+          to="functions"
           activeClassName="bg-green-800 text-white"
-          className="hidden text-green-100 hover:text-white hover:bg-green-600 group flex items-center px-2 py-2 text-base font-medium rounded-md"
+          className={'hidden ' + itemClassName}
         >
           <HiOutlineLightningBolt className="mr-4 h-6 w-6 text-green-200" />
           Functions
         </NavLink>
 
         <NavLink
-          to={`/p/${id}/webhooks`}
+          to="webhooks"
           activeClassName="bg-green-800 text-white"
-          className="hidden text-green-100 hover:text-white hover:bg-green-600 group flex items-center px-2 py-2 text-base font-medium rounded-md"
+          className={'hidden ' + itemClassName}
         >
           <HiOutlineLink className="mr-4 h-6 w-6 text-green-200" />
           Webhooks
         </NavLink>
 
         <NavLink
-          to={`/p/${id}/keys`}
+          to="keys"
           activeClassName="bg-green-800 text-white"
-          className="text-green-100 hover:text-white hover:bg-green-600 group flex items-center px-2 py-2 text-base font-medium rounded-md"
+          className={itemClassName}
         >
           <HiOutlineKey className="mr-4 h-6 w-6 text-green-200" />
           API Keys
@@ -80,9 +85,9 @@ export function SidebarNav() {
       <div className="mt-6 pt-6">
         <div className="px-2 space-y-1">
           <NavLink
-            to={`/p/${id}/settings`}
+            to="settings"
             activeClassName="bg-green-800 text-white"
-            className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-green-100 hover:text-white hover:bg-green-600"
+            className={itemClassName}
           >
             <HiOutlineCog className="mr-4 h-6 w-6 text-green-200 group-hover:text-green-200" />
             Settings
@@ -91,7 +96,7 @@ export function SidebarNav() {
           <NavLink
             to="/help"
             activeClassName="bg-green-800 text-white"
-            className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-green-100 hover:text-white hover:bg-green-600"
+            className={itemClassName}
           >
             <HiOutlineQuestionMarkCircle className="mr-4 h-6 w-6 text-green-300 group-hover:text-green-200" />
             Help
