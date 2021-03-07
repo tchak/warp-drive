@@ -133,13 +133,13 @@ type Log {
 
 type Mutation {
   createAttribute(collectionId: ID!, name: String!, type: AttributeType!): Attribute!
-  createCollection(name: String!): Collection!
+  createCollection(name: String!, projectId: ID!): Collection!
   createDocument(collectionId: ID!): Document!
   createManyToOneRelationship(collectionId: ID!, inverse: String, name: String!, relatedCollectionId: ID!): Relationship!
   createOneToOneRelationship(collectionId: ID!, inverse: String, name: String!, relatedCollectionId: ID!): Relationship!
   createProject(name: String!): Project!
-  createTeam(name: String!): Team!
-  createUser(email: String!, name: String, password: String!): User!
+  createTeam(name: String!, projectId: ID!): Team!
+  createUser(email: String!, name: String, password: String!, projectId: ID!): User!
   deleteAttribute(id: ID!): DeletedAttribute!
   deleteCollection(id: ID!): DeletedCollection!
   deleteDocument(id: ID!): DeletedDocument!

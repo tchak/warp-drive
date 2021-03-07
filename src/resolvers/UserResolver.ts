@@ -20,6 +20,7 @@ import {
   deleteUserSession,
   listUserSessions,
 } from '../lib/users';
+import { getProject } from '../lib/projects';
 
 @ObjectType()
 class DeletedUser {
@@ -38,10 +39,12 @@ export class UserResolver {
   @Mutation(() => ProjectUser)
   async createUser(
     @Ctx('context') context: Context,
+    @Arg('projectId', () => ID) projectId: string,
     @Arg('email') email: string,
     @Arg('password') password: string,
     @Arg('name', { nullable: true }) name?: string
   ): Promise<ProjectUser> {
+    context.project = await getProject({ context, projectId });
     return createUser({ context, email, password, name });
   }
 

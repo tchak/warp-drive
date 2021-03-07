@@ -33,6 +33,7 @@ import {
   renameCollectionAttribute,
   renameCollectionRelationshipInverse,
 } from '../lib/database';
+import { getProject } from '../lib/projects';
 
 @ObjectType()
 class DeletedCollection {
@@ -57,8 +58,10 @@ export class CollectionResolver {
   @Mutation(() => ProjectCollection)
   async createCollection(
     @Ctx('context') context: Context,
+    @Arg('projectId', () => ID) projectId: string,
     @Arg('name') name: string
   ): Promise<ProjectCollection> {
+    context.project = await getProject({ context, projectId });
     return createCollection({ context, name });
   }
 

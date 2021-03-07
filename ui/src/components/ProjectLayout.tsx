@@ -1,26 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   HiX,
   HiOutlineBell,
   HiMenuAlt1,
   HiOutlineSparkles,
 } from 'react-icons/hi';
-import { Link, Outlet, useParams } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Transition } from '@headlessui/react';
 
-import { useProfile, useProject } from '../hooks';
+import { useProfile } from '../hooks';
 
 import { ProfileMenu } from './ProfileMenu';
 import { SearchField } from './SearchField';
 import { SidebarNav } from './SidebarNav';
-import { ProjectLayoutStatus } from './ProjectLayoutStatus';
-import { ProjectLayoutButtons } from './ProjectLayoutButtons';
 
 export function ProjectLayout() {
+  const { pathname } = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { id } = useParams();
-  const project = useProject(id);
   const profile = useProfile();
+
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
@@ -112,22 +113,7 @@ export function ProjectLayout() {
         </div>
 
         <main className="flex-1 relative pb-8 z-0 overflow-y-auto">
-          <div className="bg-white shadow">
-            <div className="px-4 sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
-              <div className="py-6 md:flex md:items-center md:justify-between lg:border-t lg:border-gray-200">
-                <div className="flex-1 min-w-0">
-                  <ProjectLayoutStatus name={project?.name} />
-                </div>
-                <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-                  <ProjectLayoutButtons />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-8">
-            <Outlet />
-          </div>
+          <Outlet />
         </main>
       </div>
     </div>

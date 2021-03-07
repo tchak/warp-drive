@@ -12,6 +12,7 @@ import { ProjectTeam } from '../entities/ProjectTeam';
 
 import { Context } from '../lib/context';
 import { createTeam, deleteTeam } from '../lib/teams';
+import { getProject } from '../lib/projects';
 
 @ObjectType()
 class DeletedTeam {
@@ -24,8 +25,10 @@ export class TeamResolver {
   @Mutation(() => ProjectTeam)
   async createTeam(
     @Ctx('context') context: Context,
+    @Arg('projectId', () => ID) projectId: string,
     @Arg('name') name: string
   ): Promise<ProjectTeam> {
+    context.project = await getProject({ context, projectId });
     return createTeam({ context, name });
   }
 

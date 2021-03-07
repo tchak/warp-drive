@@ -1,34 +1,54 @@
 import React from 'react';
-import { HiOutlineChevronRight } from 'react-icons/hi';
-import { useTable, Column } from 'react-table';
+import { HiOutlineChevronRight, HiOutlineUser } from 'react-icons/hi';
+import { useTable, Column, Cell } from 'react-table';
 import { Link } from 'react-router-dom';
+import { FormattedDate } from 'react-intl';
 
 import { User } from '../graphql-operations';
 import { ListPagination, TablePagination } from './Pagination';
+
+function getCellProps(cell: Cell<Partial<User>>) {
+  switch (cell.column.id) {
+    case 'email':
+      return {
+        className:
+          'max-w-0 w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900',
+      };
+    default:
+      return {
+        className:
+          'px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500',
+      };
+  }
+}
+
+function getHeaderProps(column: Column<Partial<User>>) {
+  return {};
+}
+
+function getColumnProps(column: Column<Partial<User>>) {
+  return {};
+}
 
 const columns: Column<Partial<User>>[] = [
   {
     id: 'email',
     accessor: 'email',
     Header: 'email',
-    Cell: ({ value }: { value: unknown }) => {
-      return value;
-    },
   },
   {
     id: 'name',
     accessor: 'name',
     Header: 'name',
-    Cell: ({ value }: { value: unknown }) => {
-      return value;
-    },
   },
   {
     id: 'createdDate',
     accessor: 'createdDate',
     Header: 'created date',
-    Cell: ({ value }: { value: unknown }) => {
-      return value;
+    Cell: ({ value }: { value: string }) => {
+      return (
+        <FormattedDate value={value} dateStyle="medium" timeStyle="short" />
+      );
     },
   },
 ];
@@ -42,17 +62,16 @@ export function UsersList({
   offset?: number;
   total?: number;
 }) {
-  const table = useTable<Partial<User>>({
-    columns,
-    data: users,
-  });
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     rows,
     prepareRow,
-  } = table;
+  } = useTable<Partial<User>>({
+    columns,
+    data: users,
+  });
 
   const size = users.length;
   const from = size == 0 ? 0 : (offset ?? 0) + 1;
@@ -72,7 +91,13 @@ export function UsersList({
                 >
                   <span className="flex items-center space-x-4">
                     <span className="flex-1 flex space-x-2 truncate">
-                      {row.values['email']}
+                      <HiOutlineUser className="flex-shrink-0 h-5 w-5 text-gray-400" />
+                      <span className="flex flex-col text-gray-500 text-sm truncate">
+                        <span className="truncate">
+                          {row.cells[0].render('Cell')}
+                        </span>
+                        <span>{row.cells[2].render('Cell')}</span>
+                      </span>
                     </span>
                     <HiOutlineChevronRight className="flex-shrink-0 h-5 w-5 text-gray-400" />
                   </span>
@@ -99,7 +124,10 @@ export function UsersList({
                       {headerGroup.headers.map((column) => (
                         <th
                           className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          {...column.getHeaderProps()}
+                          {...column.getHeaderProps([
+                            getColumnProps(column),
+                            getHeaderProps(column),
+                          ])}
                         >
                           {column.render('Header')}
                         </th>
@@ -117,8 +145,10 @@ export function UsersList({
                       <tr className="bg-white" {...row.getRowProps()}>
                         {row.cells.map((cell) => (
                           <td
-                            className="px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500"
-                            {...cell.getCellProps()}
+                            {...cell.getCellProps([
+                              getColumnProps(cell.column),
+                              getCellProps(cell),
+                            ])}
                           >
                             {cell.render('Cell')}
                           </td>

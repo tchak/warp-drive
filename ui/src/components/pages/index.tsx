@@ -8,7 +8,11 @@ const HelpLazyPage = lazy(() => import('./HelpPage'));
 const ProjectListLazyPage = lazy(() => import('./ProjectListPage'));
 const ProjectOverviewLazyPage = lazy(() => import('./ProjectOverviewPage'));
 const ProjectDatabaseLazyPage = lazy(() => import('./ProjectDatabasePage'));
+const ProjectDatabaseDocumentsLazyPage = lazy(
+  () => import('./ProjectDatabaseDocumentsPage')
+);
 const ProjectUsersLazyPage = lazy(() => import('./ProjectUsersPage'));
+const ProjectTeamsLazyPage = lazy(() => import('./ProjectTeamsPage'));
 const ProjectFunctionsLazyPage = lazy(() => import('./ProjectFunctionsPage'));
 const ProjectWebhooksLazyPage = lazy(() => import('./ProjectWebhooksPage'));
 const ProjectKeysLazyPage = lazy(() => import('./ProjectKeysPage'));
@@ -35,9 +39,19 @@ export const ProjectDatabasePage = () => (
     <ProjectDatabaseLazyPage />
   </Loader>
 );
+export const ProjectDatabaseDocumentsPage = () => (
+  <Loader>
+    <ProjectDatabaseDocumentsLazyPage />
+  </Loader>
+);
 export const ProjectUsersPage = () => (
   <Loader>
     <ProjectUsersLazyPage />
+  </Loader>
+);
+export const ProjectTeamsPage = () => (
+  <Loader>
+    <ProjectTeamsLazyPage />
   </Loader>
 );
 export const ProjectFunctionsPage = () => (

@@ -57,7 +57,7 @@ export function SidebarNav({ desktop = true }: { desktop?: boolean }) {
         <NavLink
           to="functions"
           activeClassName="bg-green-800 text-white"
-          className={'hidden ' + itemClassName}
+          className={itemClassName}
         >
           <HiOutlineLightningBolt className="mr-4 h-6 w-6 text-green-200" />
           Functions
@@ -66,30 +66,30 @@ export function SidebarNav({ desktop = true }: { desktop?: boolean }) {
         <NavLink
           to="webhooks"
           activeClassName="bg-green-800 text-white"
-          className={'hidden ' + itemClassName}
+          className={itemClassName}
         >
           <HiOutlineLink className="mr-4 h-6 w-6 text-green-200" />
           Webhooks
-        </NavLink>
-
-        <NavLink
-          to="keys"
-          activeClassName="bg-green-800 text-white"
-          className={itemClassName}
-        >
-          <HiOutlineKey className="mr-4 h-6 w-6 text-green-200" />
-          API Keys
         </NavLink>
       </div>
 
       <div className="mt-6 pt-6">
         <div className="px-2 space-y-1">
           <NavLink
+            to="keys"
+            activeClassName="bg-green-800 text-white"
+            className={itemClassName}
+          >
+            <HiOutlineKey className="mr-4 h-6 w-6 text-green-200" />
+            API Keys
+          </NavLink>
+
+          <NavLink
             to="settings"
             activeClassName="bg-green-800 text-white"
             className={itemClassName}
           >
-            <HiOutlineCog className="mr-4 h-6 w-6 text-green-200 group-hover:text-green-200" />
+            <HiOutlineCog className="mr-4 h-6 w-6 text-green-200" />
             Settings
           </NavLink>
 
@@ -98,7 +98,7 @@ export function SidebarNav({ desktop = true }: { desktop?: boolean }) {
             activeClassName="bg-green-800 text-white"
             className={itemClassName}
           >
-            <HiOutlineQuestionMarkCircle className="mr-4 h-6 w-6 text-green-300 group-hover:text-green-200" />
+            <HiOutlineQuestionMarkCircle className="mr-4 h-6 w-6 text-green-200" />
             Help
           </NavLink>
         </div>

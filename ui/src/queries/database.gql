@@ -1,5 +1,5 @@
-mutation createCollection($name: String!) {
-  createCollection(name: $name) {
+mutation createCollection($projectId: ID!, $name: String!) {
+  createCollection(projectId: $projectId, name: $name) {
     id
     name
     createdDate

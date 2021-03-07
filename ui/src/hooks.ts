@@ -4,6 +4,7 @@ import {
   GetProjectDocument,
   MeDocument,
   ListUsersDocument,
+  ListTeamsDocument,
   ListCollectionsDocument,
   ListLogsDocument,
   ListApiKeysDocument,
@@ -21,6 +22,10 @@ export function useProfile() {
 
 export function useListUsers(id: string) {
   return useQuery({ query: ListUsersDocument, variables: { projectId: id } });
+}
+
+export function useListTeams(id: string) {
+  return useQuery({ query: ListTeamsDocument, variables: { projectId: id } });
 }
 
 export function useListCollections(id: string) {

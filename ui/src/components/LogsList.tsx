@@ -1,9 +1,33 @@
 import React from 'react';
 import { HiOutlineChevronRight } from 'react-icons/hi';
-import { useTable, Column } from 'react-table';
+import { useTable, Column, Cell } from 'react-table';
 import { Link } from 'react-router-dom';
+import { FormattedRelativeTime } from 'react-intl';
 
 import { Log } from '../graphql-operations';
+
+function getCellProps(cell: Cell<Partial<Log>>) {
+  switch (cell.column.id) {
+    case 'type':
+      return {
+        className:
+          'max-w-0 w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900',
+      };
+    default:
+      return {
+        className:
+          'px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500',
+      };
+  }
+}
+
+function getHeaderProps(column: Column<Partial<Log>>) {
+  return {};
+}
+
+function getColumnProps(column: Column<Partial<Log>>) {
+  return {};
+}
 
 const columns: Column<Partial<Log>>[] = [
   {
@@ -18,24 +42,23 @@ const columns: Column<Partial<Log>>[] = [
     id: 'createdDate',
     accessor: 'createdDate',
     Header: 'created date',
-    Cell: ({ value }: { value: unknown }) => {
-      return value;
+    Cell: ({ value }: { value: string }) => {
+      return <FormattedRelativeTime value={Date.parse(value)} />;
     },
   },
 ];
 
 export function LogsList({ logs }: { logs: Partial<Log>[] }) {
-  const table = useTable<Partial<Log>>({
-    columns,
-    data: logs,
-  });
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     rows,
     prepareRow,
-  } = table;
+  } = useTable<Partial<Log>>({
+    columns,
+    data: logs,
+  });
 
   return (
     <>
@@ -51,7 +74,7 @@ export function LogsList({ logs }: { logs: Partial<Log>[] }) {
                 >
                   <span className="flex items-center space-x-4">
                     <span className="flex-1 flex space-x-2 truncate">
-                      {row.values['type']}
+                      {row.cells[0].render('Cell')}
                     </span>
                     <HiOutlineChevronRight className="flex-shrink-0 h-5 w-5 text-gray-400" />
                   </span>
@@ -76,7 +99,10 @@ export function LogsList({ logs }: { logs: Partial<Log>[] }) {
                       {headerGroup.headers.map((column) => (
                         <th
                           className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          {...column.getHeaderProps()}
+                          {...column.getHeaderProps([
+                            getColumnProps(column),
+                            getHeaderProps(column),
+                          ])}
                         >
                           {column.render('Header')}
                         </th>
@@ -94,8 +120,10 @@ export function LogsList({ logs }: { logs: Partial<Log>[] }) {
                       <tr className="bg-white" {...row.getRowProps()}>
                         {row.cells.map((cell) => (
                           <td
-                            className="px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500"
-                            {...cell.getCellProps()}
+                            {...cell.getCellProps([
+                              getColumnProps(cell.column),
+                              getCellProps(cell),
+                            ])}
                           >
                             {cell.render('Cell')}
                           </td>

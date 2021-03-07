@@ -1,9 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { HiPlusCircle } from 'react-icons/hi';
+import { useParams } from 'react-router-dom';
+
+import { useProject } from '../../hooks';
+import { NotImplemented } from '../NotImplemented';
+import { ProjectStatusBar } from '../ProjectStatusBar';
 
 export default function ProjectFunctionsPage() {
+  const [, setSlideOverOpen] = useState(false);
+  const { id } = useParams();
+  const project = useProject(id);
+
   return (
-    <h2 className="max-w-6xl mx-auto mt-8 px-4 text-lg leading-6 font-medium text-gray-900 sm:px-6 lg:px-8">
-      Functions
-    </h2>
+    <>
+      <ProjectStatusBar name={project?.name}>
+        <button
+          type="button"
+          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          onClick={() => setSlideOverOpen(true)}
+        >
+          <HiPlusCircle className="-ml-1 mr-3 h-5 w-5" /> Function
+        </button>
+      </ProjectStatusBar>
+
+      <div className="p-10 bg-white">
+        <NotImplemented />
+      </div>
+    </>
   );
 }

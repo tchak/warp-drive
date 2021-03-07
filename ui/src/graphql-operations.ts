@@ -177,6 +177,7 @@ export type MutationCreateAttributeArgs = {
 
 export type MutationCreateCollectionArgs = {
   name: Scalars['String'];
+  projectId: Scalars['ID'];
 };
 
 export type MutationCreateDocumentArgs = {
@@ -203,12 +204,14 @@ export type MutationCreateProjectArgs = {
 
 export type MutationCreateTeamArgs = {
   name: Scalars['String'];
+  projectId: Scalars['ID'];
 };
 
 export type MutationCreateUserArgs = {
   email: Scalars['String'];
   name?: Maybe<Scalars['String']>;
   password: Scalars['String'];
+  projectId: Scalars['ID'];
 };
 
 export type MutationDeleteAttributeArgs = {
@@ -411,6 +414,7 @@ export type MeQueryVariables = Exact<{ [key: string]: never }>;
 export type MeQuery = { me: Pick<Profile, 'name' | 'email'> };
 
 export type CreateCollectionMutationVariables = Exact<{
+  projectId: Scalars['ID'];
   name: Scalars['String'];
 }>;
 
@@ -507,6 +511,7 @@ export type DeleteProjectMutation = {
 };
 
 export type CreateUserMutationVariables = Exact<{
+  projectId: Scalars['ID'];
   email: Scalars['String'];
   password: Scalars['String'];
   name?: Maybe<Scalars['String']>;
@@ -713,6 +718,17 @@ export const CreateCollectionDocument: DocumentNode<
       variableDefinitions: [
         {
           kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'projectId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
           variable: { kind: 'Variable', name: { kind: 'Name', value: 'name' } },
           type: {
             kind: 'NonNullType',
@@ -730,6 +746,14 @@ export const CreateCollectionDocument: DocumentNode<
             kind: 'Field',
             name: { kind: 'Name', value: 'createCollection' },
             arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'projectId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'projectId' },
+                },
+              },
               {
                 kind: 'Argument',
                 name: { kind: 'Name', value: 'name' },
@@ -1328,6 +1352,17 @@ export const CreateUserDocument: DocumentNode<
           kind: 'VariableDefinition',
           variable: {
             kind: 'Variable',
+            name: { kind: 'Name', value: 'projectId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
             name: { kind: 'Name', value: 'email' },
           },
           type: {
@@ -1365,6 +1400,14 @@ export const CreateUserDocument: DocumentNode<
             kind: 'Field',
             name: { kind: 'Name', value: 'createUser' },
             arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'projectId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'projectId' },
+                },
+              },
               {
                 kind: 'Argument',
                 name: { kind: 'Name', value: 'email' },
