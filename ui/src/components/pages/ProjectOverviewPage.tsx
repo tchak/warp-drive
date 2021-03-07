@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 
 import { useProject, useListLogs } from '../../hooks';
 import { OverviewCard } from '../OverviewCard';
-import { LogsList } from '../LogsList';
+import { LogList } from '../LogList';
 import { ProjectStatusBar } from '../ProjectStatusBar';
 
 export default function ProjectOverviewPage() {
@@ -47,7 +47,7 @@ export default function ProjectOverviewPage() {
           Recent activity
         </h2>
 
-        <LogsList logs={logs} />
+        <LogList logs={logs} />
       </div>
     </>
   );

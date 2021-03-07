@@ -4,10 +4,12 @@ import { useTable, Column, Cell } from 'react-table';
 import { Link } from 'react-router-dom';
 import { FormattedDate } from 'react-intl';
 
-import { User } from '../graphql-operations';
+import { User as FullUser } from '../graphql-operations';
 import { ListPagination, TablePagination } from './Pagination';
 
-function getCellProps(cell: Cell<Partial<User>>) {
+type User = Pick<FullUser, 'id' | 'name' | 'email' | 'createdDate'>;
+
+function getCellProps(cell: Cell<User>) {
   switch (cell.column.id) {
     case 'email':
       return {
@@ -22,15 +24,15 @@ function getCellProps(cell: Cell<Partial<User>>) {
   }
 }
 
-function getHeaderProps(column: Column<Partial<User>>) {
+function getHeaderProps(column: Column<User>) {
   return {};
 }
 
-function getColumnProps(column: Column<Partial<User>>) {
+function getColumnProps(column: Column<User>) {
   return {};
 }
 
-const columns: Column<Partial<User>>[] = [
+const columns: Column<User>[] = [
   {
     id: 'email',
     accessor: 'email',
@@ -53,12 +55,12 @@ const columns: Column<Partial<User>>[] = [
   },
 ];
 
-export function UsersList({
+export function UserList({
   users,
   offset,
   total,
 }: {
-  users: Partial<User>[];
+  users: User[];
   offset?: number;
   total?: number;
 }) {
@@ -68,7 +70,7 @@ export function UsersList({
     headerGroups,
     rows,
     prepareRow,
-  } = useTable<Partial<User>>({
+  } = useTable<User>({
     columns,
     data: users,
   });

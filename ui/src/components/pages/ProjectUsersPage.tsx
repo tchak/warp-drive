@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { HiPlusCircle } from 'react-icons/hi';
 import { useParams, NavLink } from 'react-router-dom';
 
-import { UsersList } from '../UsersList';
+import { UserList } from '../UserList';
 import { useListUsers, useProject } from '../../hooks';
 import { ProjectStatusBar } from '../ProjectStatusBar';
 import { AddUser } from '../AddUser';
@@ -52,7 +52,7 @@ export default function ProjectUsersPage() {
       </div>
 
       <div className="mt-8">
-        <UsersList users={users} />
+        <UserList users={users} />
       </div>
 
       {project && (

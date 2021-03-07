@@ -6,7 +6,7 @@ import { FormattedRelativeTime } from 'react-intl';
 
 import { Log } from '../graphql-operations';
 
-function getCellProps(cell: Cell<Partial<Log>>) {
+function getCellProps(cell: Cell<Log>) {
   switch (cell.column.id) {
     case 'type':
       return {
@@ -21,15 +21,15 @@ function getCellProps(cell: Cell<Partial<Log>>) {
   }
 }
 
-function getHeaderProps(column: Column<Partial<Log>>) {
+function getHeaderProps(column: Column<Log>) {
   return {};
 }
 
-function getColumnProps(column: Column<Partial<Log>>) {
+function getColumnProps(column: Column<Log>) {
   return {};
 }
 
-const columns: Column<Partial<Log>>[] = [
+const columns: Column<Log>[] = [
   {
     id: 'type',
     accessor: 'type',
@@ -48,14 +48,14 @@ const columns: Column<Partial<Log>>[] = [
   },
 ];
 
-export function LogsList({ logs }: { logs: Partial<Log>[] }) {
+export function LogList({ logs }: { logs: Log[] }) {
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     rows,
     prepareRow,
-  } = useTable<Partial<Log>>({
+  } = useTable<Log>({
     columns,
     data: logs,
   });
