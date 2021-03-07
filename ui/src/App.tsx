@@ -26,6 +26,7 @@ import {
   HelpPage,
   SignInPage,
   SignUpPage,
+  SignOutPage,
 } from './components/pages';
 
 const client = createClient({
@@ -48,6 +49,7 @@ function App() {
             <Route path="/" element={<ProjectListPage />} />
             <Route path="/signin" element={<SignInPage />} />
             <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/signout" element={<SignOutPage />} />
             <Route path="/p/:id" element={<ProjectLayout />}>
               <Route path="/" element={<ProjectOverviewPage />} />
               <Route path="database" element={<ProjectDatabasePage />} />

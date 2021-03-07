@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery } from 'urql';
 
 import {
@@ -10,13 +11,22 @@ import {
   ListApiKeysDocument,
 } from './graphql-operations';
 
+function isSignedIn(): boolean {
+  return !!localStorage.getItem('accessToken');
+}
+
+export function useSignedIn(): boolean {
+  return useMemo(() => isSignedIn(), []);
+}
+
 export function useProject(id: string) {
   const [{ data }] = useQuery({ query: GetProjectDocument, variables: { id } });
   return data?.project;
 }
 
 export function useProfile() {
-  const [{ data }] = useQuery({ query: MeDocument });
+  const isSignedIn = useSignedIn();
+  const [{ data }] = useQuery({ query: MeDocument, pause: !isSignedIn });
   return data?.me;
 }
 

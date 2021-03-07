@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery, useMutation } from 'urql';
 import { useFormik } from 'formik';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { HiOutlineTrash } from 'react-icons/hi';
 
 import {
@@ -10,21 +10,26 @@ import {
   DeleteProjectDocument,
 } from '../../graphql-operations';
 
+import { useSignedIn } from '../../hooks';
+
 export default function ProjectListPage() {
+  const isSignedIn = useSignedIn();
   const [{ data, fetching, error }] = useQuery({
     query: ListProjectsDocument,
+    pause: !isSignedIn,
   });
   const [{ fetching: deleting }, deleteProject] = useMutation(
     DeleteProjectDocument
   );
 
-  if (fetching) {
-    return <>Loading...</>;
+  if (!isSignedIn) {
+    return <Navigate to="/signin" />;
   }
+
   if (error) {
     return <>Error: {(error as Error).message}</>;
   }
-  const projects = data?.projects ?? [];
+  const projects = fetching ? [] : data?.projects ?? [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

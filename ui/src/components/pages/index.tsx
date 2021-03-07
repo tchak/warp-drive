@@ -1,5 +1,6 @@
 import React, { Suspense, lazy, FunctionComponent } from 'react';
 import { FaSpinner } from 'react-icons/fa';
+import { Navigate } from 'react-router-dom';
 
 const SignInLazyPage = lazy(() => import('./SignInPage'));
 const SignUpLazyPage = lazy(() => import('./SignUpPage'));
@@ -89,3 +90,8 @@ export const SignUpPage = () => (
     <SignUpLazyPage />
   </Loader>
 );
+
+export function SignOutPage() {
+  localStorage.removeItem('accessToken');
+  return <Navigate to="/" />;
+}

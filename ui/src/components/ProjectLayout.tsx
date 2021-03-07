@@ -5,16 +5,17 @@ import {
   HiMenuAlt1,
   HiOutlineSparkles,
 } from 'react-icons/hi';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
 import { Transition } from '@headlessui/react';
 
-import { useProfile } from '../hooks';
+import { useProfile, useSignedIn } from '../hooks';
 
 import { ProfileMenu } from './ProfileMenu';
 import { SearchField } from './SearchField';
 import { SidebarNav } from './SidebarNav';
 
 export function ProjectLayout() {
+  const isSignedIn = useSignedIn();
   const { pathname } = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const profile = useProfile();
@@ -22,6 +23,10 @@ export function ProjectLayout() {
   useEffect(() => {
     setSidebarOpen(false);
   }, [pathname]);
+
+  if (!isSignedIn) {
+    return <Navigate to="/signin" />;
+  }
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
