@@ -8,10 +8,10 @@ import {
   Field,
   FieldResolver,
   Root,
+  Query,
 } from 'type-graphql';
 
 import { ProjectCollection } from '../entities/ProjectCollection';
-import { Document } from '../entities/Document';
 import {
   AttributeType,
   CollectionAttribute,
@@ -23,6 +23,7 @@ import {
 
 import { Context } from '../lib/context';
 import {
+  getCollection,
   createCollection,
   deleteCollection,
   createCollectionAttribute,
@@ -55,6 +56,14 @@ class DeletedRelationship {
 
 @Resolver(ProjectCollection)
 export class CollectionResolver {
+  @Query(() => ProjectCollection)
+  async collection(
+    @Ctx('context') context: Context,
+    @Arg('id', () => ID) collectionId: string
+  ): Promise<ProjectCollection> {
+    return getCollection({ context, collectionId });
+  }
+
   @Mutation(() => ProjectCollection)
   async createCollection(
     @Ctx('context') context: Context,
@@ -167,12 +176,6 @@ export class CollectionResolver {
   ): Promise<DeletedRelationship> {
     await deleteCollectionRelationship({ context, relationshipId });
     return { id: relationshipId };
-  }
-
-  @FieldResolver(() => [Document])
-  async documents(@Root() collection: ProjectCollection): Promise<Document[]> {
-    await collection.documents.loadItems();
-    return [...collection.documents];
   }
 
   @FieldResolver(() => [CollectionAttribute])

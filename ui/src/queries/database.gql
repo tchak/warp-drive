@@ -1,3 +1,15 @@
+query getCollection($id: ID!) {
+  collection(id: $id) {
+    id
+    name
+    attributes {
+      id
+      name
+      type
+    }
+  }
+}
+
 mutation createCollection($projectId: ID!, $name: String!) {
   createCollection(projectId: $projectId, name: $name) {
     id
@@ -8,6 +20,24 @@ mutation createCollection($projectId: ID!, $name: String!) {
 
 mutation deleteCollection($id: ID!) {
   deleteCollection(id: $id) {
+    id
+  }
+}
+
+mutation createAttribute(
+  $collectionId: ID!
+  $name: String!
+  $type: AttributeType!
+) {
+  createAttribute(collectionId: $collectionId, name: $name, type: $type) {
+    id
+    name
+    type
+  }
+}
+
+mutation deleteAttribute($id: ID!) {
+  deleteAttribute(id: $id) {
     id
   }
 }

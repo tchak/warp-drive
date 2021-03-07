@@ -11,7 +11,6 @@ import {
   wrap,
 } from '@mikro-orm/core';
 import { v4 as uuid } from 'uuid';
-import { ObjectType, Field, ID } from 'type-graphql';
 
 import { getClock } from '../lib/hlc';
 import {
@@ -19,6 +18,7 @@ import {
   Permissions,
   PermissionsOptions,
 } from './ProjectCollection';
+import { AttributeType } from './CollectionAttribute';
 import { RelationshipType } from './CollectionRelationship';
 import { AttributeOperation } from './AttributeOperation';
 import { RelationshipOperation } from './RelationshipOperation';
@@ -42,7 +42,10 @@ export interface DocumentOperation {
   };
 }
 
-export type DocumentAttributes = Record<string, unknown>;
+export type DocumentAttributes = Record<
+  string,
+  string | number | boolean | null
+>;
 export type DocumentRelationships = Record<
   string,
   { data: DocumentIdentity[] | DocumentIdentity | null }
@@ -56,7 +59,6 @@ export interface DocumentOptions {
 }
 
 @Entity()
-@ObjectType()
 export class Document {
   constructor(collection: ProjectCollection, options?: DocumentOptions) {
     this.collection = collection;
@@ -66,14 +68,12 @@ export class Document {
     //this.permissions = new Permissions(options?.permissions);
   }
 
-  @Field(() => ID)
   @PrimaryKey({ type: 'uuid' })
   id: string;
 
   // @Embedded(() => Permissions, { prefix: false })
   // permissions: Permissions;
 
-  @Field(() => ProjectCollection)
   @ManyToOne(() => ProjectCollection, { hidden: true, eager: true })
   collection: ProjectCollection;
 
@@ -104,9 +104,11 @@ export class Document {
   @Property({ persist: false })
   get attributes(): DocumentAttributes {
     return Object.fromEntries(
-      [...this.attributeOperations].map(({ attribute: { name }, value }) => [
+      [
+        ...this.attributeOperations,
+      ].map(({ attribute: { name, type }, value }) => [
         name,
-        value,
+        castAttribute(type, value),
       ])
     );
   }
@@ -187,7 +189,12 @@ export class Document {
           return {
             op: 'update',
             ref,
-            data: { [operation.attribute.name]: operation.value },
+            data: {
+              [operation.attribute.name]: castAttribute(
+                operation.attribute.type,
+                operation.value
+              ),
+            },
             meta,
           } as DocumentOperation;
         } else if (operation.remove && operation.relatedDocument) {
@@ -256,5 +263,24 @@ export class Document {
       attributes,
       relationships,
     };
+  }
+}
+
+function castAttribute(
+  type: AttributeType,
+  value: string | null
+): string | boolean | number | null {
+  if (value == null) {
+    return null;
+  }
+  switch (type) {
+    case AttributeType.boolean:
+      return value == 'true' ? true : value == 'false' ? false : null;
+    case AttributeType.int:
+      return parseInt(value);
+    case AttributeType.float:
+      return parseFloat(value);
+    default:
+      return value;
   }
 }

@@ -3,7 +3,7 @@ import { HiOutlineX } from 'react-icons/hi';
 import { useMutation } from 'urql';
 import { useFormik } from 'formik';
 
-import { CreateUserDocument } from '../graphql-operations';
+import { CreateUserDocument } from '../graphql';
 import { RightSlideOver } from './RightSlideOver';
 
 export function AddUser({

@@ -3,7 +3,7 @@ import { HiOutlineX } from 'react-icons/hi';
 import { useMutation } from 'urql';
 import { useFormik } from 'formik';
 
-import { CreateCollectionDocument } from '../graphql-operations';
+import { CreateCollectionDocument } from '../graphql';
 import { RightSlideOver } from './RightSlideOver';
 
 export function AddCollection({
@@ -86,7 +86,7 @@ function AddCollectionForm({
                   htmlFor="collection-name"
                   className="block text-sm font-medium text-gray-900"
                 >
-                  Collection name
+                  Name (Type)
                 </label>
                 <div className="mt-1">
                   <input
@@ -101,22 +101,6 @@ function AddCollectionForm({
                     value={form.values.name}
                     onChange={form.handleChange}
                   />
-                </div>
-              </div>
-              <div>
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-medium text-gray-900"
-                >
-                  Description
-                </label>
-                <div className="mt-1">
-                  <textarea
-                    id="description"
-                    name="description"
-                    rows={4}
-                    className="block w-full shadow-sm sm:text-sm focus:ring-green-500 focus:border-green-500 border-gray-300 rounded-md"
-                  ></textarea>
                 </div>
               </div>
             </div>

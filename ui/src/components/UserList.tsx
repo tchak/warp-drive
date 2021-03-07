@@ -4,7 +4,7 @@ import { useTable, Column, Cell } from 'react-table';
 import { Link } from 'react-router-dom';
 import { FormattedDate } from 'react-intl';
 
-import { User as FullUser } from '../graphql-operations';
+import { User as FullUser } from '../graphql';
 import { ListPagination, TablePagination } from './Pagination';
 
 type User = Pick<FullUser, 'id' | 'name' | 'email' | 'createdDate'>;

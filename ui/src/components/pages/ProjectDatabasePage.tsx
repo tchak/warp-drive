@@ -4,9 +4,12 @@ import { useParams, NavLink } from 'react-router-dom';
 
 import { useListCollections, useProject } from '../../hooks';
 import { ProjectStatusBar } from '../ProjectStatusBar';
+import { CollectionList } from '../CollectionList';
 import { AddCollection } from '../AddCollection';
+import { EditCollection } from '../EditCollection';
 
 export default function ProjectDatabasePage() {
+  const [collectionId, setCollectionId] = useState<string>();
   const [slideOverOpen, setSlideOverOpen] = useState(false);
   const { id } = useParams();
   const [{ data, fetching, error }] = useListCollections(id);
@@ -50,10 +53,11 @@ export default function ProjectDatabasePage() {
         </div>
       </div>
 
-      <div className="mt-8">
-        <h2 className="max-w-6xl mx-auto mt-8 px-4 text-lg leading-6 font-medium text-gray-900 sm:px-6 lg:px-8">
-          Database
-        </h2>
+      <div className="mt-8 mx-4">
+        <CollectionList
+          collections={collections}
+          edit={(collectionId) => setCollectionId(collectionId)}
+        />
       </div>
 
       {project && (
@@ -61,6 +65,14 @@ export default function ProjectDatabasePage() {
           projectId={project.id}
           isOpen={slideOverOpen}
           close={() => setSlideOverOpen(false)}
+        />
+      )}
+
+      {collectionId && (
+        <EditCollection
+          collectionId={collectionId}
+          isOpen={!!collectionId}
+          close={() => setCollectionId(undefined)}
         />
       )}
     </>

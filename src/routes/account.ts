@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { v4 as uuid } from 'uuid';
 
 import { wrapHandler } from '../local-storage';
 import {
@@ -8,6 +9,8 @@ import {
   listAccountSessions,
   listAccountLogs,
 } from '../lib/account';
+import { generateToken } from '../lib/auth';
+import { getEnvValue } from '../lib/env';
 
 export function account() {
   const router = Router();
@@ -54,8 +57,19 @@ export function account() {
     wrapHandler(async (context, { body }, res) => {
       const { email, password } = body;
       const session = await createAccountSession({ context, email, password });
+      const meta = {
+        token: generateToken(
+          {
+            jti: session.id,
+            sub: session.user.id,
+            aud: 'client',
+          },
+          getEnvValue('AUTH_SECRET'),
+          '2 weeks'
+        ),
+      };
 
-      res.created(session);
+      res.created(session, { meta });
     })
   );
 

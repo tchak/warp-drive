@@ -13,7 +13,6 @@ import { buildSchema } from 'type-graphql';
 import { setup } from './app';
 
 import { CollectionResolver } from './resolvers/CollectionResolver';
-import { DocumentResolver } from './resolvers/DocumentResolver';
 import { ProjectResolver } from './resolvers/ProjectResolver';
 import { TeamResolver } from './resolvers/TeamResolver';
 import { UserResolver } from './resolvers/UserResolver';
@@ -40,7 +39,6 @@ async function main() {
   const schema = await buildSchema({
     resolvers: [
       CollectionResolver,
-      DocumentResolver,
       ProjectResolver,
       TeamResolver,
       UserResolver,

@@ -9,7 +9,8 @@ import {
   ListCollectionsDocument,
   ListLogsDocument,
   ListApiKeysDocument,
-} from './graphql-operations';
+  GetCollectionDocument,
+} from './graphql';
 
 function isSignedIn(): boolean {
   return !!localStorage.getItem('accessToken');
@@ -22,6 +23,15 @@ export function useSignedIn(): boolean {
 export function useProject(id: string) {
   const [{ data }] = useQuery({ query: GetProjectDocument, variables: { id } });
   return data?.project;
+}
+
+export function useCollection(id: string) {
+  const [{ data }] = useQuery({
+    query: GetCollectionDocument,
+    variables: { id },
+    //requestPolicy: 'cache-only',
+  });
+  return data?.collection;
 }
 
 export function useProfile() {

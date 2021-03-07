@@ -78,15 +78,18 @@ export interface CreateCollectionAttributeParams {
 }
 
 export async function createCollectionAttribute({
-  context: { em, project },
+  context,
   collectionId,
   name,
   type,
   required,
 }: CreateCollectionAttributeParams): Promise<CollectionAttribute> {
+  const { em, scope, audience } = context;
+  authorizeCollections(scope, 'write');
+
   const collection = await em.findOneOrFail(ProjectCollection, {
     id: collectionId,
-    project,
+    project: audience == 'admin' ? { owners: context.admin } : context.project,
   });
   const attribute = new CollectionAttribute(collection, name, type, {
     required,
@@ -102,10 +105,12 @@ export interface RenameCollectionAttributeParams {
 }
 
 export async function renameCollectionAttribute({
-  context: { em, project },
+  context: { em, project, scope },
   attributeId,
   name,
 }: RenameCollectionAttributeParams): Promise<CollectionAttribute> {
+  authorizeCollections(scope, 'write');
+
   const attribute = await em.findOneOrFail(CollectionAttribute, {
     id: attributeId,
     collection: { project },
@@ -121,12 +126,18 @@ export interface DeleteCollectionAttributeParams {
 }
 
 export async function deleteCollectionAttribute({
-  context: { em, project },
+  context,
   attributeId,
 }: DeleteCollectionAttributeParams): Promise<void> {
+  const { em, scope, audience } = context;
+  authorizeCollections(scope, 'write');
+
   const attribute = await em.findOneOrFail(CollectionAttribute, {
     id: attributeId,
-    collection: { project },
+    collection: {
+      project:
+        audience == 'admin' ? { owners: context.admin } : context.project,
+    },
   });
   await em.removeAndFlush(attribute);
 }
@@ -141,13 +152,15 @@ export interface CreateCollectionRelationshipParams {
 }
 
 export async function createCollectionRelationship({
-  context: { em, project },
+  context: { em, project, scope },
   collectionId,
   name,
   relationship: [from, to],
   relatedCollectionId,
   inverse,
 }: CreateCollectionRelationshipParams) {
+  authorizeCollections(scope, 'write');
+
   const collection = await em.findOneOrFail(ProjectCollection, {
     id: collectionId,
     project,
@@ -214,19 +227,29 @@ export interface RenameCollectionRelationshipInverseParams {
 }
 
 export async function renameCollectionRelationshipInverse({
-  context: { em, project },
+  context,
   relationshipId,
   inverse,
 }: RenameCollectionRelationshipInverseParams): Promise<CollectionRelationship> {
+  const { em, scope, audience } = context;
+  authorizeCollections(scope, 'write');
+
   const relationship = await em.findOneOrFail(CollectionRelationship, {
     id: relationshipId,
-    collection: { project },
+    collection: {
+      project:
+        audience == 'admin' ? { owners: context.admin } : context.project,
+    },
     owner: true,
   });
   if (relationship.inverse) {
     const inverseRelationship = await em.findOneOrFail(CollectionRelationship, {
       name: relationship.inverse,
-      collection: { id: relationship.collection.id, project },
+      collection: {
+        id: relationship.collection.id,
+        project:
+          audience == 'admin' ? { owners: context.admin } : context.project,
+      },
     });
     if (inverse) {
       inverseRelationship.name = inverse;
@@ -245,19 +268,29 @@ export interface DeleteCollectionRelationshipParams {
 }
 
 export async function deleteCollectionRelationship({
-  context: { em, project },
+  context,
   relationshipId,
 }: DeleteCollectionRelationshipParams) {
+  const { em, scope, audience } = context;
+  authorizeCollections(scope, 'write');
+
   const relationship = await em.findOneOrFail(CollectionRelationship, {
     id: relationshipId,
-    collection: { project },
+    collection: {
+      project:
+        audience == 'admin' ? { owners: context.admin } : context.project,
+    },
     owner: true,
   });
   if (relationship.inverse) {
     const inverseRelationship = await em.findOne(CollectionRelationship, {
       name: relationship.inverse,
       inverse: relationship.name,
-      collection: { id: relationship.relatedCollection.id, project },
+      collection: {
+        id: relationship.relatedCollection.id,
+        project:
+          audience == 'admin' ? { owners: context.admin } : context.project,
+      },
     });
     if (inverseRelationship) {
       em.remove(inverseRelationship);
@@ -272,14 +305,15 @@ export interface DeleteCollectionParams {
 }
 
 export async function deleteCollection({
-  context: { em, project, scope },
+  context,
   collectionId,
 }: DeleteCollectionParams): Promise<void> {
+  const { em, scope, audience } = context;
   authorizeCollections(scope, 'write');
 
   const collection = await em.findOneOrFail(ProjectCollection, {
     id: collectionId,
-    project,
+    project: audience == 'admin' ? { owners: context.admin } : context.project,
   });
   await em.removeAndFlush(collection);
 }
@@ -290,16 +324,18 @@ export interface GetCollectionParams {
 }
 
 export async function getCollection({
-  context: { em, project, scope },
+  context,
   collectionId,
 }: GetCollectionParams): Promise<ProjectCollection> {
+  const { em, scope, audience } = context;
   authorizeCollections(scope, 'read');
 
   const collection = await em.findOneOrFail(
     ProjectCollection,
     {
       id: collectionId,
-      project,
+      project:
+        audience == 'admin' ? { owners: context.admin } : context.project,
     },
     ['attributes', 'relationships']
   );
@@ -520,7 +556,7 @@ export async function listDocuments({
       removeOperationId: null,
     },
     {
-      orderBy: { addOperationTimestamp: QueryOrder.ASC },
+      orderBy: { timestamp: QueryOrder.ASC },
     }
   );
 
@@ -532,24 +568,42 @@ function buildAttributeOperations(
   attributes?: DocumentAttributes
 ): AttributeOperation[] {
   const operations = attributes
-    ? Object.entries(attributes).map(
-        ([attribute, value]) =>
-          new AttributeOperation(
-            document,
-            [...document.collection.attributes].find(
-              ({ name }) => name == attribute
-            ) as CollectionAttribute,
-            `${value}`,
-            {
-              id: uuid(),
-              timestamp: getClock().inc(),
-            }
-          )
-      )
+    ? Object.entries(attributes).map(([attributeName, value]) => {
+        const attribute = [...document.collection.attributes].find(
+          ({ name }) => name == attributeName
+        ) as CollectionAttribute;
+        return new AttributeOperation(
+          document,
+          attribute,
+          attributeToString(attribute.type, value),
+          {
+            id: uuid(),
+            timestamp: getClock().inc(),
+          }
+        );
+      })
     : [];
   return operations;
 }
 
 function compact<T>(map: T) {
   return Object.fromEntries(Object.entries(map).filter(([, value]) => value));
+}
+
+function attributeToString(
+  type: AttributeType,
+  value: string | boolean | number | null
+): string | null {
+  if (value == null) {
+    return null;
+  }
+  switch (type) {
+    case AttributeType.boolean:
+      return value === true ? 'true' : value === false ? 'false' : '';
+    case AttributeType.int:
+    case AttributeType.float:
+      return `${value}`;
+    default:
+      return `${value}`;
+  }
 }

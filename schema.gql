@@ -27,15 +27,9 @@ enum AttributeType {
   string
 }
 
-type BooleanAttribute {
-  name: String!
-  value: Boolean!
-}
-
 type Collection {
   attributes: [Attribute!]!
   createdDate: DateTime!
-  documents: [Document!]!
   id: ID!
   name: String!
   relationships: [Relationship!]!
@@ -52,10 +46,6 @@ type DeletedAttribute {
 }
 
 type DeletedCollection {
-  id: ID!
-}
-
-type DeletedDocument {
   id: ID!
 }
 
@@ -76,12 +66,6 @@ type DeletedTeam {
 }
 
 type DeletedUser {
-  id: ID!
-}
-
-type Document {
-  attributes: [TypedAttribute!]!
-  collection: Collection!
   id: ID!
 }
 
@@ -115,16 +99,6 @@ enum EventType {
   usersUpdateStatus
 }
 
-type FloatAttribute {
-  name: String!
-  value: Float!
-}
-
-type IntAttribute {
-  name: String!
-  value: Int!
-}
-
 type Log {
   createdDate: DateTime!
   id: ID!
@@ -134,7 +108,6 @@ type Log {
 type Mutation {
   createAttribute(collectionId: ID!, name: String!, type: AttributeType!): Attribute!
   createCollection(name: String!, projectId: ID!): Collection!
-  createDocument(collectionId: ID!): Document!
   createManyToOneRelationship(collectionId: ID!, inverse: String, name: String!, relatedCollectionId: ID!): Relationship!
   createOneToOneRelationship(collectionId: ID!, inverse: String, name: String!, relatedCollectionId: ID!): Relationship!
   createProject(name: String!): Project!
@@ -142,7 +115,6 @@ type Mutation {
   createUser(email: String!, name: String, password: String!, projectId: ID!): User!
   deleteAttribute(id: ID!): DeletedAttribute!
   deleteCollection(id: ID!): DeletedCollection!
-  deleteDocument(id: ID!): DeletedDocument!
   deleteProject(id: ID!): DeletedProject!
   deleteRelationship(id: ID!): DeletedRelationship!
   deleteSession(id: ID!): DeletedSession!
@@ -153,14 +125,6 @@ type Mutation {
   renameRelationshipInverse(id: ID!, inverse: String!): Relationship!
   signIn(email: String!, password: String!): SignInPayload!
   signUp(email: String!, password: String!): SignUpPayload!
-  updateBooleanAttribute(documentId: ID!, name: String!, value: Boolean!): BooleanAttribute!
-  updateFloatAttribute(documentId: ID!, name: String!, value: Float!): FloatAttribute!
-  updateIntAttribute(documentId: ID!, name: String!, value: Int!): IntAttribute!
-  updateStringAttribute(documentId: ID!, name: String!, value: String!): StringAttribute!
-}
-
-type NullAttribute {
-  name: String!
 }
 
 type Profile {
@@ -181,6 +145,7 @@ type Project {
 }
 
 type Query {
+  collection(id: ID!): Collection!
   me: Profile!
   project(id: ID!): Project!
   projects: [Project!]!
@@ -227,19 +192,12 @@ type SignUpPayload {
   token: String!
 }
 
-type StringAttribute {
-  name: String!
-  value: String!
-}
-
 type Team {
   createdDate: DateTime!
   id: ID!
   name: String!
   updatedDate: DateTime!
 }
-
-union TypedAttribute = BooleanAttribute | FloatAttribute | IntAttribute | NullAttribute | StringAttribute
 
 type User {
   createdDate: DateTime!

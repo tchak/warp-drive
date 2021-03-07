@@ -32,7 +32,7 @@ export class AttributeOperation {
   @Property()
   timestamp: string;
 
-  @Property({ nullable: true })
+  @Property({ type: 'text', nullable: true })
   value: string | null;
 
   @ManyToOne(() => Document, { hidden: true })

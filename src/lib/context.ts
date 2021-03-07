@@ -123,6 +123,9 @@ export async function createAPIContext(
       const user = await em.findOneOrFail(ProjectUser, {
         id: token.sub,
         project: projectId,
+        sessions: {
+          id: token.jti,
+        },
       });
       context.user = user;
       break;

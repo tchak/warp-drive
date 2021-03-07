@@ -43,7 +43,13 @@ query listCollections($projectId: ID!) {
     collections {
       id
       name
+      attributes {
+        id
+        name
+        type
+      }
       createdDate
+      updatedDate
     }
   }
 }

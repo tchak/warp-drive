@@ -5,10 +5,11 @@ import {
   Provider as URQLProvider,
   createClient,
   dedupExchange,
-  cacheExchange,
   fetchExchange,
 } from 'urql';
 import { refocusExchange } from '@urql/exchange-refocus';
+import { cacheExchange } from '@urql/exchange-graphcache';
+import { devtoolsExchange } from '@urql/devtools';
 import { IntlProvider } from 'react-intl';
 
 import { ProjectLayout } from './components/ProjectLayout';
@@ -29,6 +30,14 @@ import {
   SignOutPage,
 } from './components/pages';
 
+import {
+  ListProjectsDocument,
+  ListCollectionsDocument,
+  ListUsersDocument,
+  GetCollectionDocument,
+} from './graphql';
+import schema from './schema.json';
+
 const client = createClient({
   url: '/v1/console',
   fetchOptions: () => {
@@ -37,7 +46,107 @@ const client = createClient({
       headers: { authorization: token ? `Bearer ${token}` : '' },
     };
   },
-  exchanges: [dedupExchange, refocusExchange(), cacheExchange, fetchExchange],
+  exchanges: [
+    devtoolsExchange,
+    dedupExchange,
+    refocusExchange(),
+    cacheExchange({
+      schema: schema as any,
+      resolvers: {
+        Query: {
+          collection(_, args) {
+            return { __typename: 'Collection', id: args.id };
+          },
+          project(_, args) {
+            return { __typename: 'Project', id: args.id };
+          },
+        },
+      },
+      updates: {
+        Mutation: {
+          createProject(result, _, cache) {
+            cache.updateQuery({ query: ListProjectsDocument }, (data) => {
+              data?.projects.push(result.createProject as any);
+              return data;
+            });
+          },
+          deleteProject(_, args, cache) {
+            cache.invalidate({
+              __typename: 'Project',
+              id: args.id as string,
+            });
+          },
+          createCollection(result, args, cache) {
+            cache.updateQuery(
+              { query: ListCollectionsDocument, variables: args },
+              (data) => {
+                data?.project.collections.push(result.createCollection as any);
+                return data;
+              }
+            );
+          },
+          deleteCollection(_, args, cache) {
+            cache.invalidate({
+              __typename: 'Collection',
+              id: args.id as string,
+            });
+          },
+          createUser(result, args, cache) {
+            cache.updateQuery(
+              { query: ListUsersDocument, variables: args },
+              (data) => {
+                data?.project.users.push(result.createUser as any);
+                return data;
+              }
+            );
+          },
+          deleteUser(_, args, cache) {
+            cache.invalidate({
+              __typename: 'User',
+              id: args.id as string,
+            });
+          },
+          createAttribute(result, args, cache) {
+            cache.updateQuery(
+              {
+                query: GetCollectionDocument,
+                variables: { id: args.collectionId },
+              },
+              (data) => {
+                data?.collection.attributes.push(result.createAttribute as any);
+                return data;
+              }
+            );
+            cache.invalidate({
+              __typename: 'Collection',
+              id: args.collectionId as string,
+            });
+            // const pid = '041f5ba1-78c5-481f-9683-70dab772b964';
+            // cache.updateQuery(
+            //   {
+            //     query: ListCollectionsDocument,
+            //     variables: { projectId: pid },
+            //   },
+            //   (data) => {
+            //     const collection = data?.project.collections.find(
+            //       ({ id }) => args.collectionId == id
+            //     );
+            //     collection?.attributes.push(result.createAttribute as any);
+            //     return data;
+            //   }
+            // );
+          },
+          deleteAttribute(_, args, cache) {
+            cache.invalidate({
+              __typename: 'Attribute',
+              id: args.id as string,
+            });
+          },
+        },
+      },
+    }),
+    fetchExchange,
+  ],
 });
 
 function App() {

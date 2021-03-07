@@ -109,7 +109,7 @@ export function database() {
     '/documents',
     wrapHandler(async (context, { body }, res) => {
       const { type, attributes } = body.data;
-      const { permissions } = body.meta;
+      const { permissions } = body.meta ?? {};
       const document = await createDocument({
         context,
         collectionId: type,

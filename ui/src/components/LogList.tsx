@@ -4,7 +4,7 @@ import { useTable, Column, Cell } from 'react-table';
 import { Link } from 'react-router-dom';
 import { FormattedRelativeTime } from 'react-intl';
 
-import { Log } from '../graphql-operations';
+import { Log } from '../graphql';
 
 function getCellProps(cell: Cell<Log>) {
   switch (cell.column.id) {

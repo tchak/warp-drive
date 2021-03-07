@@ -37,7 +37,7 @@ class Response {
   }
 
   noContent() {
-    this.#res.status(204);
+    this.#res.sendStatus(204);
   }
 }
 
