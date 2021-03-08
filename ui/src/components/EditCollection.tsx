@@ -49,11 +49,22 @@ function EditCollectionForm({
       type: AttributeType.String,
       name: '',
     },
+    validate(values) {
+      if (!values.name.trim()) {
+        return {
+          name: 'Attribute name is required.',
+        };
+      }
+    },
+    validateOnBlur: false,
     async onSubmit(values) {
       const { data } = await createAttribute({
         collectionId: collection?.id as string,
         ...values,
       });
+      if (data) {
+        form.resetForm();
+      }
     },
   });
 
@@ -121,15 +132,23 @@ function EditCollectionForm({
                     autoFocus={true}
                     value={form.values.name}
                     onChange={form.handleChange}
+                    onBlur={form.handleBlur}
                   />
                   <button
                     type="submit"
-                    className="py-2 px-2 border border-gray-300 rounded-r-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    className={`${
+                      fetching || !form.values.name ? 'opacity-50' : ''
+                    } py-2 px-2 border border-gray-300 rounded-r-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
                     disabled={fetching}
                   >
                     <HiOutlinePlusCircle className="text-xl" />
                   </button>
                 </span>
+                {!form.isValid && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {form.errors.name}
+                  </p>
+                )}
               </form>
             </div>
           </div>
@@ -166,7 +185,9 @@ function AttributeList({
           className="pl-3 pr-4 py-3 flex items-center justify-between text-sm"
         >
           <div className="w-0 flex-1 flex items-center">
-            <AttributeTypeBadge type={attribute.type} />
+            <span className="w-20">
+              <AttributeTypeBadge type={attribute.type} />
+            </span>
             <span className="ml-2 flex-1 w-0 truncate">{attribute.name}</span>
           </div>
           <div className="ml-4 flex-shrink-0">
