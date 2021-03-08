@@ -5,8 +5,9 @@ import {
   HiOutlineX,
 } from 'react-icons/hi';
 import { useMutation } from 'urql';
-import { useFormik } from 'formik';
+import { useFormik, FormikErrors } from 'formik';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { isAlphanumeric, minLength, isEmpty, maxLength } from 'class-validator';
 
 import {
   AttributeType,
@@ -45,21 +46,30 @@ function EditCollectionForm({
   const [{ fetching: deleting }, deleteAttribute] = useMutation(
     DeleteAttributeDocument
   );
-  useHotkeys('esc', close, { enabled: !fetching && !deleting });
+  const isSaving = fetching || deleting;
+  useHotkeys('esc', close, { enabled: !isSaving });
   const collection = useCollection(collectionId);
   const form = useFormik({
     initialValues: {
       type: AttributeType.String,
       name: '',
     },
-    validate(values) {
-      if (!values.name.trim()) {
-        return {
-          name: 'Attribute name is required.',
-        };
+    validate({ name }) {
+      const errors: FormikErrors<{ name: string }> = {};
+
+      if (isEmpty(name)) {
+        errors.name = 'Name is required.';
+      } else if (!minLength(name, 2)) {
+        errors.name = 'Name should be at least 2 characters long.';
+      } else if (!maxLength(name, 35)) {
+        errors.name = 'Name should be at most 35 characters long.';
+      } else if (!isAlphanumeric(name)) {
+        errors.name = 'Name should contain only alphanumeric characters.';
       }
+      return errors;
     },
     validateOnBlur: false,
+    validateOnChange: false,
     async onSubmit(values) {
       const { data } = await createAttribute({
         collectionId: collection?.id as string,
@@ -87,7 +97,7 @@ function EditCollectionForm({
                 type="button"
                 className="bg-green-700 rounded-md text-green-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
                 onClick={close}
-                disabled={fetching}
+                disabled={isSaving}
               >
                 <span className="sr-only">Close panel</span>
                 <HiOutlineX className="h-6 w-6" />
@@ -102,7 +112,7 @@ function EditCollectionForm({
               <div>
                 <AttributeList
                   attributes={collection?.attributes ?? []}
-                  fetching={deleting}
+                  isSaving={isSaving}
                   remove={(id) => deleteAttribute({ id })}
                 />
               </div>
@@ -140,9 +150,9 @@ function EditCollectionForm({
                   <button
                     type="submit"
                     className={`${
-                      fetching || !form.values.name ? 'opacity-50' : ''
+                      isSaving ? 'opacity-50' : ''
                     } py-2 px-2 border border-gray-300 rounded-r-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
-                    disabled={fetching}
+                    disabled={isSaving}
                   >
                     <HiOutlinePlusCircle className="text-xl" />
                   </button>
@@ -163,11 +173,11 @@ function EditCollectionForm({
 
 function AttributeList({
   attributes,
-  fetching,
+  isSaving,
   remove,
 }: {
   attributes: { id: string; name: string; type: AttributeType }[];
-  fetching: boolean;
+  isSaving: boolean;
   remove: (id: string) => void;
 }) {
   return (
@@ -185,7 +195,7 @@ function AttributeList({
           </div>
           <div className="ml-4 flex-shrink-0">
             <button
-              disabled={fetching}
+              disabled={isSaving}
               type="button"
               onClick={() => remove(attribute.id)}
             >

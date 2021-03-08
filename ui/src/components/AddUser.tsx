@@ -41,10 +41,7 @@ function AddUserForm({
     validateOnBlur: false,
     validateOnChange: false,
     validate({ email, password }) {
-      const errors: FormikErrors<{
-        email: string;
-        password: string;
-      }> = {};
+      const errors: FormikErrors<{ email: string; password: string }> = {};
 
       if (isEmpty(email)) {
         errors.email = `Email address is required.`;

@@ -1,8 +1,9 @@
 import React from 'react';
 import { HiOutlineX } from 'react-icons/hi';
 import { useMutation } from 'urql';
-import { useFormik } from 'formik';
+import { useFormik, FormikErrors } from 'formik';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { isAlphanumeric, minLength, isEmpty, maxLength } from 'class-validator';
 
 import { CreateCollectionDocument } from '../graphql';
 import { RightSlideOver } from './RightSlideOver';
@@ -36,6 +37,22 @@ function AddCollectionForm({
   const form = useFormik({
     initialValues: {
       name: '',
+    },
+    validateOnBlur: false,
+    validateOnChange: false,
+    validate({ name }) {
+      const errors: FormikErrors<{ name: string }> = {};
+
+      if (isEmpty(name)) {
+        errors.name = 'Name is required.';
+      } else if (!minLength(name, 2)) {
+        errors.name = 'Name should be at least 2 characters long.';
+      } else if (!maxLength(name, 35)) {
+        errors.name = 'Name should be at most 35 characters long.';
+      } else if (!isAlphanumeric(name)) {
+        errors.name = 'Name should contain only alphanumeric characters.';
+      }
+      return errors;
     },
     async onSubmit(values) {
       const { data } = await createCollection({ projectId, ...values });
@@ -104,6 +121,11 @@ function AddCollectionForm({
                     onChange={form.handleChange}
                   />
                 </div>
+                {!form.isValid && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {form.errors.name}
+                  </p>
+                )}
               </div>
             </div>
             <div className="pt-4 pb-6"></div>
