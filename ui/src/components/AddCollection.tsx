@@ -59,7 +59,7 @@ function AddCollectionForm({
               id="slide-over-heading"
               className="text-lg font-medium text-white"
             >
-              New Collection
+              Add Collection
             </h2>
             <div className="ml-3 h-7 flex items-center">
               <button
@@ -75,8 +75,8 @@ function AddCollectionForm({
           </div>
           <div className="mt-1">
             <p className="text-sm text-green-300">
-              Get started by filling in the information below to create your new
-              project.
+              A collection defines a schema for a type of document your
+              application can create.
             </p>
           </div>
         </div>
@@ -88,7 +88,7 @@ function AddCollectionForm({
                   htmlFor="collection-name"
                   className="block text-sm font-medium text-gray-900"
                 >
-                  Name (Type)
+                  Name
                 </label>
                 <div className="mt-1">
                   <input

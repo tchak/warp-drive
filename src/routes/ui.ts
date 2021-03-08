@@ -18,6 +18,7 @@ export function ui() {
       </head>
       <body>
         <div id="root"></div>
+        <div id="slide-over"></div>
         <link rel="stylesheet" href="${mainJS}" />
         <script type="module" src="${mainCSS}"></script>
       </body>
@@ -33,6 +34,7 @@ export function ui() {
       </head>
       <body>
         <div id="root"></div>
+        <div id="slide-over"></div>
         <script type="module">
           import RefreshRuntime from "http://localhost:3000/@react-refresh"
           RefreshRuntime.injectIntoGlobalHook(window) 

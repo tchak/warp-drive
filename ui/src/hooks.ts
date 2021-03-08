@@ -20,16 +20,20 @@ export function useSignedIn(): boolean {
   return useMemo(() => isSignedIn(), []);
 }
 
-export function useProject(id: string) {
-  const [{ data }] = useQuery({ query: GetProjectDocument, variables: { id } });
+export function useProject(id?: string) {
+  const [{ data }] = useQuery({
+    query: GetProjectDocument,
+    variables: { id },
+    pause: !id,
+  });
   return data?.project;
 }
 
-export function useCollection(id: string) {
+export function useCollection(id?: string) {
   const [{ data }] = useQuery({
     query: GetCollectionDocument,
     variables: { id },
-    //requestPolicy: 'cache-only',
+    pause: !id,
   });
   return data?.collection;
 }

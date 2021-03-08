@@ -19,14 +19,16 @@ import { useCollection } from '../hooks';
 export function EditCollection({
   collectionId,
   isOpen,
+  afterLeave,
   close,
 }: {
-  collectionId: string;
+  collectionId?: string;
   isOpen: boolean;
   close: () => void;
+  afterLeave?: () => void;
 }) {
   return (
-    <RightSlideOver isOpen={isOpen}>
+    <RightSlideOver afterLeave={afterLeave} isOpen={isOpen}>
       <EditCollectionForm collectionId={collectionId} close={close} />
     </RightSlideOver>
   );
@@ -36,7 +38,7 @@ function EditCollectionForm({
   collectionId,
   close,
 }: {
-  collectionId: string;
+  collectionId?: string;
   close: () => void;
 }) {
   const [{ fetching }, createAttribute] = useMutation(CreateAttributeDocument);
@@ -45,7 +47,6 @@ function EditCollectionForm({
   );
   useHotkeys('esc', close, { enabled: !fetching && !deleting });
   const collection = useCollection(collectionId);
-
   const form = useFormik({
     initialValues: {
       type: AttributeType.String,
@@ -79,7 +80,7 @@ function EditCollectionForm({
               id="slide-over-heading"
               className="text-lg font-medium text-white"
             >
-              New Collection
+              {collection?.name}
             </h2>
             <div className="ml-3 h-7 flex items-center">
               <button
@@ -155,16 +156,6 @@ function EditCollectionForm({
             </div>
           </div>
         </div>
-      </div>
-      <div className="flex-shrink-0 px-4 py-4 flex justify-end">
-        <button
-          type="button"
-          className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          onClick={close}
-          disabled={fetching}
-        >
-          Cancel
-        </button>
       </div>
     </div>
   );

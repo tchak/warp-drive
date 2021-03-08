@@ -10,7 +10,8 @@ import { EditCollection } from '../EditCollection';
 
 export default function ProjectDatabasePage() {
   const [collectionId, setCollectionId] = useState<string>();
-  const [slideOverOpen, setSlideOverOpen] = useState(false);
+  const [openAddSlideOver, setAddSlideOver] = useState(false);
+  const [openEditSlideOver, setEditSlideOver] = useState(false);
   const { id } = useParams();
   const [{ data, fetching, error }] = useListCollections(id);
   const project = useProject(id);
@@ -28,7 +29,7 @@ export default function ProjectDatabasePage() {
             <button
               type="button"
               className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-              onClick={() => setSlideOverOpen(true)}
+              onClick={() => setAddSlideOver(true)}
             >
               <HiPlusCircle className="-ml-1 mr-3 h-5 w-5" /> Collection
             </button>
@@ -59,7 +60,10 @@ export default function ProjectDatabasePage() {
         <div className="px-4 sm:px-6 max-w-6xl mx-auto lg:px-8">
           <CollectionList
             collections={collections}
-            edit={(collectionId) => setCollectionId(collectionId)}
+            edit={(collectionId) => {
+              setEditSlideOver(true);
+              setCollectionId(collectionId);
+            }}
           />
         </div>
       </div>
@@ -67,18 +71,17 @@ export default function ProjectDatabasePage() {
       {project && (
         <AddCollection
           projectId={project.id}
-          isOpen={slideOverOpen}
-          close={() => setSlideOverOpen(false)}
+          isOpen={openAddSlideOver}
+          close={() => setAddSlideOver(false)}
         />
       )}
 
-      {collectionId && (
-        <EditCollection
-          collectionId={collectionId}
-          isOpen={!!collectionId}
-          close={() => setCollectionId(undefined)}
-        />
-      )}
+      <EditCollection
+        collectionId={collectionId}
+        isOpen={openEditSlideOver}
+        close={() => setEditSlideOver(false)}
+        afterLeave={() => setCollectionId(undefined)}
+      />
     </>
   );
 }

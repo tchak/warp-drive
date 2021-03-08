@@ -1,15 +1,22 @@
 import React, { ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { Transition } from '@headlessui/react';
 
 export function RightSlideOver({
   isOpen,
+  afterLeave,
   children,
 }: {
   isOpen: boolean;
+  afterLeave?: () => void;
   children: ReactNode;
 }) {
-  return (
-    <Transition show={isOpen} className="fixed inset-0 overflow-hidden z-20">
+  return createPortal(
+    <Transition
+      show={isOpen}
+      afterLeave={afterLeave}
+      className="fixed inset-0 overflow-hidden z-20"
+    >
       <div className="absolute inset-0 overflow-hidden">
         <section
           className="absolute inset-y-0 pl-16 max-w-full right-0 flex"
@@ -28,6 +35,7 @@ export function RightSlideOver({
           </Transition.Child>
         </section>
       </div>
-    </Transition>
+    </Transition>,
+    document.getElementById('slide-over') as HTMLElement
   );
 }

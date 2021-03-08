@@ -106,35 +106,11 @@ const client = createClient({
               id: args.id as string,
             });
           },
-          createAttribute(result, args, cache) {
-            cache.updateQuery(
-              {
-                query: GetCollectionDocument,
-                variables: { id: args.collectionId },
-              },
-              (data) => {
-                data?.collection.attributes.push(result.createAttribute as any);
-                return data;
-              }
-            );
+          createAttribute(_, args, cache) {
             cache.invalidate({
               __typename: 'Collection',
               id: args.collectionId as string,
             });
-            // const pid = '041f5ba1-78c5-481f-9683-70dab772b964';
-            // cache.updateQuery(
-            //   {
-            //     query: ListCollectionsDocument,
-            //     variables: { projectId: pid },
-            //   },
-            //   (data) => {
-            //     const collection = data?.project.collections.find(
-            //       ({ id }) => args.collectionId == id
-            //     );
-            //     collection?.attributes.push(result.createAttribute as any);
-            //     return data;
-            //   }
-            // );
           },
           deleteAttribute(_, args, cache) {
             cache.invalidate({
