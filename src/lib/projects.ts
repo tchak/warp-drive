@@ -112,9 +112,19 @@ export async function deleteProject({
   context: { em, admin },
   projectId,
 }: DeleteProjectParams): Promise<void> {
-  const project = await em.findOneOrFail(Project, {
-    id: projectId,
-    owners: admin,
-  });
+  const project = await em.findOneOrFail(
+    Project,
+    {
+      id: projectId,
+      owners: admin,
+    },
+    [
+      'users',
+      'teams',
+      'keys',
+      'collections.attributes',
+      'collections.relationships',
+    ]
+  );
   await em.removeAndFlush(project);
 }

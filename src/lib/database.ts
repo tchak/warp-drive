@@ -311,10 +311,15 @@ export async function deleteCollection({
   const { em, scope, audience } = context;
   authorizeCollections(scope, 'write');
 
-  const collection = await em.findOneOrFail(ProjectCollection, {
-    id: collectionId,
-    project: audience == 'admin' ? { owners: context.admin } : context.project,
-  });
+  const collection = await em.findOneOrFail(
+    ProjectCollection,
+    {
+      id: collectionId,
+      project:
+        audience == 'admin' ? { owners: context.admin } : context.project,
+    },
+    ['attributes', 'relationships']
+  );
   await em.removeAndFlush(collection);
 }
 
