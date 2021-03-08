@@ -1,8 +1,9 @@
 import React from 'react';
 import { HiOutlineX } from 'react-icons/hi';
 import { useMutation } from 'urql';
-import { useFormik } from 'formik';
+import { useFormik, FormikErrors } from 'formik';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { isEmail, minLength, isEmpty } from 'class-validator';
 
 import { CreateUserDocument } from '../graphql';
 import { RightSlideOver } from './RightSlideOver';
@@ -37,6 +38,26 @@ function AddUserForm({
       password: '',
       name: '',
     },
+    validateOnBlur: false,
+    validateOnChange: false,
+    validate({ email, password }) {
+      const errors: FormikErrors<{
+        email: string;
+        password: string;
+      }> = {};
+
+      if (isEmpty(email)) {
+        errors.email = `Email address is required.`;
+      } else if (!isEmail(email)) {
+        errors.email = `Should be a valid email address.`;
+      }
+      if (isEmpty(email)) {
+        errors.password = `Password is required.`;
+      } else if (!minLength(password, 5)) {
+        errors.password = `Password should be at least 5 characters long.`;
+      }
+      return errors;
+    },
     async onSubmit(values) {
       const { data } = await createUser({ projectId, ...values });
 
@@ -49,6 +70,7 @@ function AddUserForm({
 
   return (
     <form
+      noValidate={true}
       className="h-full divide-y divide-gray-200 flex flex-col bg-white shadow-xl"
       onSubmit={form.handleSubmit}
     >
@@ -59,7 +81,7 @@ function AddUserForm({
               id="slide-over-heading"
               className="text-lg font-medium text-white"
             >
-              New User
+              Add User
             </h2>
             <div className="ml-3 h-7 flex items-center">
               <button
@@ -101,8 +123,14 @@ function AddUserForm({
                     autoFocus={true}
                     value={form.values.email}
                     onChange={form.handleChange}
+                    onBlur={form.handleBlur}
                   />
                 </div>
+                {!form.isValid && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {form.errors.email}
+                  </p>
+                )}
               </div>
               <div>
                 <label
@@ -120,15 +148,21 @@ function AddUserForm({
                     autoComplete="off"
                     value={form.values.password}
                     onChange={form.handleChange}
+                    onBlur={form.handleBlur}
                   />
                 </div>
+                {!form.isValid && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {form.errors.password}
+                  </p>
+                )}
               </div>
               <div>
                 <label
                   htmlFor="user-name"
                   className="block text-sm font-medium text-gray-900"
                 >
-                  Name
+                  Name (optional)
                 </label>
                 <div className="mt-1">
                   <input
@@ -141,6 +175,7 @@ function AddUserForm({
                     autoCorrect="off"
                     value={form.values.name}
                     onChange={form.handleChange}
+                    onBlur={form.handleBlur}
                   />
                 </div>
               </div>
