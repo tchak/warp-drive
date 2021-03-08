@@ -2,6 +2,7 @@ import React from 'react';
 import { HiOutlineX } from 'react-icons/hi';
 import { useMutation } from 'urql';
 import { useFormik } from 'formik';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 import { CreateUserDocument } from '../graphql';
 import { RightSlideOver } from './RightSlideOver';
@@ -15,6 +16,7 @@ export function AddUser({
   isOpen: boolean;
   close: () => void;
 }) {
+  useHotkeys('esc', close);
   return (
     <RightSlideOver isOpen={isOpen}>
       <AddUserForm projectId={projectId} close={close} />

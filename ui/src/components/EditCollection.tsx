@@ -6,6 +6,7 @@ import {
 } from 'react-icons/hi';
 import { useMutation } from 'urql';
 import { useFormik } from 'formik';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 import {
   AttributeType,
@@ -24,6 +25,7 @@ export function EditCollection({
   isOpen: boolean;
   close: () => void;
 }) {
+  useHotkeys('esc', close);
   return (
     <RightSlideOver isOpen={isOpen}>
       <EditCollectionForm collectionId={collectionId} close={close} />
@@ -94,7 +96,7 @@ function EditCollectionForm({
           <div className="mt-1"></div>
         </div>
         <div className="flex-1 flex flex-col justify-between">
-          <div className="px-4 divide-y divide-gray-200 sm:px-6">
+          <div className="px-4 sm:px-6">
             <div className="space-y-6 pt-6 pb-5">
               <div>
                 <AttributeList
@@ -104,7 +106,7 @@ function EditCollectionForm({
                 />
               </div>
             </div>
-            <div className="pt-4 pb-6">
+            <div className="pt-2 pb-6">
               <form onSubmit={form.handleSubmit}>
                 <span className="relative z-0 inline-flex shadow-sm rounded-md w-full">
                   <select
