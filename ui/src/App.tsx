@@ -34,7 +34,7 @@ import {
   ListProjectsDocument,
   ListCollectionsDocument,
   ListUsersDocument,
-  GetCollectionDocument,
+  ListKeysDocument,
 } from './graphql';
 import schema from './schema.json';
 
@@ -103,6 +103,21 @@ const client = createClient({
           deleteUser(_, args, cache) {
             cache.invalidate({
               __typename: 'User',
+              id: args.id as string,
+            });
+          },
+          createKey(result, args, cache) {
+            cache.updateQuery(
+              { query: ListKeysDocument, variables: args },
+              (data) => {
+                data?.project.keys.push(result.createKey as any);
+                return data;
+              }
+            );
+          },
+          deleteKey(_, args, cache) {
+            cache.invalidate({
+              __typename: 'Key',
               id: args.id as string,
             });
           },

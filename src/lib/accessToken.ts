@@ -70,7 +70,7 @@ export async function updateAccessToken({
   context: { em, admin },
   accessTokenId,
   ...params
-}: UpdateAccessTokenParams): Promise<void> {
+}: UpdateAccessTokenParams): Promise<ProjectAccessToken> {
   const token = await em.findOneOrFail(ProjectAccessToken, {
     id: accessTokenId,
     project: {
@@ -80,6 +80,7 @@ export async function updateAccessToken({
   wrap(token).assign(params);
 
   await em.flush();
+  return token;
 }
 
 export interface DeleteAccessTokenParams {

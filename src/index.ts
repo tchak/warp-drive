@@ -16,6 +16,7 @@ import { CollectionResolver } from './resolvers/CollectionResolver';
 import { ProjectResolver } from './resolvers/ProjectResolver';
 import { TeamResolver } from './resolvers/TeamResolver';
 import { UserResolver } from './resolvers/UserResolver';
+import { KeyResolver } from './resolvers/KeyResolver';
 import { ConsoleResolver } from './resolvers/ConsoleResolver';
 
 function secs(value: string) {
@@ -42,6 +43,7 @@ async function main() {
       ProjectResolver,
       TeamResolver,
       UserResolver,
+      KeyResolver,
       ConsoleResolver,
     ],
     emitSchemaFile: true,

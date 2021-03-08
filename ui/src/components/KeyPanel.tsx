@@ -5,39 +5,43 @@ import { useFormik, FormikErrors } from 'formik';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { isAlphanumeric, minLength, isEmpty, maxLength } from 'class-validator';
 
-import { CreateCollectionDocument } from '../graphql';
-import { RightSlideOver } from './RightSlideOver';
+import { CreateKeyDocument, UpdateKeyDocument, Scope } from '../graphql';
+import { SlideOverPanel } from './SlideOverPanel';
 
-export function AddCollection({
-  projectId,
-  isOpen,
+export function KeyPanel({
+  initialValues,
+  show,
   close,
+  afterClose,
 }: {
-  projectId: string;
-  isOpen: boolean;
+  initialValues:
+    | { id: string; name: string; scope: Scope[] }
+    | { projectId: string; name: string; scope: Scope[] };
+  show: boolean;
   close: () => void;
+  afterClose?: () => void;
 }) {
   return (
-    <RightSlideOver isOpen={isOpen}>
-      <AddCollectionForm projectId={projectId} close={close} />
-    </RightSlideOver>
+    <SlideOverPanel show={show} afterLeave={afterClose}>
+      <KeyPanelForm initialValues={initialValues} close={close} />
+    </SlideOverPanel>
   );
 }
 
-function AddCollectionForm({
-  projectId,
+function KeyPanelForm({
+  initialValues,
   close,
 }: {
-  projectId: string;
+  initialValues:
+    | { id: string; name: string; scope: Scope[] }
+    | { projectId: string; name: string; scope: Scope[] };
   close: () => void;
 }) {
-  const [{ fetching }, createCollection] = useMutation(
-    CreateCollectionDocument
-  );
+  const [{ fetching: creating }, createKey] = useMutation(CreateKeyDocument);
+  const [{ fetching: updating }, updateKey] = useMutation(UpdateKeyDocument);
+  const saving = creating || updating;
   const form = useFormik({
-    initialValues: {
-      name: '',
-    },
+    initialValues,
     validateOnBlur: false,
     validateOnChange: false,
     validate({ name }) {
@@ -55,14 +59,16 @@ function AddCollectionForm({
       return errors;
     },
     async onSubmit(values) {
-      const { data } = await createCollection({ projectId, ...values });
+      const { data } = await ('id' in values
+        ? updateKey(values)
+        : createKey(values));
 
       if (data) {
         close();
       }
     },
   });
-  useHotkeys('esc', close, { enabled: !fetching });
+  useHotkeys('esc', close, { enabled: !saving });
 
   return (
     <form
@@ -76,14 +82,14 @@ function AddCollectionForm({
               id="slide-over-heading"
               className="text-lg font-medium text-white"
             >
-              Add Collection
+              API Key
             </h2>
             <div className="ml-3 h-7 flex items-center">
               <button
                 type="button"
                 className="bg-green-700 rounded-md text-green-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
                 onClick={close}
-                disabled={fetching}
+                disabled={saving}
               >
                 <span className="sr-only">Close panel</span>
                 <HiOutlineX className="h-6 w-6" />
@@ -92,8 +98,7 @@ function AddCollectionForm({
           </div>
           <div className="mt-1">
             <p className="text-sm text-green-300">
-              A collection defines a schema for a type of document your
-              application can create.
+              An API Key is used to administrate your project.
             </p>
           </div>
         </div>
@@ -137,14 +142,14 @@ function AddCollectionForm({
           type="button"
           className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           onClick={close}
-          disabled={fetching}
+          disabled={saving}
         >
           Cancel
         </button>
         <button
           type="submit"
           className="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          disabled={fetching}
+          disabled={saving}
         >
           Save
         </button>

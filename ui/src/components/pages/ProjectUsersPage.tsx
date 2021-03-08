@@ -5,13 +5,15 @@ import { useParams, NavLink } from 'react-router-dom';
 import { UserList } from '../UserList';
 import { useListUsers, useProject } from '../../hooks';
 import { ProjectStatusBar } from '../ProjectStatusBar';
-import { AddUser } from '../AddUser';
+import { UserPanel } from '../UserPanel';
 
 export default function ProjectUsersPage() {
-  const [slideOverOpen, setSlideOverOpen] = useState(false);
+  const [show, setShow] = useState(false);
   const { id } = useParams();
   const [{ data, fetching, error }] = useListUsers(id);
   const project = useProject(id);
+  const open = () => setShow(true);
+  const close = () => setShow(false);
 
   if (error) {
     return <>Error: {(error as Error).message}</>;
@@ -26,7 +28,7 @@ export default function ProjectUsersPage() {
             <button
               type="button"
               className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-              onClick={() => setSlideOverOpen(true)}
+              onClick={open}
             >
               <HiPlusCircle className="-ml-1 mr-3 h-5 w-5" /> User
             </button>
@@ -60,10 +62,15 @@ export default function ProjectUsersPage() {
       </div>
 
       {project && (
-        <AddUser
-          projectId={project.id}
-          isOpen={slideOverOpen}
-          close={() => setSlideOverOpen(false)}
+        <UserPanel
+          initialValues={{
+            projectId: project.id,
+            email: '',
+            password: '',
+            name: '',
+          }}
+          show={show}
+          close={close}
         />
       )}
     </>

@@ -44,7 +44,7 @@ registerEnumType(AccessTokenScope, {
 // 'execution.write'	Access to execute your project's functions
 
 @Entity()
-@ObjectType('APIKey')
+@ObjectType('Key')
 export class ProjectAccessToken {
   constructor(project: Project, name: string, scope: AccessTokenScope[] = []) {
     this.project = project;

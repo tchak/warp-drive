@@ -18,14 +18,6 @@ export type Scalars = {
   DateTime: any;
 };
 
-export type ApiKey = {
-  createdDate: Scalars['DateTime'];
-  id: Scalars['ID'];
-  name: Scalars['String'];
-  scope: Array<Scope>;
-  updatedDate: Scalars['DateTime'];
-};
-
 export type Attribute = {
   id: Scalars['ID'];
   name: Scalars['String'];
@@ -56,6 +48,10 @@ export type DeletedAttribute = {
 };
 
 export type DeletedCollection = {
+  id: Scalars['ID'];
+};
+
+export type DeletedKey = {
   id: Scalars['ID'];
 };
 
@@ -109,6 +105,14 @@ export enum EventType {
   UsersUpdateStatus = 'usersUpdateStatus',
 }
 
+export type Key = {
+  createdDate: Scalars['DateTime'];
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  scope: Array<Scope>;
+  updatedDate: Scalars['DateTime'];
+};
+
 export type Log = {
   createdDate: Scalars['DateTime'];
   id: Scalars['ID'];
@@ -118,6 +122,7 @@ export type Log = {
 export type Mutation = {
   createAttribute: Attribute;
   createCollection: Collection;
+  createKey: Key;
   createManyToOneRelationship: Relationship;
   createOneToOneRelationship: Relationship;
   createProject: Project;
@@ -125,6 +130,7 @@ export type Mutation = {
   createUser: User;
   deleteAttribute: DeletedAttribute;
   deleteCollection: DeletedCollection;
+  deleteKey: DeletedKey;
   deleteProject: DeletedProject;
   deleteRelationship: DeletedRelationship;
   deleteSession: DeletedSession;
@@ -135,6 +141,7 @@ export type Mutation = {
   renameRelationshipInverse: Relationship;
   signIn: SignInPayload;
   signUp: SignUpPayload;
+  updateKey: Key;
 };
 
 export type MutationCreateAttributeArgs = {
@@ -146,6 +153,12 @@ export type MutationCreateAttributeArgs = {
 export type MutationCreateCollectionArgs = {
   name: Scalars['String'];
   projectId: Scalars['ID'];
+};
+
+export type MutationCreateKeyArgs = {
+  name: Scalars['String'];
+  projectId: Scalars['ID'];
+  scope: Array<Scope>;
 };
 
 export type MutationCreateManyToOneRelationshipArgs = {
@@ -183,6 +196,10 @@ export type MutationDeleteAttributeArgs = {
 };
 
 export type MutationDeleteCollectionArgs = {
+  id: Scalars['ID'];
+};
+
+export type MutationDeleteKeyArgs = {
   id: Scalars['ID'];
 };
 
@@ -231,6 +248,12 @@ export type MutationSignUpArgs = {
   password: Scalars['String'];
 };
 
+export type MutationUpdateKeyArgs = {
+  id: Scalars['ID'];
+  name?: Maybe<Scalars['String']>;
+  scope?: Maybe<Array<Scope>>;
+};
+
 export type Profile = {
   email: Scalars['String'];
   name?: Maybe<Scalars['String']>;
@@ -240,7 +263,7 @@ export type Project = {
   collections: Array<Collection>;
   createdDate: Scalars['DateTime'];
   id: Scalars['ID'];
-  keys: Array<ApiKey>;
+  keys: Array<Key>;
   logs: Array<Log>;
   name: Scalars['String'];
   teams: Array<Team>;
@@ -383,18 +406,44 @@ export type DeleteAttributeMutation = {
   deleteAttribute: Pick<DeletedAttribute, 'id'>;
 };
 
+export type CreateKeyMutationVariables = Exact<{
+  projectId: Scalars['ID'];
+  name: Scalars['String'];
+  scope: Array<Scope> | Scope;
+}>;
+
+export type CreateKeyMutation = {
+  createKey: Pick<Key, 'id' | 'name' | 'scope' | 'createdDate'>;
+};
+
+export type UpdateKeyMutationVariables = Exact<{
+  id: Scalars['ID'];
+  name?: Maybe<Scalars['String']>;
+  scope?: Maybe<Array<Scope> | Scope>;
+}>;
+
+export type UpdateKeyMutation = {
+  updateKey: Pick<Key, 'id' | 'name' | 'scope'>;
+};
+
+export type DeleteKeyMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type DeleteKeyMutation = { deleteKey: Pick<DeletedKey, 'id'> };
+
 export type GetProjectQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 export type GetProjectQuery = {
-  project: Pick<Project, 'id' | 'name' | 'createdDate'>;
+  project: Pick<Project, 'id' | 'name' | 'updatedDate'>;
 };
 
 export type ListProjectsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ListProjectsQuery = {
-  projects: Array<Pick<Project, 'id' | 'name' | 'createdDate'>>;
+  projects: Array<Pick<Project, 'id' | 'name' | 'updatedDate'>>;
 };
 
 export type ListUsersQueryVariables = Exact<{
@@ -424,20 +473,20 @@ export type ListCollectionsQueryVariables = Exact<{
 export type ListCollectionsQuery = {
   project: Pick<Project, 'id'> & {
     collections: Array<
-      Pick<Collection, 'id' | 'name' | 'createdDate' | 'updatedDate'> & {
+      Pick<Collection, 'id' | 'name' | 'updatedDate'> & {
         attributes: Array<Pick<Attribute, 'id' | 'name' | 'type'>>;
       }
     >;
   };
 };
 
-export type ListApiKeysQueryVariables = Exact<{
+export type ListKeysQueryVariables = Exact<{
   projectId: Scalars['ID'];
 }>;
 
-export type ListApiKeysQuery = {
+export type ListKeysQuery = {
   project: Pick<Project, 'id'> & {
-    keys: Array<Pick<ApiKey, 'id' | 'name' | 'createdDate'>>;
+    keys: Array<Pick<Key, 'id' | 'name' | 'scope' | 'updatedDate'>>;
   };
 };
 
@@ -456,7 +505,7 @@ export type CreateProjectMutationVariables = Exact<{
 }>;
 
 export type CreateProjectMutation = {
-  createProject: Pick<Project, 'id' | 'name' | 'createdDate'>;
+  createProject: Pick<Project, 'id' | 'name' | 'updatedDate'>;
 };
 
 export type DeleteProjectMutationVariables = Exact<{
@@ -982,6 +1031,243 @@ export const DeleteAttributeDocument: DocumentNode<
     },
   ],
 };
+export const CreateKeyDocument: DocumentNode<
+  CreateKeyMutation,
+  CreateKeyMutationVariables
+> = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'createKey' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'projectId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'name' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'scope' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'ListType',
+              type: {
+                kind: 'NonNullType',
+                type: {
+                  kind: 'NamedType',
+                  name: { kind: 'Name', value: 'Scope' },
+                },
+              },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createKey' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'projectId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'projectId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'name' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'name' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'scope' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'scope' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'scope' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdDate' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
+export const UpdateKeyDocument: DocumentNode<
+  UpdateKeyMutation,
+  UpdateKeyMutationVariables
+> = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'updateKey' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'name' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'scope' },
+          },
+          type: {
+            kind: 'ListType',
+            type: {
+              kind: 'NonNullType',
+              type: {
+                kind: 'NamedType',
+                name: { kind: 'Name', value: 'Scope' },
+              },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateKey' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'name' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'name' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'scope' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'scope' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'scope' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
+export const DeleteKeyDocument: DocumentNode<
+  DeleteKeyMutation,
+  DeleteKeyMutationVariables
+> = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'deleteKey' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteKey' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
 export const GetProjectDocument: DocumentNode<
   GetProjectQuery,
   GetProjectQueryVariables
@@ -1023,7 +1309,7 @@ export const GetProjectDocument: DocumentNode<
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'createdDate' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedDate' } },
               ],
             },
           },
@@ -1053,7 +1339,7 @@ export const ListProjectsDocument: DocumentNode<
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'createdDate' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedDate' } },
               ],
             },
           },
@@ -1269,10 +1555,6 @@ export const ListCollectionsDocument: DocumentNode<
                       },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'createdDate' },
-                      },
-                      {
-                        kind: 'Field',
                         name: { kind: 'Name', value: 'updatedDate' },
                       },
                     ],
@@ -1286,16 +1568,16 @@ export const ListCollectionsDocument: DocumentNode<
     },
   ],
 };
-export const ListApiKeysDocument: DocumentNode<
-  ListApiKeysQuery,
-  ListApiKeysQueryVariables
+export const ListKeysDocument: DocumentNode<
+  ListKeysQuery,
+  ListKeysQueryVariables
 > = {
   kind: 'Document',
   definitions: [
     {
       kind: 'OperationDefinition',
       operation: 'query',
-      name: { kind: 'Name', value: 'listAPIKeys' },
+      name: { kind: 'Name', value: 'listKeys' },
       variableDefinitions: [
         {
           kind: 'VariableDefinition',
@@ -1337,9 +1619,10 @@ export const ListApiKeysDocument: DocumentNode<
                     selections: [
                       { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                       { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'scope' } },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'createdDate' },
+                        name: { kind: 'Name', value: 'updatedDate' },
                       },
                     ],
                   },
@@ -1462,7 +1745,7 @@ export const CreateProjectDocument: DocumentNode<
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'createdDate' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedDate' } },
               ],
             },
           },

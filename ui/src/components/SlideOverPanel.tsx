@@ -2,18 +2,18 @@ import React, { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Transition } from '@headlessui/react';
 
-export function RightSlideOver({
-  isOpen,
+export function SlideOverPanel({
+  show,
   afterLeave,
   children,
 }: {
-  isOpen: boolean;
+  show: boolean;
   afterLeave?: () => void;
   children: ReactNode;
 }) {
   return createPortal(
     <Transition
-      show={isOpen}
+      show={show}
       afterLeave={afterLeave}
       className="fixed inset-0 overflow-hidden z-20"
     >

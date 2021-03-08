@@ -1,20 +1,25 @@
 import React, { useState } from 'react';
 import { HiPlusCircle } from 'react-icons/hi';
 import { useParams, NavLink } from 'react-router-dom';
+import { useMutation } from 'urql';
 
+import { DeleteCollectionDocument } from '../../graphql';
 import { useListCollections, useProject } from '../../hooks';
 import { ProjectStatusBar } from '../ProjectStatusBar';
-import { CollectionList } from '../CollectionList';
-import { AddCollection } from '../AddCollection';
-import { EditCollection } from '../EditCollection';
+import { CollectionList, Collection } from '../CollectionList';
+import { CollectionPanel } from '../CollectionPanel';
 
 export default function ProjectDatabasePage() {
-  const [collectionId, setCollectionId] = useState<string>();
-  const [openAddSlideOver, setAddSlideOver] = useState(false);
-  const [openEditSlideOver, setEditSlideOver] = useState(false);
+  const [selectedCollection, setSelectedCollection] = useState<Collection>();
+  const [show, setShow] = useState(false);
   const { id } = useParams();
   const [{ data, fetching, error }] = useListCollections(id);
+  const [{ fetching: deleting }, deleteCollection] = useMutation(
+    DeleteCollectionDocument
+  );
   const project = useProject(id);
+  const open = () => setShow(true);
+  const close = () => setShow(false);
 
   if (error) {
     return <>Error: {(error as Error).message}</>;
@@ -29,7 +34,7 @@ export default function ProjectDatabasePage() {
             <button
               type="button"
               className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-              onClick={() => setAddSlideOver(true)}
+              onClick={open}
             >
               <HiPlusCircle className="-ml-1 mr-3 h-5 w-5" /> Collection
             </button>
@@ -60,28 +65,28 @@ export default function ProjectDatabasePage() {
         <div className="px-4 sm:px-6 max-w-6xl mx-auto lg:px-8">
           <CollectionList
             collections={collections}
-            edit={(collectionId) => {
-              setEditSlideOver(true);
-              setCollectionId(collectionId);
+            remove={deleteCollection}
+            edit={(collection) => {
+              open();
+              setSelectedCollection(collection);
             }}
+            saving={deleting}
           />
         </div>
       </div>
 
       {project && (
-        <AddCollection
-          projectId={project.id}
-          isOpen={openAddSlideOver}
-          close={() => setAddSlideOver(false)}
+        <CollectionPanel
+          initialValues={
+            selectedCollection
+              ? selectedCollection
+              : { projectId: project.id, name: '' }
+          }
+          show={show}
+          close={close}
+          afterClose={() => setSelectedCollection(undefined)}
         />
       )}
-
-      <EditCollection
-        collectionId={collectionId}
-        isOpen={openEditSlideOver}
-        close={() => setEditSlideOver(false)}
-        afterLeave={() => setCollectionId(undefined)}
-      />
     </>
   );
 }

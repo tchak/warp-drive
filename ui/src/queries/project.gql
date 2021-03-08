@@ -2,7 +2,7 @@ query getProject($id: ID!) {
   project(id: $id) {
     id
     name
-    createdDate
+    updatedDate
   }
 }
 
@@ -10,7 +10,7 @@ query listProjects {
   projects {
     id
     name
-    createdDate
+    updatedDate
   }
 }
 
@@ -48,19 +48,19 @@ query listCollections($projectId: ID!) {
         name
         type
       }
-      createdDate
       updatedDate
     }
   }
 }
 
-query listAPIKeys($projectId: ID!) {
+query listKeys($projectId: ID!) {
   project(id: $projectId) {
     id
     keys {
       id
       name
-      createdDate
+      scope
+      updatedDate
     }
   }
 }
@@ -80,7 +80,7 @@ mutation createProject($name: String!) {
   createProject(name: $name) {
     id
     name
-    createdDate
+    updatedDate
   }
 }
 

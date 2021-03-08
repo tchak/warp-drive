@@ -3,14 +3,6 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
-type APIKey {
-  createdDate: DateTime!
-  id: ID!
-  name: String!
-  scope: [Scope!]!
-  updatedDate: DateTime!
-}
-
 type Attribute {
   id: ID!
   name: String!
@@ -46,6 +38,10 @@ type DeletedAttribute {
 }
 
 type DeletedCollection {
+  id: ID!
+}
+
+type DeletedKey {
   id: ID!
 }
 
@@ -99,6 +95,14 @@ enum EventType {
   usersUpdateStatus
 }
 
+type Key {
+  createdDate: DateTime!
+  id: ID!
+  name: String!
+  scope: [Scope!]!
+  updatedDate: DateTime!
+}
+
 type Log {
   createdDate: DateTime!
   id: ID!
@@ -108,6 +112,7 @@ type Log {
 type Mutation {
   createAttribute(collectionId: ID!, name: String!, type: AttributeType!): Attribute!
   createCollection(name: String!, projectId: ID!): Collection!
+  createKey(name: String!, projectId: ID!, scope: [Scope!]!): Key!
   createManyToOneRelationship(collectionId: ID!, inverse: String, name: String!, relatedCollectionId: ID!): Relationship!
   createOneToOneRelationship(collectionId: ID!, inverse: String, name: String!, relatedCollectionId: ID!): Relationship!
   createProject(name: String!): Project!
@@ -115,6 +120,7 @@ type Mutation {
   createUser(email: String!, name: String, password: String!, projectId: ID!): User!
   deleteAttribute(id: ID!): DeletedAttribute!
   deleteCollection(id: ID!): DeletedCollection!
+  deleteKey(id: ID!): DeletedKey!
   deleteProject(id: ID!): DeletedProject!
   deleteRelationship(id: ID!): DeletedRelationship!
   deleteSession(id: ID!): DeletedSession!
@@ -125,6 +131,7 @@ type Mutation {
   renameRelationshipInverse(id: ID!, inverse: String!): Relationship!
   signIn(email: String!, password: String!): SignInPayload!
   signUp(email: String!, password: String!): SignUpPayload!
+  updateKey(id: ID!, name: String, scope: [Scope!]): Key!
 }
 
 type Profile {
@@ -136,7 +143,7 @@ type Project {
   collections: [Collection!]!
   createdDate: DateTime!
   id: ID!
-  keys: [APIKey!]!
+  keys: [Key!]!
   logs: [Log!]!
   name: String!
   teams: [Team!]!

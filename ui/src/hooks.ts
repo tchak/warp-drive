@@ -8,8 +8,7 @@ import {
   ListTeamsDocument,
   ListCollectionsDocument,
   ListLogsDocument,
-  ListApiKeysDocument,
-  GetCollectionDocument,
+  ListKeysDocument,
 } from './graphql';
 
 function isSignedIn(): boolean {
@@ -27,15 +26,6 @@ export function useProject(id?: string) {
     pause: !id,
   });
   return data?.project;
-}
-
-export function useCollection(id?: string) {
-  const [{ data }] = useQuery({
-    query: GetCollectionDocument,
-    variables: { id },
-    pause: !id,
-  });
-  return data?.collection;
 }
 
 export function useProfile() {
@@ -68,7 +58,7 @@ export function useListLogs(id: string) {
 
 export function useListKeys(id: string) {
   return useQuery({
-    query: ListApiKeysDocument,
+    query: ListKeysDocument,
     variables: { projectId: id },
   });
 }

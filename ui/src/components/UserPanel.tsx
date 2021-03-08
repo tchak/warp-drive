@@ -6,38 +6,44 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { isEmail, minLength, isEmpty } from 'class-validator';
 
 import { CreateUserDocument } from '../graphql';
-import { RightSlideOver } from './RightSlideOver';
+import { SlideOverPanel } from './SlideOverPanel';
 
-export function AddUser({
-  projectId,
-  isOpen,
+export function UserPanel({
+  initialValues,
+  show,
   close,
 }: {
-  projectId: string;
-  isOpen: boolean;
+  initialValues: {
+    projectId: string;
+    email: string;
+    password: string;
+    name?: string;
+  };
+  show: boolean;
   close: () => void;
 }) {
   return (
-    <RightSlideOver isOpen={isOpen}>
-      <AddUserForm projectId={projectId} close={close} />
-    </RightSlideOver>
+    <SlideOverPanel show={show}>
+      <UserPanelForm initialValues={initialValues} close={close} />
+    </SlideOverPanel>
   );
 }
 
-function AddUserForm({
-  projectId,
+function UserPanelForm({
+  initialValues,
   close,
 }: {
-  projectId: string;
+  initialValues: {
+    projectId: string;
+    email: string;
+    password: string;
+    name?: string;
+  };
   close: () => void;
 }) {
   const [{ fetching }, createUser] = useMutation(CreateUserDocument);
   const form = useFormik({
-    initialValues: {
-      email: '',
-      password: '',
-      name: '',
-    },
+    initialValues,
     validateOnBlur: false,
     validateOnChange: false,
     validate({ email, password }) {
@@ -56,7 +62,7 @@ function AddUserForm({
       return errors;
     },
     async onSubmit(values) {
-      const { data } = await createUser({ projectId, ...values });
+      const { data } = await createUser(values);
 
       if (data) {
         close();
