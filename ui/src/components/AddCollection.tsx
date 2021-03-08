@@ -16,7 +16,6 @@ export function AddCollection({
   isOpen: boolean;
   close: () => void;
 }) {
-  useHotkeys('esc', close);
   return (
     <RightSlideOver isOpen={isOpen}>
       <AddCollectionForm projectId={projectId} close={close} />
@@ -46,6 +45,7 @@ function AddCollectionForm({
       }
     },
   });
+  useHotkeys('esc', close, { enabled: !fetching });
 
   return (
     <form

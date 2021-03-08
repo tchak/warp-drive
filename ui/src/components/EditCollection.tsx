@@ -25,7 +25,6 @@ export function EditCollection({
   isOpen: boolean;
   close: () => void;
 }) {
-  useHotkeys('esc', close);
   return (
     <RightSlideOver isOpen={isOpen}>
       <EditCollectionForm collectionId={collectionId} close={close} />
@@ -44,6 +43,7 @@ function EditCollectionForm({
   const [{ fetching: deleting }, deleteAttribute] = useMutation(
     DeleteAttributeDocument
   );
+  useHotkeys('esc', close, { enabled: !fetching && !deleting });
   const collection = useCollection(collectionId);
 
   const form = useFormik({

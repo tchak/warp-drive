@@ -16,7 +16,6 @@ export function AddUser({
   isOpen: boolean;
   close: () => void;
 }) {
-  useHotkeys('esc', close);
   return (
     <RightSlideOver isOpen={isOpen}>
       <AddUserForm projectId={projectId} close={close} />
@@ -46,6 +45,7 @@ function AddUserForm({
       }
     },
   });
+  useHotkeys('esc', close, { enabled: !fetching });
 
   return (
     <form
