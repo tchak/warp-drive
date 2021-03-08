@@ -11,10 +11,16 @@ export default function ProjectSettingsPage() {
 
   return (
     <>
-      <ProjectStatusBar name={project?.name} />
+      <div className="bg-white">
+        <div className="px-4 sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
+          <ProjectStatusBar name={project?.name} />
+        </div>
+      </div>
 
-      <div className="p-10 bg-white">
-        <NotImplemented />
+      <div className="mt-8">
+        <div className="px-4 sm:px-6 max-w-6xl mx-auto lg:px-8">
+          <NotImplemented />
+        </div>
       </div>
     </>
   );

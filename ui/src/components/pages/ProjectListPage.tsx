@@ -8,7 +8,7 @@ import {
   ListProjectsDocument,
   CreateProjectDocument,
   DeleteProjectDocument,
-} from '../../graphql-operations';
+} from '../../graphql';
 
 import { useSignedIn } from '../../hooks';
 
