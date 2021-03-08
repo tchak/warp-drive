@@ -1,3 +1,5 @@
+import { QueryOrder } from '@mikro-orm/core';
+
 import type { Context } from './context';
 import { Project } from '../entities/Project';
 import { ProjectEvent } from '../entities/ProjectEvent';
@@ -32,9 +34,13 @@ export interface ListProjectsParams {
 export async function listProjects({
   context: { em, admin },
 }: ListProjectsParams): Promise<Project[]> {
-  const projects = await em.find(Project, {
-    owners: admin,
-  });
+  const projects = await em.find(
+    Project,
+    {
+      owners: admin,
+    },
+    { orderBy: { createdDate: QueryOrder.ASC } }
+  );
 
   return projects;
 }
@@ -56,7 +62,7 @@ export async function listProjectLogs({
         owners: admin,
       },
     },
-    { limit: 50 }
+    { orderBy: { createdDate: QueryOrder.DESC }, limit: 50 }
   );
 
   return logs;

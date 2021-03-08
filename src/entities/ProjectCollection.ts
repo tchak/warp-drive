@@ -10,6 +10,7 @@ import {
   OneToMany,
   Collection,
   Cascade,
+  QueryOrder,
 } from '@mikro-orm/core';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { v4 as uuid } from 'uuid';
@@ -100,12 +101,14 @@ export class ProjectCollection {
   @OneToMany(() => CollectionAttribute, ({ collection }) => collection, {
     cascade: [Cascade.ALL],
     hidden: true,
+    orderBy: { createdDate: QueryOrder.ASC },
   })
   attributes = new Collection<CollectionAttribute>(this);
 
   @OneToMany(() => CollectionRelationship, ({ collection }) => collection, {
     cascade: [Cascade.ALL],
     hidden: true,
+    orderBy: { createdDate: QueryOrder.ASC },
   })
   relationships = new Collection<CollectionRelationship>(this);
 

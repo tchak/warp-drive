@@ -1,3 +1,4 @@
+import { QueryOrder } from '@mikro-orm/core';
 import { hash } from 'argon2';
 
 import type { Context } from './context';
@@ -34,9 +35,13 @@ export async function listUsers({
 }: ListUserParams): Promise<ProjectUser[]> {
   authorizeUsers(scope, 'read');
 
-  const users = await em.find(ProjectUser, {
-    project,
-  });
+  const users = await em.find(
+    ProjectUser,
+    {
+      project,
+    },
+    { orderBy: { createdDate: QueryOrder.ASC } }
+  );
 
   return users;
 }
@@ -76,9 +81,13 @@ export async function listUserSessions({
 }: ListUserSessionsParams): Promise<ProjectUserSession[]> {
   authorizeUsers(scope, 'read');
 
-  const sessions = await em.find(ProjectUserSession, {
-    user: { id: userId, project },
-  });
+  const sessions = await em.find(
+    ProjectUserSession,
+    {
+      user: { id: userId, project },
+    },
+    { orderBy: { createdDate: QueryOrder.ASC } }
+  );
 
   return sessions;
 }

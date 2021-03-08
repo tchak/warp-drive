@@ -351,10 +351,14 @@ export async function listCollections({
 }: ListCollectionsParams): Promise<ProjectCollection[]> {
   authorizeCollections(scope, 'read');
 
-  const collections = await em.find(ProjectCollection, { project }, [
-    'attributes',
-    'relationships',
-  ]);
+  const collections = await em.find(
+    ProjectCollection,
+    { project },
+    {
+      populate: ['attributes', 'relationships'],
+      orderBy: { createdDate: QueryOrder.ASC },
+    }
+  );
   return collections;
 }
 
