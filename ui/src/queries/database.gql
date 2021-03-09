@@ -1,15 +1,3 @@
-query getCollection($id: ID!) {
-  collection(id: $id) {
-    id
-    name
-    attributes {
-      id
-      name
-      type
-    }
-  }
-}
-
 mutation createCollection($projectId: ID!, $name: String!) {
   createCollection(projectId: $projectId, name: $name) {
     id

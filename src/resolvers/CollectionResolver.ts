@@ -56,14 +56,6 @@ class DeletedRelationship {
 
 @Resolver(ProjectCollection)
 export class CollectionResolver {
-  @Query(() => ProjectCollection)
-  async collection(
-    @Ctx('context') context: Context,
-    @Arg('id', () => ID) collectionId: string
-  ): Promise<ProjectCollection> {
-    return getCollection({ context, collectionId });
-  }
-
   @Mutation(() => ProjectCollection)
   async createCollection(
     @Ctx('context') context: Context,

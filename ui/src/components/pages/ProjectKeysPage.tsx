@@ -22,7 +22,7 @@ export default function ProjectKeysPage() {
   if (error) {
     return <>Error: {(error as Error).message}</>;
   }
-  const keys = fetching ? [] : data?.project.keys ?? [];
+  const keys = fetching ? [] : data?.getProject.keys ?? [];
 
   return (
     <>

@@ -40,7 +40,7 @@ class DeletedProject {
 @Resolver(Project)
 export class ProjectResolver {
   @Query(() => Project)
-  async project(
+  async getProject(
     @Ctx('context') context: Context,
     @Arg('id', () => ID) projectId: string
   ): Promise<Project> {
@@ -48,7 +48,7 @@ export class ProjectResolver {
   }
 
   @Query(() => [Project])
-  async projects(@Ctx('context') context: Context): Promise<Project[]> {
+  async listProjects(@Ctx('context') context: Context): Promise<Project[]> {
     return listProjects({ context });
   }
 

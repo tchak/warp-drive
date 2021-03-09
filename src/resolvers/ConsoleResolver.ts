@@ -39,7 +39,7 @@ class Profile {
 @Resolver()
 export class ConsoleResolver {
   @Query(() => Profile)
-  me(@Ctx('context') context: Context): Profile {
+  getProfile(@Ctx('context') context: Context): Profile {
     return context.admin;
   }
 

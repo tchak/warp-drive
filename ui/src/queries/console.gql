@@ -10,8 +10,8 @@ mutation signUp($email: String!, $password: String!) {
   }
 }
 
-query me {
-  me {
+query getProfile {
+  getProfile {
     name
     email
   }

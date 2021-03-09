@@ -272,17 +272,17 @@ export type Project = {
 };
 
 export type Query = {
-  collection: Collection;
-  me: Profile;
-  project: Project;
-  projects: Array<Project>;
+  getKeyToken: Scalars['String'];
+  getProfile: Profile;
+  getProject: Project;
+  listProjects: Array<Project>;
 };
 
-export type QueryCollectionArgs = {
+export type QueryGetKeyTokenArgs = {
   id: Scalars['ID'];
 };
 
-export type QueryProjectArgs = {
+export type QueryGetProjectArgs = {
   id: Scalars['ID'];
 };
 
@@ -357,19 +357,9 @@ export type SignUpMutationVariables = Exact<{
 
 export type SignUpMutation = { signUp: Pick<SignUpPayload, 'token'> };
 
-export type MeQueryVariables = Exact<{ [key: string]: never }>;
+export type GetProfileQueryVariables = Exact<{ [key: string]: never }>;
 
-export type MeQuery = { me: Pick<Profile, 'name' | 'email'> };
-
-export type GetCollectionQueryVariables = Exact<{
-  id: Scalars['ID'];
-}>;
-
-export type GetCollectionQuery = {
-  collection: Pick<Collection, 'id' | 'name'> & {
-    attributes: Array<Pick<Attribute, 'id' | 'name' | 'type'>>;
-  };
-};
+export type GetProfileQuery = { getProfile: Pick<Profile, 'name' | 'email'> };
 
 export type CreateCollectionMutationVariables = Exact<{
   projectId: Scalars['ID'];
@@ -432,18 +422,24 @@ export type DeleteKeyMutationVariables = Exact<{
 
 export type DeleteKeyMutation = { deleteKey: Pick<DeletedKey, 'id'> };
 
+export type GetKeyTokenQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetKeyTokenQuery = Pick<Query, 'getKeyToken'>;
+
 export type GetProjectQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 export type GetProjectQuery = {
-  project: Pick<Project, 'id' | 'name' | 'updatedDate'>;
+  getProject: Pick<Project, 'id' | 'name' | 'updatedDate'>;
 };
 
 export type ListProjectsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ListProjectsQuery = {
-  projects: Array<Pick<Project, 'id' | 'name' | 'updatedDate'>>;
+  listProjects: Array<Pick<Project, 'id' | 'name' | 'updatedDate'>>;
 };
 
 export type ListUsersQueryVariables = Exact<{
@@ -451,7 +447,7 @@ export type ListUsersQueryVariables = Exact<{
 }>;
 
 export type ListUsersQuery = {
-  project: Pick<Project, 'id'> & {
+  getProject: Pick<Project, 'id'> & {
     users: Array<Pick<User, 'id' | 'email' | 'name' | 'createdDate'>>;
   };
 };
@@ -461,7 +457,7 @@ export type ListTeamsQueryVariables = Exact<{
 }>;
 
 export type ListTeamsQuery = {
-  project: Pick<Project, 'id'> & {
+  getProject: Pick<Project, 'id'> & {
     teams: Array<Pick<Team, 'id' | 'name' | 'createdDate'>>;
   };
 };
@@ -471,7 +467,7 @@ export type ListCollectionsQueryVariables = Exact<{
 }>;
 
 export type ListCollectionsQuery = {
-  project: Pick<Project, 'id'> & {
+  getProject: Pick<Project, 'id'> & {
     collections: Array<
       Pick<Collection, 'id' | 'name' | 'updatedDate'> & {
         attributes: Array<Pick<Attribute, 'id' | 'name' | 'type'>>;
@@ -485,7 +481,7 @@ export type ListKeysQueryVariables = Exact<{
 }>;
 
 export type ListKeysQuery = {
-  project: Pick<Project, 'id'> & {
+  getProject: Pick<Project, 'id'> & {
     keys: Array<Pick<Key, 'id' | 'name' | 'scope' | 'updatedDate'>>;
   };
 };
@@ -495,7 +491,7 @@ export type ListLogsQueryVariables = Exact<{
 }>;
 
 export type ListLogsQuery = {
-  project: Pick<Project, 'id'> & {
+  getProject: Pick<Project, 'id'> & {
     logs: Array<Pick<Log, 'id' | 'type' | 'createdDate'>>;
   };
 };
@@ -685,85 +681,27 @@ export const SignUpDocument: DocumentNode<
     },
   ],
 };
-export const MeDocument: DocumentNode<MeQuery, MeQueryVariables> = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'me' },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'me' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'email' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-};
-export const GetCollectionDocument: DocumentNode<
-  GetCollectionQuery,
-  GetCollectionQueryVariables
+export const GetProfileDocument: DocumentNode<
+  GetProfileQuery,
+  GetProfileQueryVariables
 > = {
   kind: 'Document',
   definitions: [
     {
       kind: 'OperationDefinition',
       operation: 'query',
-      name: { kind: 'Name', value: 'getCollection' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-      ],
+      name: { kind: 'Name', value: 'getProfile' },
       selectionSet: {
         kind: 'SelectionSet',
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'collection' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'id' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'id' },
-                },
-              },
-            ],
+            name: { kind: 'Name', value: 'getProfile' },
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'attributes' },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'type' } },
-                    ],
-                  },
-                },
+                { kind: 'Field', name: { kind: 'Name', value: 'email' } },
               ],
             },
           },
@@ -1268,6 +1206,48 @@ export const DeleteKeyDocument: DocumentNode<
     },
   ],
 };
+export const GetKeyTokenDocument: DocumentNode<
+  GetKeyTokenQuery,
+  GetKeyTokenQueryVariables
+> = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'getKeyToken' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'getKeyToken' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+};
 export const GetProjectDocument: DocumentNode<
   GetProjectQuery,
   GetProjectQueryVariables
@@ -1293,7 +1273,7 @@ export const GetProjectDocument: DocumentNode<
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'project' },
+            name: { kind: 'Name', value: 'getProject' },
             arguments: [
               {
                 kind: 'Argument',
@@ -1333,7 +1313,7 @@ export const ListProjectsDocument: DocumentNode<
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'projects' },
+            name: { kind: 'Name', value: 'listProjects' },
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
@@ -1376,7 +1356,7 @@ export const ListUsersDocument: DocumentNode<
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'project' },
+            name: { kind: 'Name', value: 'getProject' },
             arguments: [
               {
                 kind: 'Argument',
@@ -1443,7 +1423,7 @@ export const ListTeamsDocument: DocumentNode<
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'project' },
+            name: { kind: 'Name', value: 'getProject' },
             arguments: [
               {
                 kind: 'Argument',
@@ -1509,7 +1489,7 @@ export const ListCollectionsDocument: DocumentNode<
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'project' },
+            name: { kind: 'Name', value: 'getProject' },
             arguments: [
               {
                 kind: 'Argument',
@@ -1596,7 +1576,7 @@ export const ListKeysDocument: DocumentNode<
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'project' },
+            name: { kind: 'Name', value: 'getProject' },
             arguments: [
               {
                 kind: 'Argument',
@@ -1663,7 +1643,7 @@ export const ListLogsDocument: DocumentNode<
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'project' },
+            name: { kind: 'Name', value: 'getProject' },
             arguments: [
               {
                 kind: 'Argument',

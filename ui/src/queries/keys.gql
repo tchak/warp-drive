@@ -14,8 +14,13 @@ mutation updateKey($id: ID!, $name: String, $scope: [Scope!]) {
     scope
   }
 }
+
 mutation deleteKey($id: ID!) {
   deleteKey(id: $id) {
     id
   }
+}
+
+query getKeyToken($id: ID!) {
+  getKeyToken(id: $id)
 }

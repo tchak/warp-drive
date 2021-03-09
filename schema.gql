@@ -152,10 +152,10 @@ type Project {
 }
 
 type Query {
-  collection(id: ID!): Collection!
-  me: Profile!
-  project(id: ID!): Project!
-  projects: [Project!]!
+  getKeyToken(id: ID!): String!
+  getProfile: Profile!
+  getProject(id: ID!): Project!
+  listProjects: [Project!]!
 }
 
 type Relationship {

@@ -66,7 +66,7 @@ const client = createClient({
         Mutation: {
           createProject(result, _, cache) {
             cache.updateQuery({ query: ListProjectsDocument }, (data) => {
-              data?.projects.push(result.createProject as any);
+              data?.listProjects.push(result.createProject as any);
               return data;
             });
           },
@@ -80,7 +80,9 @@ const client = createClient({
             cache.updateQuery(
               { query: ListCollectionsDocument, variables: args },
               (data) => {
-                data?.project.collections.push(result.createCollection as any);
+                data?.getProject.collections.push(
+                  result.createCollection as any
+                );
                 return data;
               }
             );
@@ -95,7 +97,7 @@ const client = createClient({
             cache.updateQuery(
               { query: ListUsersDocument, variables: args },
               (data) => {
-                data?.project.users.push(result.createUser as any);
+                data?.getProject.users.push(result.createUser as any);
                 return data;
               }
             );
@@ -110,7 +112,7 @@ const client = createClient({
             cache.updateQuery(
               { query: ListKeysDocument, variables: args },
               (data) => {
-                data?.project.keys.push(result.createKey as any);
+                data?.getProject.keys.push(result.createKey as any);
                 return data;
               }
             );

@@ -2,8 +2,9 @@ import { useMemo } from 'react';
 import { useQuery } from 'urql';
 
 import {
+  GetKeyTokenDocument,
   GetProjectDocument,
-  MeDocument,
+  GetProfileDocument,
   ListUsersDocument,
   ListTeamsDocument,
   ListCollectionsDocument,
@@ -25,13 +26,25 @@ export function useProject(id?: string) {
     variables: { id },
     pause: !id,
   });
-  return data?.project;
+  return data?.getProject;
 }
 
 export function useProfile() {
   const isSignedIn = useSignedIn();
-  const [{ data }] = useQuery({ query: MeDocument, pause: !isSignedIn });
-  return data?.me;
+  const [{ data }] = useQuery({
+    query: GetProfileDocument,
+    pause: !isSignedIn,
+  });
+  return data?.getProfile;
+}
+
+export function useKeyToken(id?: string): string | undefined {
+  const [{ data }] = useQuery({
+    query: GetKeyTokenDocument,
+    variables: { id },
+    pause: !id,
+  });
+  return data?.getKeyToken;
 }
 
 export function useListUsers(id: string) {

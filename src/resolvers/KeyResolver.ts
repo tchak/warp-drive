@@ -6,7 +6,9 @@ import {
   ID,
   ObjectType,
   Field,
+  Query,
 } from 'type-graphql';
+import { v4 as uuid } from 'uuid';
 
 import {
   ProjectAccessToken,
@@ -17,9 +19,12 @@ import { Context } from '../lib/context';
 import {
   createAccessToken,
   deleteAccessToken,
+  getAccessToken,
   updateAccessToken,
 } from '../lib/accessToken';
 import { getProject } from '../lib/projects';
+import { generateToken } from '../lib/auth';
+import { getEnvValue } from '../lib/env';
 
 @ObjectType()
 class DeletedKey {
@@ -58,5 +63,17 @@ export class KeyResolver {
   ): Promise<DeletedKey> {
     await deleteAccessToken({ context, accessTokenId: keyId });
     return { id: keyId };
+  }
+
+  @Query(() => String)
+  async getKeyToken(
+    @Ctx('context') context: Context,
+    @Arg('id', () => ID) keyId: string
+  ): Promise<string> {
+    const token = await getAccessToken({ context, accessTokenId: keyId });
+    return generateToken(
+      { jti: uuid(), sub: token.id, aud: 'server' },
+      getEnvValue('AUTH_SECRET')
+    );
   }
 }
