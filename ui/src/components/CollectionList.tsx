@@ -28,6 +28,7 @@ export function CollectionList({
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {collections.map((collection) => (
         <CollectionItem
+          key={collection.id}
           collection={collection}
           remove={remove}
           edit={edit}
@@ -35,6 +36,16 @@ export function CollectionList({
         />
       ))}
     </div>
+  );
+}
+
+function useCollectionURLClipboard(
+  collection: Collection
+): [boolean, () => void] {
+  const { id } = useParams();
+  return useClipboard(
+    `https://warp.tchak.dev/v1/${id}/collections/${collection.id}/documents`,
+    { successDuration: 2000 }
   );
 }
 
@@ -49,16 +60,10 @@ function CollectionItem({
   edit: (collection: Collection) => void;
   saving: boolean;
 }) {
-  const { id } = useParams();
-  const [, setCopied] = useClipboard(
-    `https://warp.tchak.dev/v1/${id}/collections/${collection.id}/documents`
-  );
+  const [, setCopied] = useCollectionURLClipboard(collection);
 
   return (
-    <div
-      key={collection.id}
-      className="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500"
-    >
+    <div className="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500">
       <div className="flex-1">{collection.name}</div>
       <div className="flex-shrink-0 min-w-0">
         <button
