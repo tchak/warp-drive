@@ -4,7 +4,7 @@ import { useMutation } from 'urql';
 import { useFormik } from 'formik';
 import { Navigate } from 'react-router-dom';
 
-import { SignInDocument } from '../../graphql-operations';
+import { SignInDocument } from '../../graphql';
 
 export default function SignInPage() {
   const [accessToken, setAccessToken] = useState(() =>

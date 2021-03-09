@@ -15,7 +15,7 @@ export default function ProjectDatabaseDocumentsPage() {
   if (error) {
     return <>Error: {(error as Error).message}</>;
   }
-  const collections = fetching ? [] : data?.project.collections ?? [];
+  const collections = fetching ? [] : data?.getProject.collections ?? [];
 
   return (
     <>

@@ -15,7 +15,7 @@ export default function ProjectOverviewPage() {
   if (error) {
     return <>Error: {(error as Error).message}</>;
   }
-  const logs = fetching ? [] : data?.project.logs ?? [];
+  const logs = fetching ? [] : data?.getProject.logs ?? [];
 
   return (
     <>

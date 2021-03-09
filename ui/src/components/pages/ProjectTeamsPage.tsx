@@ -15,7 +15,7 @@ export default function ProjectTeamsPage() {
   if (error) {
     return <>Error: {(error as Error).message}</>;
   }
-  const teams = fetching ? [] : data?.project.teams ?? [];
+  const teams = fetching ? [] : data?.getProject.teams ?? [];
 
   return (
     <>

@@ -29,7 +29,7 @@ export default function ProjectListPage() {
   if (error) {
     return <>Error: {(error as Error).message}</>;
   }
-  const projects = fetching ? [] : data?.projects ?? [];
+  const projects = fetching ? [] : data?.listProjects ?? [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

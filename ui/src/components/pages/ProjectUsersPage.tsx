@@ -18,7 +18,7 @@ export default function ProjectUsersPage() {
   if (error) {
     return <>Error: {(error as Error).message}</>;
   }
-  const users = fetching ? [] : data?.project.users ?? [];
+  const users = fetching ? [] : data?.getProject.users ?? [];
 
   return (
     <>
