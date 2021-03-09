@@ -1,12 +1,25 @@
 import React, { useState } from 'react';
 import { HiOutlineSearch } from 'react-icons/hi';
 import { useSearchParams } from 'react-router-dom';
+import { useDebouncedCallback } from 'use-debounce';
 
 export function SearchField() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchText, setSearchText] = useState(
     () => searchParams.get('q') ?? ''
   );
+  const debounced = useDebouncedCallback((value) => {
+    if (value) {
+      searchParams.set('q', value);
+    } else {
+      searchParams.delete('q');
+    }
+    setSearchParams(searchParams, { replace: true });
+  }, 500);
+  const search = (value: string) => {
+    setSearchText(value);
+    debounced(value);
+  };
 
   return (
     <form className="w-full flex md:ml-0" action="#" method="GET">
@@ -30,7 +43,7 @@ export function SearchField() {
           autoCorrect={'off'}
           autoComplete={'off'}
           value={searchText}
-          onChange={({ currentTarget: { value } }) => setSearchText(value)}
+          onChange={({ currentTarget: { value } }) => search(value)}
         />
       </div>
     </form>
