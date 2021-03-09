@@ -1069,9 +1069,9 @@
   integrity sha512-WEezM1FWztfbzqIUbsDzFRVMxSoLy3HugVcux6KDDtTqzPsLE8NDRHfXvev66aH1i2oOKKar3/XDjbvh/OUBdg==
 
 "@headlessui/react@^0.3.1-d519f7d":
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/@headlessui/react/-/react-0.3.1.tgz#62d8df3b49f7e212f81f7fa4ba3cefb8945720ec"
-  integrity sha512-GnAVXCLmDs3CFvmvYo4Iu/LqAWVIoS+bGo+eMADnbWgF8BeMX13sWMyb8eOdj7N9nqY9QA2AsMzqYdAIbbsRIw==
+  version "0.3.1-d519f7d"
+  resolved "https://registry.yarnpkg.com/@headlessui/react/-/react-0.3.1-d519f7d.tgz#64f28267448d3ea9443ee19a6c4a5b315468b5cf"
+  integrity sha512-OeAucMKAf48JqMYbajxmp1sOCvU8KhfjbLO+nj6lehOnW+MAI3p8JZ9Q8BBkBIiEJUBsCdGTrKu+YdrcD4VFeg==
 
 "@iarna/toml@^2.2.5":
   version "2.2.5"

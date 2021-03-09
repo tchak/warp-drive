@@ -41,7 +41,9 @@ jobs:
       run: yarn install --frozen-lockfile --non-interactive
 
     - name: Lint
-      run: yarn lint
+      run: |
+        yarn lint
+        yarn tsc -p ui
 
     - name: Test
       run: |
