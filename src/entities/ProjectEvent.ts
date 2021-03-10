@@ -54,7 +54,7 @@ export function logAccountCreate(user: ProjectUser) {
 }
 
 export function logAccountDelete(user: ProjectUser) {
-  return new ProjectEvent(EventType.accountDelete, user.project, user);
+  return new ProjectEvent(EventType.accountDelete, user.project);
 }
 
 export function logAccountSessionsCreate(session: ProjectUserSession) {

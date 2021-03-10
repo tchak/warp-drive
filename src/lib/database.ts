@@ -25,6 +25,14 @@ import {
   DocumentOperation,
 } from '../entities/Document';
 import { AttributeOperation } from '../entities/AttributeOperation';
+import {
+  logCollectionCreate,
+  logCollectionUpdate,
+  logCollectionDelete,
+  logDocumentCreate,
+  logDocumentUpdate,
+  logDocumentDelete,
+} from '../entities/ProjectEvent';
 
 export interface CreateCollectionParams {
   context: Context;
@@ -40,7 +48,8 @@ export async function createCollection({
   authorizeCollections(scope, 'write');
 
   const collection = new ProjectCollection(project, name, permissions);
-  await em.persistAndFlush(collection);
+  const event = logCollectionCreate(collection);
+  await em.persistAndFlush([collection, event]);
   return collection;
 }
 
@@ -66,7 +75,8 @@ export async function updateCollection({
   wrap(collection).assign(compact({ name, permissions }), {
     mergeObjects: true,
   });
-  await em.flush();
+  const event = logCollectionUpdate(collection);
+  await em.persistAndFlush(event);
 }
 
 export interface CreateCollectionAttributeParams {
@@ -94,7 +104,8 @@ export async function createCollectionAttribute({
   const attribute = new CollectionAttribute(collection, name, type, {
     required,
   });
-  await em.persistAndFlush(attribute);
+  const event = logCollectionUpdate(collection);
+  await em.persistAndFlush([attribute, event]);
   return attribute;
 }
 
@@ -116,7 +127,8 @@ export async function renameCollectionAttribute({
     collection: { project },
   });
   attribute.name = name;
-  await em.flush();
+  const event = logCollectionUpdate(attribute.collection);
+  await em.persistAndFlush(event);
   return attribute;
 }
 
@@ -139,7 +151,9 @@ export async function deleteCollectionAttribute({
         audience == 'admin' ? { owners: context.admin } : context.project,
     },
   });
-  await em.removeAndFlush(attribute);
+  em.remove(attribute);
+  const event = logCollectionUpdate(attribute.collection);
+  await em.persistAndFlush(event);
 }
 
 export interface CreateCollectionRelationshipParams {
@@ -188,7 +202,8 @@ export async function createCollectionRelationship({
     );
     em.persist(inverseRelationship);
   }
-  await em.persistAndFlush(relationship);
+  const event = logCollectionUpdate(collection);
+  await em.persistAndFlush([relationship, event]);
   return relationship;
 }
 
@@ -216,7 +231,8 @@ export async function renameCollectionRelationship({
     });
     inverseRelationship.inverse = name;
   }
-  await em.flush();
+  const event = logCollectionUpdate(relationship.collection);
+  await em.persistAndFlush(event);
   return relationship;
 }
 
@@ -258,7 +274,8 @@ export async function renameCollectionRelationshipInverse({
     }
   }
   relationship.inverse = inverse;
-  await em.flush();
+  const event = logCollectionUpdate(relationship.collection);
+  await em.persistAndFlush(event);
   return relationship;
 }
 
@@ -296,7 +313,9 @@ export async function deleteCollectionRelationship({
       em.remove(inverseRelationship);
     }
   }
-  em.removeAndFlush(relationship);
+  em.remove(relationship);
+  const event = logCollectionUpdate(relationship.collection);
+  await em.persistAndFlush(event);
 }
 
 export interface DeleteCollectionParams {
@@ -320,7 +339,9 @@ export async function deleteCollection({
     },
     ['attributes', 'relationships']
   );
-  await em.removeAndFlush(collection);
+  em.remove(collection);
+  const event = logCollectionDelete(collection);
+  await em.persistAndFlush(event);
 }
 
 export interface GetCollectionParams {
@@ -424,7 +445,8 @@ export async function createDocument({
     throw new ValidationError('Required attributes are not provided');
   }
   const operations = buildAttributeOperations(document, attributes);
-  await em.persistAndFlush([document, ...operations]);
+  const event = logDocumentCreate(document);
+  await em.persistAndFlush([document, ...operations, event]);
 
   return document;
 }
@@ -456,7 +478,8 @@ export async function updateDocument({
   );
 
   const operations = buildAttributeOperations(document, attributes);
-  await em.persistAndFlush(operations);
+  const event = logDocumentUpdate(document);
+  await em.persistAndFlush([...operations, event]);
 }
 
 export interface DeleteDocumentParams {
@@ -481,7 +504,8 @@ export async function deleteDocument({
 
   document.removeOperationId = uuid();
   document.removeTimestamp = getClock().inc();
-  await em.flush();
+  const event = logDocumentDelete(document);
+  await em.persistAndFlush(event);
 }
 
 export interface PushDocumentsParams {

@@ -13,6 +13,7 @@ import { ObjectType, Field, ID } from 'type-graphql';
 import { v4 as uuid } from 'uuid';
 
 import { Project } from './Project';
+import { ProjectEvent } from './ProjectEvent';
 import { ProjectTeamMember } from './ProjectTeamMember';
 import { ProjectUserSession } from './ProjectUserSession';
 
@@ -62,6 +63,12 @@ export class ProjectUser {
     hidden: true,
   })
   sessions = new Collection<ProjectUserSession>(this);
+
+  @OneToMany(() => ProjectEvent, ({ user }) => user, {
+    cascade: [Cascade.ALL],
+    hidden: true,
+  })
+  events = new Collection<ProjectEvent>(this);
 
   @Field()
   @Property()

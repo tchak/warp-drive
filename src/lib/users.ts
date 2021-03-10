@@ -4,6 +4,11 @@ import { hash } from 'argon2';
 import type { Context } from './context';
 import { ProjectUser } from '../entities/ProjectUser';
 import { ProjectUserSession } from '../entities/ProjectUserSession';
+import {
+  logUsersCreate,
+  logUsersDelete,
+  logUsersSessionsDelete,
+} from '../entities/ProjectEvent';
 
 import { authorizeUsers } from './authorize';
 
@@ -109,7 +114,8 @@ export async function createUser({
 
   const passwordHash = await hash(password);
   const user = new ProjectUser(project, email, passwordHash, name);
-  await em.persistAndFlush(user);
+  const event = logUsersCreate(user);
+  await em.persistAndFlush([user, event]);
   return user;
 }
 
@@ -124,11 +130,17 @@ export async function deleteUser({
 }: DeleteUserParams): Promise<void> {
   authorizeUsers(scope, 'write');
 
-  const user = await em.findOneOrFail(ProjectUser, {
-    id: userId,
-    project,
-  });
-  await em.removeAndFlush(user);
+  const user = await em.findOneOrFail(
+    ProjectUser,
+    {
+      id: userId,
+      project,
+    },
+    ['memberships', 'sessions', 'events']
+  );
+  em.remove(user);
+  const event = logUsersDelete(user);
+  await em.persistAndFlush(event);
 }
 
 export interface DeleteUserSessionParams {
@@ -148,8 +160,9 @@ export async function deleteUserSession({
       project,
     },
   });
-
-  await em.removeAndFlush(session);
+  em.remove(session);
+  const event = logUsersSessionsDelete(session);
+  await em.persistAndFlush([session, event]);
 }
 
 export interface DeleteUserSessionsParam {
@@ -169,6 +182,10 @@ export async function deleteUserSessions({
       project,
     },
   });
+  const events = sessions.map((session) => {
+    em.remove(session);
+    return logUsersSessionsDelete(session);
+  });
 
-  await em.removeAndFlush(sessions);
+  await em.persistAndFlush([...sessions, ...events]);
 }
