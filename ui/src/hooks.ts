@@ -8,7 +8,7 @@ import {
   ListUsersDocument,
   ListTeamsDocument,
   ListCollectionsDocument,
-  ListLogsDocument,
+  ListEventsDocument,
   ListKeysDocument,
 } from './graphql';
 
@@ -62,9 +62,9 @@ export function useListCollections(id: string) {
   });
 }
 
-export function useListLogs(id: string) {
+export function useListEvents(id: string) {
   return useQuery({
-    query: ListLogsDocument,
+    query: ListEventsDocument,
     variables: { projectId: id },
   });
 }

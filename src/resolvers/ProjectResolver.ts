@@ -105,7 +105,7 @@ export class ProjectResolver {
   }
 
   @FieldResolver(() => [ProjectEvent])
-  async logs(
+  async events(
     @Root() project: Project,
     @Ctx('context') context: Context
   ): Promise<ProjectEvent[]> {

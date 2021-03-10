@@ -54,7 +54,7 @@ export async function listProjectLogs({
   context: { em, admin },
   projectId,
 }: ListProjectLogsParams): Promise<ProjectEvent[]> {
-  const logs = await em.find(
+  const events = await em.find(
     ProjectEvent,
     {
       project: {
@@ -65,7 +65,7 @@ export async function listProjectLogs({
     { orderBy: { createdDate: QueryOrder.DESC }, limit: 50 }
   );
 
-  return logs;
+  return events;
 }
 
 export interface CreateProjectParams {
@@ -122,6 +122,7 @@ export async function deleteProject({
       'users',
       'teams',
       'keys',
+      'events',
       'collections.attributes',
       'collections.relationships',
     ]

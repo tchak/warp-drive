@@ -75,6 +75,12 @@ export type DeletedUser = {
   id: Scalars['ID'];
 };
 
+export type Event = {
+  createdDate: Scalars['DateTime'];
+  id: Scalars['ID'];
+  type: EventType;
+};
+
 export enum EventType {
   AccountCreate = 'accountCreate',
   AccountDelete = 'accountDelete',
@@ -111,12 +117,6 @@ export type Key = {
   name: Scalars['String'];
   scope: Array<Scope>;
   updatedDate: Scalars['DateTime'];
-};
-
-export type Log = {
-  createdDate: Scalars['DateTime'];
-  id: Scalars['ID'];
-  type: EventType;
 };
 
 export type Mutation = {
@@ -262,9 +262,9 @@ export type Profile = {
 export type Project = {
   collections: Array<Collection>;
   createdDate: Scalars['DateTime'];
+  events: Array<Event>;
   id: Scalars['ID'];
   keys: Array<Key>;
-  logs: Array<Log>;
   name: Scalars['String'];
   teams: Array<Team>;
   updatedDate: Scalars['DateTime'];
@@ -486,13 +486,13 @@ export type ListKeysQuery = {
   };
 };
 
-export type ListLogsQueryVariables = Exact<{
+export type ListEventsQueryVariables = Exact<{
   projectId: Scalars['ID'];
 }>;
 
-export type ListLogsQuery = {
+export type ListEventsQuery = {
   getProject: Pick<Project, 'id'> & {
-    logs: Array<Pick<Log, 'id' | 'type' | 'createdDate'>>;
+    events: Array<Pick<Event, 'id' | 'type' | 'createdDate'>>;
   };
 };
 
@@ -1615,16 +1615,16 @@ export const ListKeysDocument: DocumentNode<
     },
   ],
 };
-export const ListLogsDocument: DocumentNode<
-  ListLogsQuery,
-  ListLogsQueryVariables
+export const ListEventsDocument: DocumentNode<
+  ListEventsQuery,
+  ListEventsQueryVariables
 > = {
   kind: 'Document',
   definitions: [
     {
       kind: 'OperationDefinition',
       operation: 'query',
-      name: { kind: 'Name', value: 'listLogs' },
+      name: { kind: 'Name', value: 'listEvents' },
       variableDefinitions: [
         {
           kind: 'VariableDefinition',
@@ -1660,7 +1660,7 @@ export const ListLogsDocument: DocumentNode<
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 {
                   kind: 'Field',
-                  name: { kind: 'Name', value: 'logs' },
+                  name: { kind: 'Name', value: 'events' },
                   selectionSet: {
                     kind: 'SelectionSet',
                     selections: [

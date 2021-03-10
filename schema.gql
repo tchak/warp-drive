@@ -65,6 +65,12 @@ type DeletedUser {
   id: ID!
 }
 
+type Event {
+  createdDate: DateTime!
+  id: ID!
+  type: EventType!
+}
+
 enum EventType {
   accountCreate
   accountDelete
@@ -103,12 +109,6 @@ type Key {
   updatedDate: DateTime!
 }
 
-type Log {
-  createdDate: DateTime!
-  id: ID!
-  type: EventType!
-}
-
 type Mutation {
   createAttribute(collectionId: ID!, name: String!, type: AttributeType!): Attribute!
   createCollection(name: String!, projectId: ID!): Collection!
@@ -142,9 +142,9 @@ type Profile {
 type Project {
   collections: [Collection!]!
   createdDate: DateTime!
+  events: [Event!]!
   id: ID!
   keys: [Key!]!
-  logs: [Log!]!
   name: String!
   teams: [Team!]!
   updatedDate: DateTime!

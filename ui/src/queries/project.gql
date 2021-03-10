@@ -65,10 +65,10 @@ query listKeys($projectId: ID!) {
   }
 }
 
-query listLogs($projectId: ID!) {
+query listEvents($projectId: ID!) {
   getProject(id: $projectId) {
     id
-    logs {
+    events {
       id
       type
       createdDate

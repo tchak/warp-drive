@@ -122,10 +122,14 @@ export async function renameCollectionAttribute({
 }: RenameCollectionAttributeParams): Promise<CollectionAttribute> {
   authorizeCollections(scope, 'write');
 
-  const attribute = await em.findOneOrFail(CollectionAttribute, {
-    id: attributeId,
-    collection: { project },
-  });
+  const attribute = await em.findOneOrFail(
+    CollectionAttribute,
+    {
+      id: attributeId,
+      collection: { project },
+    },
+    ['collection']
+  );
   attribute.name = name;
   const event = logCollectionUpdate(attribute.collection);
   await em.persistAndFlush(event);
@@ -144,13 +148,17 @@ export async function deleteCollectionAttribute({
   const { em, scope, audience } = context;
   authorizeCollections(scope, 'write');
 
-  const attribute = await em.findOneOrFail(CollectionAttribute, {
-    id: attributeId,
-    collection: {
-      project:
-        audience == 'admin' ? { owners: context.admin } : context.project,
+  const attribute = await em.findOneOrFail(
+    CollectionAttribute,
+    {
+      id: attributeId,
+      collection: {
+        project:
+          audience == 'admin' ? { owners: context.admin } : context.project,
+      },
     },
-  });
+    ['collection']
+  );
   em.remove(attribute);
   const event = logCollectionUpdate(attribute.collection);
   await em.persistAndFlush(event);
@@ -218,11 +226,15 @@ export async function renameCollectionRelationship({
   relationshipId,
   name,
 }: RenameCollectionRelationshipParams): Promise<CollectionRelationship> {
-  const relationship = await em.findOneOrFail(CollectionRelationship, {
-    id: relationshipId,
-    collection: { project },
-    owner: true,
-  });
+  const relationship = await em.findOneOrFail(
+    CollectionRelationship,
+    {
+      id: relationshipId,
+      collection: { project },
+      owner: true,
+    },
+    ['collection']
+  );
   relationship.name = name;
   if (relationship.inverse) {
     const inverseRelationship = await em.findOneOrFail(CollectionRelationship, {
@@ -250,14 +262,18 @@ export async function renameCollectionRelationshipInverse({
   const { em, scope, audience } = context;
   authorizeCollections(scope, 'write');
 
-  const relationship = await em.findOneOrFail(CollectionRelationship, {
-    id: relationshipId,
-    collection: {
-      project:
-        audience == 'admin' ? { owners: context.admin } : context.project,
+  const relationship = await em.findOneOrFail(
+    CollectionRelationship,
+    {
+      id: relationshipId,
+      collection: {
+        project:
+          audience == 'admin' ? { owners: context.admin } : context.project,
+      },
+      owner: true,
     },
-    owner: true,
-  });
+    ['collection']
+  );
   if (relationship.inverse) {
     const inverseRelationship = await em.findOneOrFail(CollectionRelationship, {
       name: relationship.inverse,
@@ -291,14 +307,18 @@ export async function deleteCollectionRelationship({
   const { em, scope, audience } = context;
   authorizeCollections(scope, 'write');
 
-  const relationship = await em.findOneOrFail(CollectionRelationship, {
-    id: relationshipId,
-    collection: {
-      project:
-        audience == 'admin' ? { owners: context.admin } : context.project,
+  const relationship = await em.findOneOrFail(
+    CollectionRelationship,
+    {
+      id: relationshipId,
+      collection: {
+        project:
+          audience == 'admin' ? { owners: context.admin } : context.project,
+      },
+      owner: true,
     },
-    owner: true,
-  });
+    ['collection']
+  );
   if (relationship.inverse) {
     const inverseRelationship = await em.findOne(CollectionRelationship, {
       name: relationship.inverse,

@@ -16,6 +16,7 @@ import { ProjectAccessToken } from './ProjectAccessToken';
 import { ProjectUser } from './ProjectUser';
 import { ProjectTeam } from './ProjectTeam';
 import { ProjectCollection } from './ProjectCollection';
+import { ProjectEvent } from './ProjectEvent';
 
 @Entity()
 @ObjectType()
@@ -62,6 +63,12 @@ export class Project {
     orderBy: { createdDate: QueryOrder.ASC },
   })
   collections = new Collection<ProjectCollection>(this);
+
+  @OneToMany(() => ProjectEvent, ({ project }) => project, {
+    cascade: [Cascade.ALL],
+    hidden: true,
+  })
+  events = new Collection<ProjectEvent>(this);
 
   @Field()
   @Property()

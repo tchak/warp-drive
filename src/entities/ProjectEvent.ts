@@ -143,7 +143,7 @@ export function logDocumentDelete(document: Document, user?: ProjectUser) {
 }
 
 @Entity()
-@ObjectType('Log')
+@ObjectType('Event')
 export class ProjectEvent {
   constructor(type: EventType, project: Project, user?: ProjectUser) {
     this.project = project;
@@ -176,7 +176,7 @@ export class ProjectEvent {
     const { id, ...attributes } = wrap(this).toObject();
     return {
       id,
-      type: 'log',
+      type: 'event',
       attributes,
     };
   }

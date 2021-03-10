@@ -2,20 +2,20 @@ import React from 'react';
 import { HiOutlineUserGroup, HiOutlineDatabase } from 'react-icons/hi';
 import { useParams } from 'react-router-dom';
 
-import { useProject, useListLogs } from '../../hooks';
+import { useProject, useListEvents } from '../../hooks';
 import { OverviewCard } from '../OverviewCard';
-import { LogList } from '../LogList';
+import { EventFeed } from '../EventFeed';
 import { ProjectStatusBar } from '../ProjectStatusBar';
 
 export default function ProjectOverviewPage() {
   const { id } = useParams();
   const project = useProject(id);
-  const [{ data, fetching, error }] = useListLogs(id);
+  const [{ data, fetching, error }] = useListEvents(id);
 
   if (error) {
     return <>Error: {(error as Error).message}</>;
   }
-  const logs = fetching ? [] : data?.getProject.logs ?? [];
+  const events = fetching ? [] : data?.getProject.events ?? [];
 
   return (
     <>
@@ -47,11 +47,18 @@ export default function ProjectOverviewPage() {
           </div>
         </div>
 
-        <h2 className="max-w-6xl mx-auto mt-8 px-4 text-lg leading-6 font-medium text-gray-900 sm:px-6 lg:px-8">
-          Recent activity
-        </h2>
-
-        <LogList logs={logs} />
+        <div className="mt-8">
+          <div className="px-4 sm:px-6 max-w-6xl mx-auto lg:px-8">
+            <h2 className="text-lg leading-6 font-medium text-gray-900">
+              Recent activity
+            </h2>
+            <div className="mt-2 bg-white overflow-hidden shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <EventFeed events={events} />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );
