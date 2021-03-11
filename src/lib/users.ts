@@ -143,6 +143,28 @@ export async function deleteUser({
   await em.persistAndFlush(event);
 }
 
+export async function disableUser({
+  context: { em, project, scope },
+  userId,
+}: DeleteUserParams): Promise<void> {
+  authorizeUsers(scope, 'write');
+
+  const user = await em.findOneOrFail(
+    ProjectUser,
+    {
+      id: userId,
+      project,
+    },
+    ['sessions']
+  );
+  const events = [...user.sessions].map((session) => {
+    em.remove(session);
+    return logUsersSessionsDelete(session);
+  });
+  user.disabledDate = new Date();
+  await em.persistAndFlush(events);
+}
+
 export interface DeleteUserSessionParams {
   context: Context;
   sessionId: string;

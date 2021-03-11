@@ -126,6 +126,7 @@ export async function createAPIContext(
         sessions: {
           id: token.jti,
         },
+        disabledDate: null,
       });
       context.user = user;
       break;

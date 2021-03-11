@@ -70,6 +70,14 @@ export class ProjectUser {
   })
   events = new Collection<ProjectEvent>(this);
 
+  @Field({ nullable: true })
+  @Property({ nullable: true })
+  disabledDate?: Date;
+
+  @Field({ nullable: true })
+  @Property({ nullable: true })
+  verifiedDate?: Date;
+
   @Field()
   @Property()
   createdDate: Date = new Date();

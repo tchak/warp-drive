@@ -208,9 +208,11 @@ type Team {
 
 type User {
   createdDate: DateTime!
+  disabledDate: DateTime
   email: String!
   id: ID!
   name: String
   sessions: [Session!]!
   updatedDate: DateTime!
+  verifiedDate: DateTime
 }
