@@ -18,7 +18,6 @@ import {
   Permissions,
   PermissionsOptions,
 } from './ProjectCollection';
-import { AttributeType } from './CollectionAttribute';
 import { RelationshipType } from './CollectionRelationship';
 import { AttributeOperation } from './AttributeOperation';
 import { RelationshipOperation } from './RelationshipOperation';
@@ -142,7 +141,7 @@ export class Document {
         }
       } else {
         relationships[name].data = relatedDocument
-          ? { id: relatedDocument.id, type: relatedDocument.collection.id }
+          ? relatedDocument.identity
           : null;
       }
     }
@@ -188,7 +187,9 @@ export class Document {
             op: 'update',
             ref,
             data: {
-              [operation.attribute.name]: operation.value,
+              attributes: {
+                [operation.attribute.name]: operation.value,
+              },
             },
             meta,
           } as DocumentOperation;
@@ -207,6 +208,16 @@ export class Document {
             op: 'update',
             ref: { ...ref, relationship: operation.relationship.name },
             data: [],
+            meta,
+          } as DocumentOperation;
+        } else if (operation.relationship.type == RelationshipType.hasOne) {
+          return {
+            op: 'update',
+            ref: { ...ref, relationship: operation.relationship.name },
+            data: {
+              id: operation.relatedDocument.id,
+              type: operation.relatedDocument.collection.name,
+            },
             meta,
           } as DocumentOperation;
         } else {

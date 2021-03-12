@@ -16,7 +16,7 @@ export class RelationshipOperation {
   constructor(
     document: Document,
     relationship: CollectionRelationship,
-    relatedDocument: Document,
+    relatedDocument: Document | null,
     options?: RelationshipOperationOptions
   ) {
     this.document = document;
@@ -25,7 +25,7 @@ export class RelationshipOperation {
 
     this.id = options?.id ?? uuid();
     this.timestamp = options?.timestamp ?? getClock().inc();
-    this.remove = options?.remove !== true;
+    this.remove = options?.remove ?? false;
   }
 
   @PrimaryKey({ type: 'uuid' })
@@ -44,7 +44,7 @@ export class RelationshipOperation {
   relationship: CollectionRelationship;
 
   @ManyToOne(() => Document, { nullable: true, hidden: true })
-  relatedDocument?: Document;
+  relatedDocument?: Document | null;
 
   @Property()
   createdDate: Date = new Date();

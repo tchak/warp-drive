@@ -299,5 +299,156 @@ describe('database', () => {
         },
       ]);
     });
+
+    describe('todo', () => {
+      let listCollection: ProjectCollection;
+      beforeEach(async () => {
+        listCollection = await createCollection({
+          context,
+          name: 'list',
+        });
+        await createCollectionAttribute({
+          context,
+          collectionId: listCollection.id,
+          name: 'title',
+          type: AttributeType.string,
+        });
+
+        await createCollectionAttribute({
+          context,
+          collectionId: collection.id,
+          name: 'title',
+          type: AttributeType.string,
+        });
+        await createCollectionRelationship({
+          context,
+          collectionId: collection.id,
+          name: 'list',
+          relationship: [RelationshipType.hasOne, RelationshipType.hasMany],
+          relatedCollectionId: listCollection.id,
+          inverse: 'items',
+        });
+      });
+      afterEach(async () => {
+        for (const { id } of collection.documents) {
+          await deleteDocument({ context, documentId: id });
+        }
+        for (const { id } of listCollection.documents) {
+          await deleteDocument({ context, documentId: id });
+        }
+        await deleteCollection({ context, collectionId: collection.id });
+        await deleteCollection({ context, collectionId: listCollection.id });
+      });
+
+      test('create list with items', async () => {
+        const list = await createDocument({
+          context,
+          collectionId: listCollection.id,
+          attributes: {
+            title: 'First list',
+          },
+        });
+        const item = await createDocument({
+          context,
+          collectionId: collection.id,
+          attributes: {
+            title: 'First item',
+          },
+          relationships: {
+            list: {
+              data: {
+                id: list.id,
+                type: listCollection.name,
+              },
+            },
+          },
+        });
+
+        expect(list.toJSON()).toMatchObject({
+          id: list.id,
+          type: 'list',
+          attributes: { title: 'First list' },
+          relationships: {},
+        });
+        expect(item.toJSON()).toMatchObject({
+          id: item.id,
+          type: 'item',
+          attributes: { title: 'First item' },
+          relationships: {
+            list: {
+              data: { id: list.id, type: 'list' },
+            },
+          },
+        });
+
+        const listOperations = list.operations;
+        expect(listOperations.length).toEqual(2);
+        expect(listOperations).toMatchObject([
+          {
+            op: 'add',
+            ref: {
+              id: list.id,
+              type: 'list',
+            },
+            meta: {
+              id: list.operationId,
+              timestamp: list.timestamp,
+            },
+          },
+          {
+            op: 'update',
+            ref: {
+              id: list.id,
+              type: 'list',
+            },
+            data: {
+              attributes: {
+                title: 'First list',
+              },
+            },
+          },
+        ]);
+
+        const itemOperations = item.operations;
+        expect(itemOperations.length).toEqual(3);
+        expect(itemOperations).toMatchObject([
+          {
+            op: 'add',
+            ref: {
+              id: item.id,
+              type: 'item',
+            },
+            meta: {
+              id: item.operationId,
+              timestamp: item.timestamp,
+            },
+          },
+          {
+            op: 'update',
+            ref: {
+              id: item.id,
+              type: 'item',
+            },
+            data: {
+              attributes: {
+                title: 'First item',
+              },
+            },
+          },
+          {
+            op: 'update',
+            ref: {
+              id: item.id,
+              type: 'item',
+              relationship: 'list',
+            },
+            data: {
+              type: 'list',
+              id: list.id,
+            },
+          },
+        ]);
+      });
+    });
   });
 });

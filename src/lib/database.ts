@@ -1,4 +1,4 @@
-import { QueryOrder, wrap } from '@mikro-orm/core';
+import { EntityManager, QueryOrder, wrap } from '@mikro-orm/core';
 import { v4 as uuid } from 'uuid';
 
 import type { Context } from './context';
@@ -22,6 +22,7 @@ import {
 import {
   Document,
   DocumentAttributes,
+  DocumentRelationships,
   DocumentOperation,
 } from '../entities/Document';
 import { AttributeOperation } from '../entities/AttributeOperation';
@@ -33,6 +34,7 @@ import {
   logDocumentUpdate,
   logDocumentDelete,
 } from '../entities/ProjectEvent';
+import { RelationshipOperation } from '../entities/RelationshipOperation';
 
 export interface CreateCollectionParams {
   context: Context;
@@ -447,6 +449,7 @@ export interface CreateDocumentParams {
   context: Context;
   collectionId: string;
   attributes?: DocumentAttributes;
+  relationships?: DocumentRelationships;
   permissions?: PermissionsOptions;
 }
 
@@ -454,6 +457,7 @@ export async function createDocument({
   context,
   collectionId,
   attributes,
+  relationships,
   permissions,
 }: CreateDocumentParams): Promise<Document> {
   if (context.audience == 'server') {
@@ -481,9 +485,19 @@ export async function createDocument({
   if (!isValid) {
     throw new ValidationError('Required attributes are not provided');
   }
-  const operations = buildAttributeOperations(document, attributes);
+  const attributeOperations = buildAttributeOperations(document, attributes);
+  const relationshipOperations = await buildRelationshipOperations(
+    context.em,
+    document,
+    relationships
+  );
   const event = logDocumentCreate(document);
-  await em.persistAndFlush([document, ...operations, event]);
+  await em.persistAndFlush([
+    document,
+    ...attributeOperations,
+    ...relationshipOperations,
+    event,
+  ]);
 
   return document;
 }
@@ -491,13 +505,15 @@ export async function createDocument({
 export interface UpdateDocumentParams {
   context: Context;
   documentId: string;
-  attributes: DocumentAttributes;
+  attributes?: DocumentAttributes;
+  relationships?: DocumentRelationships;
 }
 
 export async function updateDocument({
   context,
   documentId,
   attributes,
+  relationships,
 }: UpdateDocumentParams): Promise<void> {
   if (context.audience == 'server') {
     authorizeDocuments(context.scope, 'write');
@@ -514,9 +530,18 @@ export async function updateDocument({
     ['collection.attributes', 'collection.relationships']
   );
 
-  const operations = buildAttributeOperations(document, attributes);
+  const attributeOperations = buildAttributeOperations(document, attributes);
+  const relationshipOperations = await buildRelationshipOperations(
+    context.em,
+    document,
+    relationships
+  );
   const event = logDocumentUpdate(document);
-  await em.persistAndFlush([...operations, event]);
+  await em.persistAndFlush([
+    ...attributeOperations,
+    ...relationshipOperations,
+    event,
+  ]);
 }
 
 export interface DeleteDocumentParams {
@@ -648,6 +673,56 @@ function buildAttributeOperations(
         });
       })
     : [];
+  return operations;
+}
+
+async function buildRelationshipOperations(
+  em: EntityManager,
+  document: Document,
+  relationships?: DocumentRelationships
+): Promise<RelationshipOperation[]> {
+  if (!relationships) {
+    return [];
+  }
+  const operations: RelationshipOperation[] = [];
+  for (const [relationahipName, { data }] of Object.entries(relationships)) {
+    const relationship = [...document.collection.relationships].find(
+      ({ name }) => name == relationahipName
+    ) as CollectionRelationship;
+    if (!data) {
+      operations.push(
+        new RelationshipOperation(document, relationship, null, {
+          id: uuid(),
+          timestamp: getClock().inc(),
+        })
+      );
+    } else if (Array.isArray(data)) {
+      operations.push(
+        new RelationshipOperation(document, relationship, null, {
+          id: uuid(),
+          timestamp: getClock().inc(),
+        })
+      );
+    } else {
+      operations.push(
+        new RelationshipOperation(
+          document,
+          relationship,
+          await em.findOneOrFail(Document, {
+            id: data.id,
+            collection: {
+              project: document.collection.project,
+              name: data.type,
+            },
+          }),
+          {
+            id: uuid(),
+            timestamp: getClock().inc(),
+          }
+        )
+      );
+    }
+  }
   return operations;
 }
 
