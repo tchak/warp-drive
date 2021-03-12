@@ -193,14 +193,16 @@ export class Document {
             },
             meta,
           } as DocumentOperation;
-        } else if (operation.remove && operation.relatedDocument) {
+        } else if (operation.relationship.type == RelationshipType.hasOne) {
           return {
-            op: 'remove',
+            op: 'update',
             ref: { ...ref, relationship: operation.relationship.name },
-            data: {
-              id: operation.relatedDocument.id,
-              type: operation.relatedDocument.collection.name,
-            },
+            data: operation.relatedDocument
+              ? {
+                  id: operation.relatedDocument.id,
+                  type: operation.relatedDocument.collection.name,
+                }
+              : null,
             meta,
           } as DocumentOperation;
         } else if (!operation.relatedDocument) {
@@ -210,9 +212,9 @@ export class Document {
             data: [],
             meta,
           } as DocumentOperation;
-        } else if (operation.relationship.type == RelationshipType.hasOne) {
+        } else if (operation.remove) {
           return {
-            op: 'update',
+            op: 'remove',
             ref: { ...ref, relationship: operation.relationship.name },
             data: {
               id: operation.relatedDocument.id,
