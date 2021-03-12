@@ -2,7 +2,6 @@ import {
   Entity,
   PrimaryKey,
   Property,
-  ManyToMany,
   OneToMany,
   Collection,
   Cascade,
@@ -11,7 +10,8 @@ import {
 import { ObjectType, Field, ID } from 'type-graphql';
 import { v4 as uuid } from 'uuid';
 
-import { User } from './User';
+import { ProjectMember } from './ProjectMember';
+
 import { ProjectAccessToken } from './ProjectAccessToken';
 import { ProjectUser } from './ProjectUser';
 import { ProjectTeam } from './ProjectTeam';
@@ -33,8 +33,12 @@ export class Project {
   @Property()
   name: string;
 
-  @ManyToMany(() => User, ({ projects }) => projects, { hidden: true })
-  owners = new Collection<User>(this);
+  @OneToMany(() => ProjectMember, ({ project }) => project, {
+    hidden: true,
+    cascade: [Cascade.ALL],
+    orderBy: { createdDate: QueryOrder.ASC },
+  })
+  members = new Collection<ProjectMember>(this);
 
   @OneToMany(() => ProjectAccessToken, ({ project }) => project, {
     hidden: true,

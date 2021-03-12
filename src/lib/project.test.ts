@@ -11,7 +11,7 @@ import {
   updateProject,
   deleteProject,
 } from './projects';
-import type { Project } from 'src/entities/Project';
+import type { Project } from '../entities/Project';
 
 describe('projects', () => {
   const email = `${uuid()}@test.com`;
@@ -39,7 +39,7 @@ describe('projects', () => {
 
   it('create project', () => {
     expect(project.name).toEqual('hello world');
-    expect(project.owners[0]).toStrictEqual(user);
+    expect(project.members[0].user).toStrictEqual(user);
   });
 
   it('get project', async () => {

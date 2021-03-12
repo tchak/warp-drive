@@ -16,9 +16,7 @@ export async function getAccessToken({
 }: GetAccessTokenParams): Promise<ProjectAccessToken> {
   const token = await em.findOneOrFail(ProjectAccessToken, {
     id: accessTokenId,
-    project: {
-      owners: admin,
-    },
+    project: { members: { user: admin } },
   });
 
   return token;
@@ -36,7 +34,7 @@ export async function listAccessTokens({
   const tokens = await em.find(ProjectAccessToken, {
     project: {
       id: projectId,
-      owners: admin,
+      members: { user: admin },
     },
   });
 
@@ -74,7 +72,7 @@ export async function updateAccessToken({
   const token = await em.findOneOrFail(ProjectAccessToken, {
     id: accessTokenId,
     project: {
-      owners: admin,
+      members: { user: admin },
     },
   });
   wrap(token).assign(params);
@@ -95,7 +93,7 @@ export async function deleteAccessToken({
   const token = await em.findOneOrFail(ProjectAccessToken, {
     id: accessTokenId,
     project: {
-      owners: admin,
+      members: { user: admin },
     },
   });
   await em.removeAndFlush(token);

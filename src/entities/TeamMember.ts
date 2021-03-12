@@ -11,7 +11,7 @@ import { ProjectTeam } from './ProjectTeam';
 import { ProjectUser } from './ProjectUser';
 
 @Entity()
-export class ProjectTeamMember {
+export class TeamMember {
   constructor(team: ProjectTeam, user: ProjectUser, roles: string[] = []) {
     this.team = team;
     this.user = user;

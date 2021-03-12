@@ -65,7 +65,7 @@ export interface DeleteAccountParams {
 export async function deleteAccount({
   context: { em, user },
 }: DeleteAccountParams): Promise<void> {
-  await em.populate(user, ['memberships', 'sessions', 'events']);
+  await em.populate(user, ['members', 'sessions', 'events']);
   em.remove(user);
   const event = logAccountDelete(user);
   await em.persistAndFlush(event);

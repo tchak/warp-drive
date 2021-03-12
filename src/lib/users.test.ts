@@ -4,8 +4,8 @@ import { v4 as uuid } from 'uuid';
 
 import { Context } from './context';
 import { User } from '../entities/User';
-import type { Project } from 'src/entities/Project';
-import type { ProjectUser } from 'src/entities/ProjectUser';
+import type { Project } from '../entities/Project';
+import type { ProjectUser } from '../entities/ProjectUser';
 
 import { createProject } from './projects';
 import { createUser, getUser, listUsers, deleteUser } from './users';

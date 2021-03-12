@@ -1,6 +1,6 @@
 import type { Context } from './context';
 import { ProjectTeam } from '../entities/ProjectTeam';
-import { ProjectTeamMember } from '../entities/ProjectTeamMember';
+import { TeamMember } from '../entities/TeamMember';
 
 import { authorizeTeams } from './authorize';
 
@@ -26,9 +26,7 @@ async function getTeamClient({
   const team = await em.findOneOrFail(ProjectTeam, {
     id: teamId,
     project,
-    memberships: {
-      user,
-    },
+    members: { user },
   });
 
   return team;
@@ -66,9 +64,7 @@ async function listTeamsClient({
 }: ListTeamsParams): Promise<ProjectTeam[]> {
   const teams = await em.find(ProjectTeam, {
     project,
-    memberships: {
-      user,
-    },
+    members: { user },
   });
   return teams;
 }
@@ -104,7 +100,7 @@ async function createTeamClient({
   name,
 }: CreateTeamParams): Promise<ProjectTeam> {
   const team = new ProjectTeam(project, name);
-  const member = new ProjectTeamMember(team, user);
+  const member = new TeamMember(team, user);
   em.persistAndFlush([team, member]);
   return team;
 }
@@ -145,9 +141,7 @@ async function updateTeamClient({
   const team = await em.findOneOrFail(ProjectTeam, {
     id: teamId,
     project,
-    memberships: {
-      user,
-    },
+    members: { user },
   });
   team.name = name;
   await em.flush();
@@ -190,9 +184,7 @@ async function deleteTeamClient({
   const team = await em.findOneOrFail(ProjectTeam, {
     id: teamId,
     project,
-    memberships: {
-      user,
-    },
+    members: { user },
   });
   await em.removeAndFlush(team);
 }

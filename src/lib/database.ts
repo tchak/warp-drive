@@ -99,7 +99,10 @@ export async function createCollectionAttribute({
 
   const collection = await em.findOneOrFail(ProjectCollection, {
     id: collectionId,
-    project: audience == 'admin' ? { owners: context.admin } : context.project,
+    project:
+      audience == 'admin'
+        ? { members: { user: context.admin } }
+        : context.project,
   });
   const attribute = new CollectionAttribute(collection, name, type, {
     required,
@@ -154,7 +157,9 @@ export async function deleteCollectionAttribute({
       id: attributeId,
       collection: {
         project:
-          audience == 'admin' ? { owners: context.admin } : context.project,
+          audience == 'admin'
+            ? { members: { user: context.admin } }
+            : context.project,
       },
     },
     ['collection']
@@ -268,7 +273,9 @@ export async function renameCollectionRelationshipInverse({
       id: relationshipId,
       collection: {
         project:
-          audience == 'admin' ? { owners: context.admin } : context.project,
+          audience == 'admin'
+            ? { members: { user: context.admin } }
+            : context.project,
       },
       owner: true,
     },
@@ -280,7 +287,9 @@ export async function renameCollectionRelationshipInverse({
       collection: {
         id: relationship.collection.id,
         project:
-          audience == 'admin' ? { owners: context.admin } : context.project,
+          audience == 'admin'
+            ? { members: { user: context.admin } }
+            : context.project,
       },
     });
     if (inverse) {
@@ -313,7 +322,9 @@ export async function deleteCollectionRelationship({
       id: relationshipId,
       collection: {
         project:
-          audience == 'admin' ? { owners: context.admin } : context.project,
+          audience == 'admin'
+            ? { members: { user: context.admin } }
+            : context.project,
       },
       owner: true,
     },
@@ -326,7 +337,9 @@ export async function deleteCollectionRelationship({
       collection: {
         id: relationship.relatedCollection.id,
         project:
-          audience == 'admin' ? { owners: context.admin } : context.project,
+          audience == 'admin'
+            ? { members: { user: context.admin } }
+            : context.project,
       },
     });
     if (inverseRelationship) {
@@ -355,7 +368,9 @@ export async function deleteCollection({
     {
       id: collectionId,
       project:
-        audience == 'admin' ? { owners: context.admin } : context.project,
+        audience == 'admin'
+          ? { members: { user: context.admin } }
+          : context.project,
     },
     ['attributes', 'relationships']
   );
@@ -381,7 +396,9 @@ export async function getCollection({
     {
       id: collectionId,
       project:
-        audience == 'admin' ? { owners: context.admin } : context.project,
+        audience == 'admin'
+          ? { members: { user: context.admin } }
+          : context.project,
     },
     ['attributes', 'relationships']
   );

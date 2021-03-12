@@ -3,6 +3,7 @@ import { QueryOrder } from '@mikro-orm/core';
 import type { Context } from './context';
 import { Project } from '../entities/Project';
 import { ProjectEvent } from '../entities/ProjectEvent';
+import { ProjectMember } from '../entities/ProjectMember';
 
 export interface GetProjectParams {
   context: Context;
@@ -17,10 +18,7 @@ export async function getProject({
 }: GetProjectParams): Promise<Project> {
   const project = await em.findOneOrFail(
     Project,
-    {
-      id: projectId,
-      owners: admin,
-    },
+    { id: projectId, members: { user: admin } },
     include
   );
 
@@ -36,9 +34,7 @@ export async function listProjects({
 }: ListProjectsParams): Promise<Project[]> {
   const projects = await em.find(
     Project,
-    {
-      owners: admin,
-    },
+    { members: { user: admin } },
     { orderBy: { createdDate: QueryOrder.ASC } }
   );
 
@@ -56,12 +52,7 @@ export async function listProjectLogs({
 }: ListProjectLogsParams): Promise<ProjectEvent[]> {
   const events = await em.find(
     ProjectEvent,
-    {
-      project: {
-        id: projectId,
-        owners: admin,
-      },
-    },
+    { project: { id: projectId, members: { user: admin } } },
     { orderBy: { createdDate: QueryOrder.DESC }, limit: 50 }
   );
 
@@ -78,8 +69,8 @@ export async function createProject({
   name,
 }: CreateProjectParams): Promise<Project> {
   const project = new Project(name);
-  admin.projects.add(project);
-  await em.persistAndFlush(project);
+  const member = new ProjectMember(project, admin);
+  await em.persistAndFlush([project, member]);
   return project;
 }
 
@@ -96,7 +87,7 @@ export async function updateProject({
 }: UpdateProjectParams): Promise<Project> {
   const project = await em.findOneOrFail(Project, {
     id: projectId,
-    owners: admin,
+    members: { user: admin },
   });
   project.name = name;
   await em.flush();
@@ -116,9 +107,10 @@ export async function deleteProject({
     Project,
     {
       id: projectId,
-      owners: admin,
+      members: { user: admin },
     },
     [
+      'members',
       'users',
       'teams',
       'keys',

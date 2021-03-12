@@ -136,7 +136,7 @@ export async function deleteUser({
       id: userId,
       project,
     },
-    ['memberships', 'sessions', 'events']
+    ['members', 'sessions', 'events']
   );
   em.remove(user);
   const event = logUsersDelete(user);

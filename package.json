@@ -107,7 +107,9 @@
     "schema:drop": "mikro-orm schema:drop  --fk-checks -r",
     "schema:update": "mikro-orm schema:update --fk-checks -r",
     "test": "jest",
-    "lint": "eslint . --ext .ts,.tsx"
+    "lint": "eslint . --ext .ts,.tsx",
+    "test:prepare": "NODE_ENV=test yarn schema:drop && NODE_ENV=test yarn schema:update",
+    "dev:prepare": "yarn schema:drop && yarn schema:update"
   },
   "prettier": {
     "singleQuote": true

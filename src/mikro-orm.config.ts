@@ -10,11 +10,12 @@ import { Project } from './entities/Project';
 import { ProjectAccessToken } from './entities/ProjectAccessToken';
 import { ProjectCollection, Permissions } from './entities/ProjectCollection';
 import { ProjectEvent } from './entities/ProjectEvent';
+import { ProjectMember } from './entities/ProjectMember';
 import { ProjectTeam } from './entities/ProjectTeam';
-import { ProjectTeamMember } from './entities/ProjectTeamMember';
 import { ProjectUser } from './entities/ProjectUser';
 import { ProjectUserSession } from './entities/ProjectUserSession';
 import { RelationshipOperation } from './entities/RelationshipOperation';
+import { TeamMember } from './entities/TeamMember';
 import { User } from './entities/User';
 
 import { ormStorage } from './local-storage';
@@ -95,11 +96,12 @@ const options: Options = {
     ProjectAccessToken,
     ProjectCollection,
     ProjectEvent,
+    ProjectMember,
     ProjectTeam,
-    ProjectTeamMember,
     ProjectUser,
     ProjectUserSession,
     RelationshipOperation,
+    TeamMember,
     User,
   ],
   highlighter: new SqlHighlighter(),

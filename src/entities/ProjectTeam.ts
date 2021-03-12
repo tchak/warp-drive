@@ -13,7 +13,7 @@ import { ObjectType, Field, ID } from 'type-graphql';
 import { v4 as uuid } from 'uuid';
 
 import { Project } from './Project';
-import { ProjectTeamMember } from './ProjectTeamMember';
+import { TeamMember } from './TeamMember';
 
 @Entity()
 @ObjectType('Team')
@@ -39,11 +39,11 @@ export class ProjectTeam {
   @ManyToOne(() => Project, { hidden: true })
   project: Project;
 
-  @OneToMany(() => ProjectTeamMember, ({ team }) => team, {
+  @OneToMany(() => TeamMember, ({ team }) => team, {
     cascade: [Cascade.ALL],
     hidden: true,
   })
-  memberships = new Collection<ProjectTeamMember>(this);
+  members = new Collection<TeamMember>(this);
 
   @Field()
   @Property()

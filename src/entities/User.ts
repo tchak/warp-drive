@@ -2,12 +2,14 @@ import {
   Entity,
   PrimaryKey,
   Property,
-  ManyToMany,
+  OneToMany,
   Collection,
+  Cascade,
+  QueryOrder,
 } from '@mikro-orm/core';
 import { v4 as uuid } from 'uuid';
 
-import { Project } from './Project';
+import { ProjectMember } from './ProjectMember';
 
 @Entity()
 export class User {
@@ -29,11 +31,12 @@ export class User {
   @Property({ hidden: true, lazy: true })
   passwordHash: string;
 
-  @ManyToMany(() => Project, ({ owners }) => owners, {
-    owner: true,
+  @OneToMany(() => ProjectMember, ({ user }) => user, {
     hidden: true,
+    cascade: [Cascade.ALL],
+    orderBy: { createdDate: QueryOrder.ASC },
   })
-  projects = new Collection<Project>(this);
+  members = new Collection<ProjectMember>(this);
 
   @Property()
   createdDate: Date = new Date();

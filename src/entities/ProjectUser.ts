@@ -14,7 +14,7 @@ import { v4 as uuid } from 'uuid';
 
 import { Project } from './Project';
 import { ProjectEvent } from './ProjectEvent';
-import { ProjectTeamMember } from './ProjectTeamMember';
+import { TeamMember } from './TeamMember';
 import { ProjectUserSession } from './ProjectUserSession';
 
 @Entity()
@@ -52,11 +52,11 @@ export class ProjectUser {
   @ManyToOne(() => Project, { hidden: true })
   project: Project;
 
-  @OneToMany(() => ProjectTeamMember, ({ user }) => user, {
+  @OneToMany(() => TeamMember, ({ user }) => user, {
     cascade: [Cascade.ALL],
     hidden: true,
   })
-  memberships = new Collection<ProjectTeamMember>(this);
+  members = new Collection<TeamMember>(this);
 
   @OneToMany(() => ProjectUserSession, ({ user }) => user, {
     cascade: [Cascade.ALL],
