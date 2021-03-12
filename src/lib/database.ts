@@ -642,15 +642,10 @@ function buildAttributeOperations(
         const attribute = [...document.collection.attributes].find(
           ({ name }) => name == attributeName
         ) as CollectionAttribute;
-        return new AttributeOperation(
-          document,
-          attribute,
-          attributeToString(attribute.type, value),
-          {
-            id: uuid(),
-            timestamp: getClock().inc(),
-          }
-        );
+        return new AttributeOperation(document, attribute, value, {
+          id: uuid(),
+          timestamp: getClock().inc(),
+        });
       })
     : [];
   return operations;
@@ -658,22 +653,4 @@ function buildAttributeOperations(
 
 function compact<T>(map: T) {
   return Object.fromEntries(Object.entries(map).filter(([, value]) => value));
-}
-
-function attributeToString(
-  type: AttributeType,
-  value: string | boolean | number | null
-): string | null {
-  if (value == null) {
-    return null;
-  }
-  switch (type) {
-    case AttributeType.boolean:
-      return value === true ? 'true' : value === false ? 'false' : '';
-    case AttributeType.int:
-    case AttributeType.float:
-      return `${value}`;
-    default:
-      return `${value}`;
-  }
 }

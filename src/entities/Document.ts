@@ -104,11 +104,9 @@ export class Document {
   @Property({ persist: false })
   get attributes(): DocumentAttributes {
     return Object.fromEntries(
-      [
-        ...this.attributeOperations,
-      ].map(({ attribute: { name, type }, value }) => [
-        name,
-        castAttribute(type, value),
+      [...this.attributeOperations].map((operation) => [
+        operation.attribute.name,
+        operation.value,
       ])
     );
   }
@@ -190,10 +188,7 @@ export class Document {
             op: 'update',
             ref,
             data: {
-              [operation.attribute.name]: castAttribute(
-                operation.attribute.type,
-                operation.value
-              ),
+              [operation.attribute.name]: operation.value,
             },
             meta,
           } as DocumentOperation;
@@ -263,24 +258,5 @@ export class Document {
       attributes,
       relationships,
     };
-  }
-}
-
-function castAttribute(
-  type: AttributeType,
-  value: string | null
-): string | boolean | number | null {
-  if (value == null) {
-    return null;
-  }
-  switch (type) {
-    case AttributeType.boolean:
-      return value == 'true' ? true : value == 'false' ? false : null;
-    case AttributeType.int:
-      return parseInt(value);
-    case AttributeType.float:
-      return parseFloat(value);
-    default:
-      return value;
   }
 }
