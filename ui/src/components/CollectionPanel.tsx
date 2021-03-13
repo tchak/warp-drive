@@ -148,6 +148,11 @@ function EditCollectionForm({
                     value={form.values.name}
                     onChange={form.handleChange}
                     onBlur={form.handleBlur}
+                    onKeyUp={({ key, currentTarget }) => {
+                      if (key == 'Escape' && currentTarget.value == '') {
+                        close();
+                      }
+                    }}
                   />
                   <button
                     type="submit"
@@ -311,6 +316,12 @@ function AddCollectionForm({
                     autoFocus={true}
                     value={form.values.name}
                     onChange={form.handleChange}
+                    onBlur={form.handleBlur}
+                    onKeyUp={({ key, currentTarget }) => {
+                      if (key == 'Escape' && currentTarget.value == '') {
+                        close();
+                      }
+                    }}
                   />
                 </div>
                 {!form.isValid && (
