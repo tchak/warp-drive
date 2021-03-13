@@ -291,6 +291,7 @@ export type Relationship = {
   id: Scalars['ID'];
   inverse?: Maybe<Scalars['String']>;
   name: Scalars['String'];
+  owner: Scalars['Boolean'];
   projectId: Scalars['String'];
   relatedCollection: Collection;
   type: RelationshipType;
@@ -410,7 +411,7 @@ export type CreateManyToOneRelationshipMutationVariables = Exact<{
 export type CreateManyToOneRelationshipMutation = {
   createManyToOneRelationship: Pick<
     Relationship,
-    'id' | 'name' | 'type' | 'projectId'
+    'id' | 'name' | 'type' | 'owner' | 'projectId'
   > & { relatedCollection: Pick<Collection, 'id' | 'name'> };
 };
 
@@ -424,7 +425,7 @@ export type CreateOneToOneRelationshipMutationVariables = Exact<{
 export type CreateOneToOneRelationshipMutation = {
   createOneToOneRelationship: Pick<
     Relationship,
-    'id' | 'name' | 'type' | 'projectId'
+    'id' | 'name' | 'type' | 'owner' | 'projectId'
   > & { relatedCollection: Pick<Collection, 'id' | 'name'> };
 };
 
@@ -512,7 +513,7 @@ export type ListCollectionsQuery = {
       Pick<Collection, 'id' | 'name' | 'updatedDate'> & {
         attributes: Array<Pick<Attribute, 'id' | 'name' | 'type'>>;
         relationships: Array<
-          Pick<Relationship, 'id' | 'type' | 'inverse'> & {
+          Pick<Relationship, 'id' | 'name' | 'type' | 'owner' | 'inverse'> & {
             relatedCollection: Pick<Collection, 'id' | 'name'>;
           }
         >;
@@ -1114,6 +1115,7 @@ export const CreateManyToOneRelationshipDocument: DocumentNode<
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'owner' } },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'relatedCollection' },
@@ -1233,6 +1235,7 @@ export const CreateOneToOneRelationshipDocument: DocumentNode<
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'owner' } },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'relatedCollection' },
@@ -1877,7 +1880,15 @@ export const ListCollectionsDocument: DocumentNode<
                             },
                             {
                               kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
                               name: { kind: 'Name', value: 'type' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'owner' },
                             },
                             {
                               kind: 'Field',

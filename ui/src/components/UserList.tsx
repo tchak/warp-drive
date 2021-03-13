@@ -4,10 +4,10 @@ import { useTable, Column, Cell } from 'react-table';
 import { Link } from 'react-router-dom';
 import { FormattedDate } from 'react-intl';
 
-import { User as FullUser } from '../graphql';
+import { ListUsersQuery } from '../graphql';
 import { ListPagination, TablePagination } from './Pagination';
 
-type User = Pick<FullUser, 'id' | 'name' | 'email' | 'createdDate'>;
+type User = ListUsersQuery['getProject']['users'][0];
 
 function getCellProps(cell: Cell<User>) {
   switch (cell.column.id) {

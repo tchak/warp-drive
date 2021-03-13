@@ -46,6 +46,7 @@ mutation createManyToOneRelationship(
     id
     name
     type
+    owner
     relatedCollection {
       id
       name
@@ -69,6 +70,7 @@ mutation createOneToOneRelationship(
     id
     name
     type
+    owner
     relatedCollection {
       id
       name

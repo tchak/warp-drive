@@ -63,13 +63,18 @@ export interface UpdateCollectionParams {
 }
 
 export async function updateCollection({
-  context: { em, project, scope },
+  context,
   collectionId,
   name,
   permissions,
 }: UpdateCollectionParams): Promise<void> {
+  const { em, scope, audience } = context;
   authorizeCollections(scope, 'write');
 
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const collection = await em.findOneOrFail(ProjectCollection, {
     id: collectionId,
     project,
@@ -99,12 +104,13 @@ export async function createCollectionAttribute({
   const { em, scope, audience } = context;
   authorizeCollections(scope, 'write');
 
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const collection = await em.findOneOrFail(ProjectCollection, {
     id: collectionId,
-    project:
-      audience == 'admin'
-        ? { members: { user: context.admin } }
-        : context.project,
+    project,
   });
   const attribute = new CollectionAttribute(collection, name, type, {
     required,
@@ -121,12 +127,17 @@ export interface RenameCollectionAttributeParams {
 }
 
 export async function renameCollectionAttribute({
-  context: { em, project, scope },
+  context,
   attributeId,
   name,
 }: RenameCollectionAttributeParams): Promise<CollectionAttribute> {
+  const { em, scope, audience } = context;
   authorizeCollections(scope, 'write');
 
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const attribute = await em.findOneOrFail(
     CollectionAttribute,
     {
@@ -153,16 +164,15 @@ export async function deleteCollectionAttribute({
   const { em, scope, audience } = context;
   authorizeCollections(scope, 'write');
 
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const attribute = await em.findOneOrFail(
     CollectionAttribute,
     {
       id: attributeId,
-      collection: {
-        project:
-          audience == 'admin'
-            ? { members: { user: context.admin } }
-            : context.project,
-      },
+      collection: { project },
     },
     ['collection']
   );
@@ -181,15 +191,20 @@ export interface CreateCollectionRelationshipParams {
 }
 
 export async function createCollectionRelationship({
-  context: { em, project, scope },
+  context,
   collectionId,
   name,
   relationship: [from, to],
   relatedCollectionId,
   inverse,
 }: CreateCollectionRelationshipParams) {
+  const { em, scope, audience } = context;
   authorizeCollections(scope, 'write');
 
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const collection = await em.findOneOrFail(ProjectCollection, {
     id: collectionId,
     project,
@@ -229,10 +244,17 @@ export interface RenameCollectionRelationshipParams {
 }
 
 export async function renameCollectionRelationship({
-  context: { em, project },
+  context,
   relationshipId,
   name,
 }: RenameCollectionRelationshipParams): Promise<CollectionRelationship> {
+  const { em, scope, audience } = context;
+  authorizeCollections(scope, 'write');
+
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const relationship = await em.findOneOrFail(
     CollectionRelationship,
     {
@@ -269,16 +291,15 @@ export async function renameCollectionRelationshipInverse({
   const { em, scope, audience } = context;
   authorizeCollections(scope, 'write');
 
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const relationship = await em.findOneOrFail(
     CollectionRelationship,
     {
       id: relationshipId,
-      collection: {
-        project:
-          audience == 'admin'
-            ? { members: { user: context.admin } }
-            : context.project,
-      },
+      collection: { project },
       owner: true,
     },
     ['collection']
@@ -288,10 +309,7 @@ export async function renameCollectionRelationshipInverse({
       name: relationship.inverse,
       collection: {
         id: relationship.collection.id,
-        project:
-          audience == 'admin'
-            ? { members: { user: context.admin } }
-            : context.project,
+        project,
       },
     });
     if (inverse) {
@@ -318,16 +336,15 @@ export async function deleteCollectionRelationship({
   const { em, scope, audience } = context;
   authorizeCollections(scope, 'write');
 
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const relationship = await em.findOneOrFail(
     CollectionRelationship,
     {
       id: relationshipId,
-      collection: {
-        project:
-          audience == 'admin'
-            ? { members: { user: context.admin } }
-            : context.project,
-      },
+      collection: { project },
       owner: true,
     },
     ['collection']
@@ -338,10 +355,7 @@ export async function deleteCollectionRelationship({
       inverse: relationship.name,
       collection: {
         id: relationship.relatedCollection.id,
-        project:
-          audience == 'admin'
-            ? { members: { user: context.admin } }
-            : context.project,
+        project,
       },
     });
     if (inverseRelationship) {
@@ -365,15 +379,13 @@ export async function deleteCollection({
   const { em, scope, audience } = context;
   authorizeCollections(scope, 'write');
 
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const collection = await em.findOneOrFail(
     ProjectCollection,
-    {
-      id: collectionId,
-      project:
-        audience == 'admin'
-          ? { members: { user: context.admin } }
-          : context.project,
-    },
+    { id: collectionId, project },
     ['attributes', 'relationships']
   );
   em.remove(collection);
@@ -393,15 +405,13 @@ export async function getCollection({
   const { em, scope, audience } = context;
   authorizeCollections(scope, 'read');
 
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const collection = await em.findOneOrFail(
     ProjectCollection,
-    {
-      id: collectionId,
-      project:
-        audience == 'admin'
-          ? { members: { user: context.admin } }
-          : context.project,
-    },
+    { id: collectionId, project },
     ['attributes', 'relationships']
   );
   return collection;
@@ -417,14 +427,13 @@ export async function listCollections({
   const { em, scope, audience } = context;
   authorizeCollections(scope, 'read');
 
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const collections = await em.find(
     ProjectCollection,
-    {
-      project:
-        audience == 'admin'
-          ? { members: { user: context.admin } }
-          : context.project,
-    },
+    { project },
     {
       populate: ['attributes', 'relationships'],
       orderBy: { createdDate: QueryOrder.ASC },
@@ -438,10 +447,12 @@ export interface GetDatabaseSchemaParams {
 }
 
 export async function getDatabaseSchema({
-  context: { em, project, scope },
+  context,
 }: GetDatabaseSchemaParams): Promise<Record<string, CollectionSchema>> {
+  const { em, scope } = context;
   authorizeCollections(scope, 'read');
 
+  const project = context.project;
   const collections = await em.find(ProjectCollection, { project }, [
     'attributes',
     'relationships',
@@ -466,11 +477,15 @@ export async function createDocument({
   relationships,
   permissions,
 }: CreateDocumentParams): Promise<Document> {
-  if (context.audience == 'server') {
+  const { em, audience } = context;
+  if (audience !== 'client') {
     authorizeDocuments(context.scope, 'write');
   }
 
-  const { em, project } = context;
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const collection = await em.findOneOrFail(
     ProjectCollection,
     {
@@ -521,11 +536,15 @@ export async function updateDocument({
   attributes,
   relationships,
 }: UpdateDocumentParams): Promise<void> {
-  if (context.audience == 'server') {
+  const { em, audience } = context;
+  if (audience !== 'client') {
     authorizeDocuments(context.scope, 'write');
   }
 
-  const { em, project } = context;
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const document = await em.findOneOrFail(
     Document,
     {
@@ -559,11 +578,15 @@ export async function deleteDocument({
   context,
   documentId,
 }: DeleteDocumentParams): Promise<void> {
-  if (context.audience == 'server') {
+  const { em, audience } = context;
+  if (audience !== 'client') {
     authorizeDocuments(context.scope, 'write');
   }
 
-  const { em, project } = context;
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const document = await em.findOneOrFail(Document, {
     id: documentId,
     collection: { project },
@@ -598,11 +621,15 @@ export async function getDocument({
   documentId,
   include,
 }: GetDocumentParams): Promise<Document> {
-  if (context.audience == 'server') {
+  const { em, audience } = context;
+  if (audience !== 'client') {
     authorizeDocuments(context.scope, 'read');
   }
 
-  const { em, project } = context;
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const document = await em.findOneOrFail(Document, {
     id: documentId,
     collection: { project },
@@ -633,11 +660,15 @@ export async function listDocumentOperations({
   documentId,
   include,
 }: ListDocumentOperationsParams): Promise<DocumentOperation[]> {
-  if (context.audience == 'server') {
+  const { em, audience } = context;
+  if (audience !== 'client') {
     authorizeDocuments(context.scope, 'read');
   }
 
-  const { em, project } = context;
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const document = await em.findOneOrFail(Document, {
     id: documentId,
     collection: { project },
@@ -669,11 +700,15 @@ export async function listDocuments({
   collectionId,
   include,
 }: ListDocumentsParams): Promise<Document[]> {
-  if (context.audience == 'server') {
+  const { em, audience } = context;
+  if (audience !== 'client') {
     authorizeDocuments(context.scope, 'read');
   }
 
-  const { em, project } = context;
+  const project =
+    audience == 'admin'
+      ? { members: { user: context.admin } }
+      : context.project;
   const documents = await em.find(
     Document,
     {

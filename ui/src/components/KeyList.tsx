@@ -6,10 +6,10 @@ import {
 } from 'react-icons/hi';
 import useClipboard from 'react-use-clipboard';
 
-import { Key as _Key } from '../graphql';
+import { ListKeysQuery } from '../graphql';
 import { useKeyToken } from '../hooks';
 
-export type Key = Pick<_Key, 'id' | 'name' | 'scope' | 'updatedDate'>;
+export type Key = ListKeysQuery['getProject']['keys'][0];
 
 export function KeyList({
   keys,

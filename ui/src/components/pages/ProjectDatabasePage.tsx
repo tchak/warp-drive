@@ -30,6 +30,9 @@ export default function ProjectDatabasePage() {
     : project
     ? { projectId: project.id, name: '' }
     : null;
+  const collectionsToRelate = selectedCollection
+    ? collections.filter(({ id }) => id !== selectedCollection.id)
+    : [];
 
   return (
     <>
@@ -83,6 +86,7 @@ export default function ProjectDatabasePage() {
       {editorInitialValues && (
         <CollectionPanel
           initialValues={editorInitialValues}
+          collections={collectionsToRelate}
           show={show}
           close={close}
           afterClose={() => setSelectedCollection(undefined)}

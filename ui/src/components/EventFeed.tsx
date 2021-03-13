@@ -10,7 +10,7 @@ export function EventFeed({ events }: { events: Event[] }) {
     <div className="flow-root">
       <ul className="-mb-8">
         {events.map((event, index) => (
-          <li>
+          <li key={event.id}>
             <div className="relative pb-8">
               {index != events.length - 1 && (
                 <span

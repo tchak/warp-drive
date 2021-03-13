@@ -1,30 +1,32 @@
-import React from 'react';
+import React, { KeyboardEvent } from 'react';
 import {
   HiOutlinePlusCircle,
   HiOutlineTrash,
   HiOutlineX,
 } from 'react-icons/hi';
-import { useMutation } from 'urql';
-import { useFormik, FormikErrors } from 'formik';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { isAlphanumeric, minLength, isEmpty, maxLength } from 'class-validator';
 
-import {
-  AttributeType,
-  CreateCollectionDocument,
-  CreateAttributeDocument,
-  DeleteAttributeDocument,
-} from '../graphql';
+import { AttributeType, RelationshipType } from '../graphql';
 import { SlideOverPanel } from './SlideOverPanel';
 import { Collection } from './CollectionList';
 
+import {
+  useAttributeForm,
+  useRelationshipForm,
+  AttributeForm,
+  RelationshipForm,
+  useCollectionForm,
+} from '../forms';
+
 export function CollectionPanel({
   initialValues,
+  collections,
   show,
   close,
   afterClose,
 }: {
   initialValues: Collection | { projectId: string; name: string };
+  collections: Collection[];
   show: boolean;
   close: () => void;
   afterClose?: () => void;
@@ -32,7 +34,11 @@ export function CollectionPanel({
   return (
     <SlideOverPanel afterLeave={afterClose} show={show}>
       {'id' in initialValues ? (
-        <EditCollectionForm initialValues={initialValues} close={close} />
+        <EditCollectionForm
+          initialValues={initialValues}
+          collections={collections}
+          close={close}
+        />
       ) : (
         <AddCollectionForm initialValues={initialValues} close={close} />
       )}
@@ -42,46 +48,30 @@ export function CollectionPanel({
 
 function EditCollectionForm({
   initialValues,
+  collections,
   close,
 }: {
   initialValues: Collection;
+  collections: Collection[];
   close: () => void;
 }) {
-  const [{ fetching }, createAttribute] = useMutation(CreateAttributeDocument);
-  const [{ fetching: deleting }, deleteAttribute] = useMutation(
-    DeleteAttributeDocument
-  );
-  const isSaving = fetching || deleting;
-  useHotkeys('esc', close, { enabled: !isSaving });
-  const form = useFormik({
-    initialValues: {
-      collectionId: initialValues.id,
-      type: AttributeType.String,
-      name: '',
-    },
-    validate({ name }) {
-      const errors: FormikErrors<{ name: string }> = {};
-
-      if (isEmpty(name)) {
-        errors.name = 'Name is required.';
-      } else if (!minLength(name, 2)) {
-        errors.name = 'Name should be at least 2 characters long.';
-      } else if (!maxLength(name, 35)) {
-        errors.name = 'Name should be at most 35 characters long.';
-      } else if (!isAlphanumeric(name)) {
-        errors.name = 'Name should contain only alphanumeric characters.';
-      }
-      return errors;
-    },
-    validateOnBlur: false,
-    validateOnChange: false,
-    async onSubmit(values) {
-      const { data } = await createAttribute(values);
-      if (data) {
-        form.resetForm();
-      }
+  const attribute = useAttributeForm(initialValues.id, {
+    success() {
+      attribute.form.resetForm();
     },
   });
+  const relationship = useRelationshipForm(
+    initialValues.id,
+    collections[0]?.id ?? '',
+    {
+      success() {
+        relationship.form.resetForm();
+      },
+    }
+  );
+  const fetching = attribute.fetching || relationship.fetching;
+
+  useHotkeys('esc', close, { enabled: !fetching });
 
   return (
     <div className="h-full divide-y divide-gray-200 flex flex-col bg-white shadow-xl">
@@ -99,7 +89,7 @@ function EditCollectionForm({
                 type="button"
                 className="bg-green-700 rounded-md text-green-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
                 onClick={close}
-                disabled={isSaving}
+                disabled={fetching}
               >
                 <span className="sr-only">Close panel</span>
                 <HiOutlineX className="h-6 w-6" />
@@ -112,79 +102,124 @@ function EditCollectionForm({
           <div className="px-4 sm:px-6">
             <div className="space-y-6 pt-6 pb-5">
               <div>
+                <span className="block text-sm font-medium text-gray-700 mb-1">
+                  Attributes
+                </span>
                 <AttributeList
                   attributes={initialValues.attributes}
-                  isSaving={isSaving}
-                  remove={(id) => deleteAttribute({ id })}
+                  fetching={fetching}
+                  remove={(id) => attribute.delete({ id })}
                 />
               </div>
             </div>
             <div className="pt-2 pb-6">
-              <form onSubmit={form.handleSubmit}>
-                <span className="relative z-0 inline-flex shadow-sm rounded-md w-full">
-                  <select
-                    name="type"
-                    id="attribute-type"
-                    className="-mr-px w-36 px-2 py-2 rounded-r-none rounded-l-md border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
-                    value={form.values.type}
-                    onChange={form.handleChange}
-                  >
-                    <option value={AttributeType.String}>String</option>
-                    <option value={AttributeType.Boolean}>Boolean</option>
-                    <option value={AttributeType.Int}>Integer</option>
-                    <option value={AttributeType.Float}>Float</option>
-                    <option value={AttributeType.Datetime}>DateTime</option>
-                    <option value={AttributeType.Date}>Date</option>
-                  </select>
-                  <input
-                    type="text"
-                    name="name"
-                    id="attribute-name"
-                    className="-mr-px w-full sm:text-sm focus:ring-green-500 focus:border-green-500 border-gray-300"
-                    autoComplete="off"
-                    autoCapitalize="off"
-                    autoCorrect="off"
-                    autoFocus={true}
-                    value={form.values.name}
-                    onChange={form.handleChange}
-                    onBlur={form.handleBlur}
-                    onKeyUp={({ key, currentTarget }) => {
-                      if (key == 'Escape' && currentTarget.value == '') {
-                        close();
-                      }
-                    }}
-                  />
-                  <button
-                    type="submit"
-                    className={`${
-                      isSaving ? 'opacity-50' : ''
-                    } py-2 px-2 border border-gray-300 rounded-r-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
-                    disabled={isSaving}
-                  >
-                    <HiOutlinePlusCircle className="text-xl" />
-                  </button>
-                </span>
-                {!form.isValid && (
-                  <p className="mt-2 text-sm text-red-600">
-                    {form.errors.name}
-                  </p>
-                )}
-              </form>
+              <AddAttributeForm
+                form={attribute.form}
+                fetching={fetching}
+                close={close}
+              />
             </div>
           </div>
+          {collections.length ? (
+            <div className="px-4 sm:px-6">
+              <div className="space-y-6 pt-6 pb-5">
+                <div>
+                  <span className="block text-sm font-medium text-gray-700 mb-1">
+                    Relationships
+                  </span>
+                  <RelationshipList
+                    relationships={initialValues.relationships}
+                    fetching={fetching}
+                    remove={(id) => relationship.delete({ id })}
+                  />
+                </div>
+              </div>
+              <div className="pt-2 pb-6">
+                <AddRelationshipForm
+                  collections={collections}
+                  form={relationship.form}
+                  fetching={fetching}
+                  close={close}
+                />
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
   );
 }
 
+function AddAttributeForm({
+  fetching,
+  form,
+  close,
+}: {
+  fetching: boolean;
+  form: AttributeForm;
+  close: () => void;
+}) {
+  return (
+    <form onSubmit={form.handleSubmit}>
+      <label
+        htmlFor="attribute-name"
+        className="block text-sm font-medium text-gray-700 mb-1"
+      >
+        Add attribute
+      </label>
+      <span className="relative z-0 inline-flex shadow-sm rounded-md w-full">
+        <select
+          name="type"
+          className="-mr-px w-36 px-2 py-2 rounded-r-none rounded-l-md border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+          value={form.values.type}
+          onChange={form.handleChange}
+        >
+          <option value={AttributeType.String}>String</option>
+          <option value={AttributeType.Boolean}>Boolean</option>
+          <option value={AttributeType.Int}>Integer</option>
+          <option value={AttributeType.Float}>Float</option>
+          <option value={AttributeType.Datetime}>DateTime</option>
+          <option value={AttributeType.Date}>Date</option>
+        </select>
+        <input
+          id="attribute-name"
+          type="text"
+          name="name"
+          placeholder="Attribute name"
+          className="-mr-px w-full sm:text-sm focus:ring-green-500 focus:border-green-500 border-gray-300"
+          autoComplete="off"
+          autoCapitalize="off"
+          autoCorrect="off"
+          autoFocus={true}
+          value={form.values.name}
+          onChange={form.handleChange}
+          onBlur={form.handleBlur}
+          onKeyUp={closeOnKeyUp(close)}
+        />
+        <button
+          type="submit"
+          className={`${
+            fetching ? 'opacity-50' : ''
+          } py-2 px-2 border border-gray-300 rounded-r-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
+          disabled={fetching}
+        >
+          <HiOutlinePlusCircle className="text-xl" />
+        </button>
+      </span>
+      {!form.isValid && form.errors.name && (
+        <p className="mt-2 text-sm text-red-600">{form.errors.name}</p>
+      )}
+    </form>
+  );
+}
+
 function AttributeList({
   attributes,
-  isSaving,
+  fetching,
   remove,
 }: {
   attributes: { id: string; name: string; type: AttributeType }[];
-  isSaving: boolean;
+  fetching: boolean;
   remove: (id: string) => void;
 }) {
   return (
@@ -202,12 +237,143 @@ function AttributeList({
           </div>
           <div className="ml-4 flex-shrink-0">
             <button
-              disabled={isSaving}
+              disabled={fetching}
               type="button"
               onClick={() => remove(attribute.id)}
             >
               <HiOutlineTrash className="text-xl hover:text-red-600" />
             </button>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function AddRelationshipForm({
+  collections,
+  fetching,
+  form,
+  close,
+}: {
+  collections: Collection[];
+  fetching: boolean;
+  form: RelationshipForm;
+  close: () => void;
+}) {
+  return (
+    <form onSubmit={form.handleSubmit} className="shadow-sm">
+      <label
+        htmlFor="relationship-name"
+        className="block text-sm font-medium text-gray-700 mb-1"
+      >
+        Add relationship
+      </label>
+      <span className="relative z-0 inline-flex w-full">
+        <select
+          name="type"
+          className="-mr-px w-44 px-2 py-2 rounded-tl-md border-gray-300 border-b-0 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+          value={form.values.type}
+          onChange={form.handleChange}
+        >
+          <option value="ManyToOne">Many to One</option>
+          <option value="OneToOne">One to One</option>
+        </select>
+        <input
+          id="relationship-name"
+          type="text"
+          name="name"
+          placeholder="Relationship name"
+          className="-mr-px w-full sm:text-sm focus:ring-green-500 focus:border-green-500 border-gray-300 border-b-0 rounded-tr-md"
+          autoComplete="off"
+          autoCapitalize="off"
+          autoCorrect="off"
+          value={form.values.name}
+          onChange={form.handleChange}
+          onBlur={form.handleBlur}
+          onKeyUp={closeOnKeyUp(close)}
+        />
+      </span>
+      <span className="relative z-0 inline-flex  w-full">
+        <select
+          name="relatedCollectionId"
+          className="-mr-px w-44 px-2 py-2 rounded-bl-md border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+          value={form.values.relatedCollectionId}
+          onChange={form.handleChange}
+        >
+          {collections.map(({ id, name }) => (
+            <option key={id} value={id}>
+              {name}
+            </option>
+          ))}
+        </select>
+        <input
+          type="text"
+          name="inverse"
+          placeholder="Relationship inverse"
+          className="-mr-px w-full sm:text-sm focus:ring-green-500 focus:border-green-500 border-gray-300"
+          autoComplete="off"
+          autoCapitalize="off"
+          autoCorrect="off"
+          value={form.values.inverse}
+          onChange={form.handleChange}
+          onBlur={form.handleBlur}
+          onKeyUp={closeOnKeyUp(close)}
+        />
+        <button
+          type="submit"
+          className={`${
+            fetching ? 'opacity-50' : ''
+          } py-2 px-2 border border-gray-300 rounded-br-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
+          disabled={fetching}
+        >
+          <HiOutlinePlusCircle className="text-xl" />
+        </button>
+      </span>
+      {!form.isValid && form.errors.inverse && (
+        <p className="mt-2 text-sm text-red-600">{form.errors.inverse}</p>
+      )}
+      {!form.isValid && form.errors.name && (
+        <p className="mt-2 text-sm text-red-600">{form.errors.name}</p>
+      )}
+    </form>
+  );
+}
+
+function RelationshipList({
+  relationships,
+  fetching,
+  remove,
+}: {
+  relationships: Collection['relationships'];
+  fetching: boolean;
+  remove: (id: string) => void;
+}) {
+  return (
+    <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
+      {relationships.map((relationship) => (
+        <li
+          key={relationship.id}
+          className="pl-3 pr-4 py-3 flex items-center justify-between text-sm"
+        >
+          <div className="w-0 flex-1 flex items-center">
+            <span className="w-20">
+              <RelationshipTypeBadge type={relationship.type} />
+            </span>
+            <span className="ml-2 flex-1 w-0 truncate">
+              {relationship.name}
+            </span>
+          </div>
+          <div className="ml-4 flex-shrink-0">
+            {relationship.owner && (
+              <button
+                disabled={fetching}
+                type="button"
+                onClick={() => remove(relationship.id)}
+              >
+                <HiOutlineTrash className="text-xl hover:text-red-600" />
+              </button>
+            )}
           </div>
         </li>
       ))}
@@ -223,6 +389,14 @@ function AttributeTypeBadge({ type }: { type: AttributeType }) {
   );
 }
 
+function RelationshipTypeBadge({ type }: { type: RelationshipType }) {
+  return (
+    <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-gray-100 text-gray-800">
+      {type}
+    </span>
+  );
+}
+
 function AddCollectionForm({
   initialValues,
   close,
@@ -230,35 +404,7 @@ function AddCollectionForm({
   initialValues: { projectId: string; name: string };
   close: () => void;
 }) {
-  const [{ fetching }, createCollection] = useMutation(
-    CreateCollectionDocument
-  );
-  const form = useFormik({
-    initialValues,
-    validateOnBlur: false,
-    validateOnChange: false,
-    validate({ name }) {
-      const errors: FormikErrors<{ name: string }> = {};
-
-      if (isEmpty(name)) {
-        errors.name = 'Name is required.';
-      } else if (!minLength(name, 2)) {
-        errors.name = 'Name should be at least 2 characters long.';
-      } else if (!maxLength(name, 35)) {
-        errors.name = 'Name should be at most 35 characters long.';
-      } else if (!isAlphanumeric(name)) {
-        errors.name = 'Name should contain only alphanumeric characters.';
-      }
-      return errors;
-    },
-    async onSubmit(values) {
-      const { data } = await createCollection(values);
-
-      if (data) {
-        close();
-      }
-    },
-  });
+  const { form, fetching } = useCollectionForm(initialValues.projectId);
   useHotkeys('esc', close, { enabled: !fetching });
 
   return (
@@ -317,11 +463,7 @@ function AddCollectionForm({
                     value={form.values.name}
                     onChange={form.handleChange}
                     onBlur={form.handleBlur}
-                    onKeyUp={({ key, currentTarget }) => {
-                      if (key == 'Escape' && currentTarget.value == '') {
-                        close();
-                      }
-                    }}
+                    onKeyUp={closeOnKeyUp(close)}
                   />
                 </div>
                 {!form.isValid && (
@@ -354,4 +496,12 @@ function AddCollectionForm({
       </div>
     </form>
   );
+}
+
+function closeOnKeyUp(close: () => void) {
+  return ({ key, currentTarget }: KeyboardEvent<HTMLInputElement>) => {
+    if (key == 'Escape' && currentTarget.value == '') {
+      close();
+    }
+  };
 }

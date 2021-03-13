@@ -65,6 +65,7 @@ export class CollectionRelationship {
   @Property({ nullable: true })
   inverse?: string;
 
+  @Field()
   @Property({ hidden: true })
   owner: boolean;
 

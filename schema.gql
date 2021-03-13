@@ -163,6 +163,7 @@ type Relationship {
   id: ID!
   inverse: String
   name: String!
+  owner: Boolean!
   projectId: String!
   relatedCollection: Collection!
   type: RelationshipType!

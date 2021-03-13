@@ -7,11 +7,9 @@ import {
 import { useParams } from 'react-router-dom';
 import useClipboard from 'react-use-clipboard';
 
-import { Collection as _Collection, Attribute } from '../graphql';
+import { ListCollectionsQuery } from '../graphql';
 
-export type Collection = Pick<_Collection, 'id' | 'name' | 'updatedDate'> & {
-  attributes: Array<Pick<Attribute, 'id' | 'name' | 'type'>>;
-};
+export type Collection = ListCollectionsQuery['getProject']['collections'][0];
 
 export function CollectionList({
   collections,

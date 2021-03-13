@@ -50,7 +50,9 @@ query listCollections($projectId: ID!) {
       }
       relationships {
         id
+        name
         type
+        owner
         relatedCollection {
           id
           name
