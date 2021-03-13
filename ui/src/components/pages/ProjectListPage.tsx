@@ -8,9 +8,10 @@ import {
   ListProjectsDocument,
   CreateProjectDocument,
   DeleteProjectDocument,
+  CreateProjectMutationVariables,
 } from '../../graphql';
 
-import { useSignedIn } from '../../hooks';
+import { useSignedIn } from '../../auth';
 
 export default function ProjectListPage() {
   const isSignedIn = useSignedIn();
@@ -57,7 +58,7 @@ export default function ProjectListPage() {
 
 function CreateProject() {
   const [{ fetching }, createProject] = useMutation(CreateProjectDocument);
-  const form = useFormik({
+  const form = useFormik<CreateProjectMutationVariables>({
     initialValues: {
       name: '',
     },

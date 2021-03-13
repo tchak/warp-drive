@@ -10,7 +10,16 @@ import {
   CreateOneToOneRelationshipDocument,
   DeleteRelationshipDocument,
   CreateCollectionDocument,
+  CreateAttributeMutationVariables,
+  CreateManyToOneRelationshipMutationVariables,
+  CreateOneToOneRelationshipMutationVariables,
+  CreateCollectionMutationVariables,
 } from './graphql';
+
+type CreateRelationshipMutationVariables = (
+  | CreateManyToOneRelationshipMutationVariables
+  | CreateOneToOneRelationshipMutationVariables
+) & { type: 'ManyToOne' | 'OneToOne' };
 
 export type AttributeForm = ReturnType<typeof useAttributeForm>['form'];
 export type RelationshipForm = ReturnType<typeof useRelationshipForm>['form'];
@@ -31,14 +40,14 @@ export function useAttributeForm(
   const [{ fetching: deleting }, deleteAttribute] = useMutation(
     DeleteAttributeDocument
   );
-  const form = useFormik({
+  const form = useFormik<CreateAttributeMutationVariables>({
     initialValues: {
       collectionId,
       type: AttributeType.String,
       name: '',
     },
     validate({ name }) {
-      const errors: FormikErrors<{ name: string }> = {};
+      const errors: FormikErrors<CreateAttributeMutationVariables> = {};
 
       if (isEmpty(name)) {
         errors.name = 'Name is required.';
@@ -87,7 +96,7 @@ export function useRelationshipForm(
   const [{ fetching: deleting }, deleteRelationship] = useMutation(
     DeleteRelationshipDocument
   );
-  const form = useFormik({
+  const form = useFormik<CreateRelationshipMutationVariables>({
     initialValues: {
       collectionId,
       type: 'ManyToOne',
@@ -96,7 +105,7 @@ export function useRelationshipForm(
       inverse: '',
     },
     validate({ name }) {
-      const errors: FormikErrors<{ name: string; inverse?: string }> = {};
+      const errors: FormikErrors<CreateManyToOneRelationshipMutationVariables> = {};
 
       if (isEmpty(name)) {
         errors.name = 'Name is required.';
@@ -144,7 +153,7 @@ export function useCollectionForm(projectId: string, options?: UseFormOptions) {
   const [{ fetching }, createCollection] = useMutation(
     CreateCollectionDocument
   );
-  const form = useFormik({
+  const form = useFormik<CreateCollectionMutationVariables>({
     initialValues: {
       projectId,
       name: '',
@@ -152,7 +161,7 @@ export function useCollectionForm(projectId: string, options?: UseFormOptions) {
     validateOnBlur: false,
     validateOnChange: false,
     validate({ name }) {
-      const errors: FormikErrors<{ name: string }> = {};
+      const errors: FormikErrors<CreateCollectionMutationVariables> = {};
 
       if (isEmpty(name)) {
         errors.name = 'Name is required.';

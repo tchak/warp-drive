@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { useQuery } from 'urql';
 
 import {
@@ -11,11 +10,8 @@ import {
   ListEventsDocument,
   ListKeysDocument,
 } from './graphql';
-import { isSignedIn } from './auth';
 
-export function useSignedIn(): boolean {
-  return useMemo(() => isSignedIn(), []);
-}
+import { useSignedIn } from './auth';
 
 export function useProject(id?: string) {
   const [{ data }] = useQuery({

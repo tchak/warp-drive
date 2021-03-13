@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 export function isSignedIn(): boolean {
   return !!localStorage.getItem('accessToken');
@@ -29,4 +29,8 @@ export function useAccessToken(): [
       signIn(accessToken);
     },
   ];
+}
+
+export function useSignedIn(): boolean {
+  return useMemo(() => isSignedIn(), []);
 }

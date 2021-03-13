@@ -8,7 +8,8 @@ import {
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
 import { Transition } from '@headlessui/react';
 
-import { useProfile, useSignedIn } from '../hooks';
+import { useSignedIn } from '../auth';
+import { useProfile } from '../hooks';
 
 import { ProfileMenu } from './ProfileMenu';
 import { SearchField } from './SearchField';

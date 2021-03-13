@@ -315,7 +315,7 @@ function AddRelationshipForm({
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
-          value={form.values.inverse}
+          value={form.values.inverse ?? ''}
           onChange={form.handleChange}
           onBlur={form.handleBlur}
           onKeyUp={closeOnKeyUp(close)}
