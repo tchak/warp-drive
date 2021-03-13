@@ -336,11 +336,13 @@ export type Team = {
 
 export type User = {
   createdDate: Scalars['DateTime'];
+  disabledDate?: Maybe<Scalars['DateTime']>;
   email: Scalars['String'];
   id: Scalars['ID'];
   name?: Maybe<Scalars['String']>;
   sessions: Array<Session>;
   updatedDate: Scalars['DateTime'];
+  verifiedDate?: Maybe<Scalars['DateTime']>;
 };
 
 export type SignInMutationVariables = Exact<{
