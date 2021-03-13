@@ -6,10 +6,13 @@ import {
   createClient,
   dedupExchange,
   fetchExchange,
+  Operation,
+  makeOperation,
 } from 'urql';
 import { refocusExchange } from '@urql/exchange-refocus';
 import { cacheExchange } from '@urql/exchange-graphcache';
 import { devtoolsExchange } from '@urql/devtools';
+import { authExchange } from '@urql/exchange-auth';
 import { IntlProvider } from 'react-intl';
 
 import { ProjectLayout } from './components/ProjectLayout';
@@ -38,14 +41,50 @@ import {
 } from './graphql';
 import schema from './schema.json';
 
+function addAuthToOperation({
+  authState,
+  operation,
+}: {
+  authState?: { accessToken?: string } | null;
+  operation: Operation;
+}) {
+  if (!authState || !authState.accessToken) {
+    return operation;
+  }
+
+  const fetchOptions =
+    typeof operation.context.fetchOptions === 'function'
+      ? operation.context.fetchOptions()
+      : operation.context.fetchOptions || {};
+
+  return makeOperation(operation.kind, operation, {
+    ...operation.context,
+    fetchOptions: {
+      ...fetchOptions,
+      headers: {
+        ...fetchOptions.headers,
+        Authorization: `Bearer ${authState.accessToken}`,
+      },
+    },
+  });
+}
+
+async function getAuth({
+  authState,
+}: {
+  authState?: { accessToken?: string } | null;
+}) {
+  if (!authState) {
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken) {
+      return { accessToken };
+    }
+    return null;
+  }
+}
+
 const client = createClient({
   url: '/v1/console',
-  fetchOptions: () => {
-    const token = localStorage.getItem('accessToken');
-    return {
-      headers: { authorization: token ? `Bearer ${token}` : '' },
-    };
-  },
   exchanges: [
     devtoolsExchange,
     dedupExchange,
@@ -136,6 +175,15 @@ const client = createClient({
             });
           },
         },
+      },
+    }),
+    authExchange({
+      addAuthToOperation,
+      getAuth,
+      didAuthError({ error }) {
+        return error.graphQLErrors.some(
+          (e) => e.extensions?.code === 'FORBIDDEN'
+        );
       },
     }),
     fetchExchange,
