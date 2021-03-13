@@ -186,7 +186,7 @@ function AddAttributeForm({
           type="text"
           name="name"
           placeholder="Attribute name"
-          className="-mr-px w-full sm:text-sm focus:ring-green-500 focus:border-green-500 border-gray-300"
+          className="-mr-px w-full sm:text-sm focus:ring-green-500 focus:border-green-500 border-gray-300 placeholder-gray-500"
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
@@ -200,7 +200,7 @@ function AddAttributeForm({
           type="submit"
           className={`${
             fetching ? 'opacity-50' : ''
-          } py-2 px-2 border border-gray-300 rounded-r-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
+          } py-2 px-2 border border-gray-300 rounded-r-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500`}
           disabled={fetching}
         >
           <HiOutlinePlusCircle className="text-xl" />
@@ -262,14 +262,17 @@ function AddRelationshipForm({
   close: () => void;
 }) {
   return (
-    <form onSubmit={form.handleSubmit} className="shadow-sm">
+    <form
+      onSubmit={form.handleSubmit}
+      className="rounded-md shadow-sm -space-y-px"
+    >
       <label
         htmlFor="relationship-name"
         className="block text-sm font-medium text-gray-700 mb-1"
       >
         Add relationship
       </label>
-      <span className="relative z-0 inline-flex w-full">
+      <span className="relative inline-flex w-full">
         <select
           name="type"
           className="-mr-px w-44 px-2 py-2 rounded-tl-md border-gray-300 border-b-0 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
@@ -284,7 +287,7 @@ function AddRelationshipForm({
           type="text"
           name="name"
           placeholder="Relationship name"
-          className="-mr-px w-full sm:text-sm focus:ring-green-500 focus:border-green-500 border-gray-300 border-b-0 rounded-tr-md"
+          className="-mr-px w-full sm:text-sm focus:ring-green-500 focus:border-green-500 border-gray-300 border-b-0 rounded-tr-md focus:z-10 placeholder-gray-500"
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
@@ -294,7 +297,7 @@ function AddRelationshipForm({
           onKeyUp={closeOnKeyUp(close)}
         />
       </span>
-      <span className="relative z-0 inline-flex  w-full">
+      <span className="relative inline-flex  w-full">
         <select
           name="relatedCollectionId"
           className="-mr-px w-44 px-2 py-2 rounded-bl-md border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
@@ -311,7 +314,7 @@ function AddRelationshipForm({
           type="text"
           name="inverse"
           placeholder="Relationship inverse"
-          className="-mr-px w-full sm:text-sm focus:ring-green-500 focus:border-green-500 border-gray-300"
+          className="-mr-px w-full sm:text-sm focus:ring-green-500 focus:border-green-500 border-gray-300 focus:z-10 placeholder-gray-500"
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
@@ -324,7 +327,7 @@ function AddRelationshipForm({
           type="submit"
           className={`${
             fetching ? 'opacity-50' : ''
-          } py-2 px-2 border border-gray-300 rounded-br-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
+          } py-2 px-2 border border-gray-300 rounded-br-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500`}
           disabled={fetching}
         >
           <HiOutlinePlusCircle className="text-xl" />
