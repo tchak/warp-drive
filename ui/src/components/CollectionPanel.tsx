@@ -235,7 +235,7 @@ function AttributeList({
             </span>
             <span className="ml-2 flex-1 w-0 truncate">{attribute.name}</span>
           </div>
-          <div className="ml-4 flex-shrink-0">
+          <div className="ml-4 flex-shrink-0 flex items-center">
             <button
               disabled={fetching}
               type="button"
@@ -364,7 +364,7 @@ function RelationshipList({
               {relationship.name}
             </span>
           </div>
-          <div className="ml-4 flex-shrink-0">
+          <div className="ml-4 flex-shrink-0 flex items-center">
             {relationship.owner && (
               <button
                 disabled={fetching}
