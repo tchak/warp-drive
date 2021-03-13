@@ -2,6 +2,8 @@ import React, { Suspense, lazy, FunctionComponent } from 'react';
 import { FaSpinner } from 'react-icons/fa';
 import { Navigate } from 'react-router-dom';
 
+import { signOut } from '../../auth';
+
 const SignInLazyPage = lazy(() => import('./SignInPage'));
 const SignUpLazyPage = lazy(() => import('./SignUpPage'));
 const HelpLazyPage = lazy(() => import('./HelpPage'));
@@ -92,6 +94,6 @@ export const SignUpPage = () => (
 );
 
 export function SignOutPage() {
-  localStorage.removeItem('accessToken');
+  signOut();
   return <Navigate to="/" />;
 }

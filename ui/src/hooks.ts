@@ -11,10 +11,7 @@ import {
   ListEventsDocument,
   ListKeysDocument,
 } from './graphql';
-
-function isSignedIn(): boolean {
-  return !!localStorage.getItem('accessToken');
-}
+import { isSignedIn } from './auth';
 
 export function useSignedIn(): boolean {
   return useMemo(() => isSignedIn(), []);

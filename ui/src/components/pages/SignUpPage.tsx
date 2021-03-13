@@ -4,12 +4,11 @@ import { useMutation } from 'urql';
 import { useFormik } from 'formik';
 import { Navigate } from 'react-router-dom';
 
+import { useAccessToken } from '../../auth';
 import { SignUpDocument } from '../../graphql';
 
 export default function SignUpPage() {
-  const [accessToken, setAccessToken] = useState(() =>
-    localStorage.getItem('accessToken')
-  );
+  const [accessToken, setAccessToken] = useAccessToken();
   const [{ fetching }, signUp] = useMutation(SignUpDocument);
   const form = useFormik({
     initialValues: {
@@ -20,7 +19,6 @@ export default function SignUpPage() {
       const { data } = await signUp(values);
       const accessToken = data?.signUp.token;
       if (accessToken) {
-        localStorage.setItem('accessToken', accessToken);
         setAccessToken(accessToken);
       }
     },
