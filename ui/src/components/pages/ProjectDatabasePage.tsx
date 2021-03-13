@@ -25,6 +25,11 @@ export default function ProjectDatabasePage() {
     return <>Error: {(error as Error).message}</>;
   }
   const collections = fetching ? [] : data?.getProject.collections ?? [];
+  const editorInitialValues = selectedCollection
+    ? collections.find(({ id }) => id == selectedCollection.id)
+    : project
+    ? { projectId: project.id, name: '' }
+    : null;
 
   return (
     <>
@@ -75,13 +80,9 @@ export default function ProjectDatabasePage() {
         </div>
       </div>
 
-      {project && (
+      {editorInitialValues && (
         <CollectionPanel
-          initialValues={
-            selectedCollection
-              ? selectedCollection
-              : { projectId: project.id, name: '' }
-          }
+          initialValues={editorInitialValues}
           show={show}
           close={close}
           afterClose={() => setSelectedCollection(undefined)}

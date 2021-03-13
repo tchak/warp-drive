@@ -21,6 +21,7 @@ export type Scalars = {
 export type Attribute = {
   id: Scalars['ID'];
   name: Scalars['String'];
+  projectId: Scalars['String'];
   required: Scalars['Boolean'];
   type: AttributeType;
 };
@@ -290,6 +291,7 @@ export type Relationship = {
   id: Scalars['ID'];
   inverse?: Maybe<Scalars['String']>;
   name: Scalars['String'];
+  projectId: Scalars['String'];
   relatedCollection: Collection;
   type: RelationshipType;
 };
@@ -387,7 +389,7 @@ export type CreateAttributeMutationVariables = Exact<{
 }>;
 
 export type CreateAttributeMutation = {
-  createAttribute: Pick<Attribute, 'id' | 'name' | 'type'>;
+  createAttribute: Pick<Attribute, 'id' | 'name' | 'type' | 'projectId'>;
 };
 
 export type DeleteAttributeMutationVariables = Exact<{
@@ -396,6 +398,42 @@ export type DeleteAttributeMutationVariables = Exact<{
 
 export type DeleteAttributeMutation = {
   deleteAttribute: Pick<DeletedAttribute, 'id'>;
+};
+
+export type CreateManyToOneRelationshipMutationVariables = Exact<{
+  collectionId: Scalars['ID'];
+  name: Scalars['String'];
+  relatedCollectionId: Scalars['ID'];
+  inverse?: Maybe<Scalars['String']>;
+}>;
+
+export type CreateManyToOneRelationshipMutation = {
+  createManyToOneRelationship: Pick<
+    Relationship,
+    'id' | 'name' | 'type' | 'projectId'
+  > & { relatedCollection: Pick<Collection, 'id' | 'name'> };
+};
+
+export type CreateOneToOneRelationshipMutationVariables = Exact<{
+  collectionId: Scalars['ID'];
+  name: Scalars['String'];
+  relatedCollectionId: Scalars['ID'];
+  inverse?: Maybe<Scalars['String']>;
+}>;
+
+export type CreateOneToOneRelationshipMutation = {
+  createOneToOneRelationship: Pick<
+    Relationship,
+    'id' | 'name' | 'type' | 'projectId'
+  > & { relatedCollection: Pick<Collection, 'id' | 'name'> };
+};
+
+export type DeleteRelationshipMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type DeleteRelationshipMutation = {
+  deleteRelationship: Pick<DeletedRelationship, 'id'>;
 };
 
 export type CreateKeyMutationVariables = Exact<{
@@ -473,6 +511,11 @@ export type ListCollectionsQuery = {
     collections: Array<
       Pick<Collection, 'id' | 'name' | 'updatedDate'> & {
         attributes: Array<Pick<Attribute, 'id' | 'name' | 'type'>>;
+        relationships: Array<
+          Pick<Relationship, 'id' | 'type' | 'inverse'> & {
+            relatedCollection: Pick<Collection, 'id' | 'name'>;
+          }
+        >;
       }
     >;
   };
@@ -915,6 +958,7 @@ export const CreateAttributeDocument: DocumentNode<
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'projectId' } },
               ],
             },
           },
@@ -949,6 +993,292 @@ export const DeleteAttributeDocument: DocumentNode<
           {
             kind: 'Field',
             name: { kind: 'Name', value: 'deleteAttribute' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
+export const CreateManyToOneRelationshipDocument: DocumentNode<
+  CreateManyToOneRelationshipMutation,
+  CreateManyToOneRelationshipMutationVariables
+> = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'createManyToOneRelationship' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'collectionId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'name' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'relatedCollectionId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'inverse' },
+          },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createManyToOneRelationship' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'collectionId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'collectionId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'name' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'name' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'relatedCollectionId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'relatedCollectionId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'inverse' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'inverse' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'relatedCollection' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                    ],
+                  },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'projectId' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
+export const CreateOneToOneRelationshipDocument: DocumentNode<
+  CreateOneToOneRelationshipMutation,
+  CreateOneToOneRelationshipMutationVariables
+> = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'createOneToOneRelationship' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'collectionId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'name' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'relatedCollectionId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'inverse' },
+          },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createOneToOneRelationship' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'collectionId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'collectionId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'name' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'name' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'relatedCollectionId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'relatedCollectionId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'inverse' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'inverse' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'relatedCollection' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                    ],
+                  },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'projectId' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
+export const DeleteRelationshipDocument: DocumentNode<
+  DeleteRelationshipMutation,
+  DeleteRelationshipMutationVariables
+> = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'deleteRelationship' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteRelationship' },
             arguments: [
               {
                 kind: 'Argument',
@@ -1531,6 +1861,47 @@ export const ListCollectionsDocument: DocumentNode<
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'type' },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'relationships' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'type' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: {
+                                kind: 'Name',
+                                value: 'relatedCollection',
+                              },
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'id' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'name' },
+                                  },
+                                ],
+                              },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'inverse' },
                             },
                           ],
                         },

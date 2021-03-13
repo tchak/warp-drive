@@ -8,7 +8,6 @@ import {
   Field,
   FieldResolver,
   Root,
-  Query,
 } from 'type-graphql';
 
 import { ProjectCollection } from '../entities/ProjectCollection';
@@ -23,7 +22,6 @@ import {
 
 import { Context } from '../lib/context';
 import {
-  getCollection,
   createCollection,
   deleteCollection,
   createCollectionAttribute,

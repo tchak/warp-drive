@@ -21,11 +21,64 @@ mutation createAttribute(
     id
     name
     type
+    projectId
   }
 }
 
 mutation deleteAttribute($id: ID!) {
   deleteAttribute(id: $id) {
+    id
+  }
+}
+
+mutation createManyToOneRelationship(
+  $collectionId: ID!
+  $name: String!
+  $relatedCollectionId: ID!
+  $inverse: String
+) {
+  createManyToOneRelationship(
+    collectionId: $collectionId
+    name: $name
+    relatedCollectionId: $relatedCollectionId
+    inverse: $inverse
+  ) {
+    id
+    name
+    type
+    relatedCollection {
+      id
+      name
+    }
+    projectId
+  }
+}
+
+mutation createOneToOneRelationship(
+  $collectionId: ID!
+  $name: String!
+  $relatedCollectionId: ID!
+  $inverse: String
+) {
+  createOneToOneRelationship(
+    collectionId: $collectionId
+    name: $name
+    relatedCollectionId: $relatedCollectionId
+    inverse: $inverse
+  ) {
+    id
+    name
+    type
+    relatedCollection {
+      id
+      name
+    }
+    projectId
+  }
+}
+
+mutation deleteRelationship($id: ID!) {
+  deleteRelationship(id: $id) {
     id
   }
 }

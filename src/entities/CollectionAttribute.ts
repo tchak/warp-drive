@@ -63,4 +63,9 @@ export class CollectionAttribute {
 
   @Property()
   createdDate: Date = new Date();
+
+  @Field()
+  get projectId(): string {
+    return this.collection.project.id;
+  }
 }

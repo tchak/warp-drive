@@ -5,6 +5,12 @@ import {
   ListCollectionsDocument,
   ListUsersDocument,
   ListKeysDocument,
+  CreateAttributeMutationVariables,
+  CreateAttributeMutation,
+  CreateManyToOneRelationshipMutationVariables,
+  CreateManyToOneRelationshipMutation,
+  CreateOneToOneRelationshipMutationVariables,
+  CreateOneToOneRelationshipMutation,
 } from '../graphql';
 import schema from '../schema.json';
 
@@ -80,15 +86,79 @@ export function createCacheExchange() {
             id: args.id as string,
           });
         },
-        createAttribute(_, args, cache) {
-          cache.invalidate({
-            __typename: 'Collection',
-            id: args.collectionId as string,
-          });
+        createAttribute(result, args, cache) {
+          const { collectionId } = args as CreateAttributeMutationVariables;
+          const {
+            createAttribute,
+          } = (result as unknown) as CreateAttributeMutation;
+          cache.updateQuery(
+            {
+              query: ListCollectionsDocument,
+              variables: {
+                projectId: createAttribute.projectId,
+              },
+            },
+            (data) => {
+              data?.getProject.collections
+                .find((collection) => collection.id == collectionId)
+                ?.attributes.push(createAttribute);
+              return data;
+            }
+          );
         },
         deleteAttribute(_, args, cache) {
           cache.invalidate({
             __typename: 'Attribute',
+            id: args.id as string,
+          });
+        },
+        createManyToOneRelationship(result, args, cache) {
+          const {
+            collectionId,
+          } = args as CreateManyToOneRelationshipMutationVariables;
+          const {
+            createManyToOneRelationship,
+          } = (result as unknown) as CreateManyToOneRelationshipMutation;
+          cache.updateQuery(
+            {
+              query: ListCollectionsDocument,
+              variables: {
+                projectId: createManyToOneRelationship.projectId,
+              },
+            },
+            (data) => {
+              data?.getProject.collections
+                .find((collection) => collection.id == collectionId)
+                ?.relationships.push(createManyToOneRelationship);
+              return data;
+            }
+          );
+        },
+        createOneToOneRelationship(result, args, cache) {
+          const {
+            collectionId,
+          } = args as CreateOneToOneRelationshipMutationVariables;
+          const {
+            createOneToOneRelationship,
+          } = (result as unknown) as CreateOneToOneRelationshipMutation;
+          cache.updateQuery(
+            {
+              query: ListCollectionsDocument,
+              variables: {
+                projectId: createOneToOneRelationship.projectId,
+              },
+            },
+            (data) => {
+              data?.getProject.collections
+                .find((collection) => collection.id == collectionId)
+                ?.relationships.push(createOneToOneRelationship);
+              return data;
+            }
+          );
+        },
+        deleteRelationship(_, args, cache) {
+          cache.invalidate({
+            __typename: 'Relationship',
             id: args.id as string,
           });
         },

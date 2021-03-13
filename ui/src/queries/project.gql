@@ -48,6 +48,15 @@ query listCollections($projectId: ID!) {
         name
         type
       }
+      relationships {
+        id
+        type
+        relatedCollection {
+          id
+          name
+        }
+        inverse
+      }
       updatedDate
     }
   }
