@@ -14,6 +14,7 @@ import {
   updateCollection,
   updateDocument,
 } from '../lib/database';
+import { parseInclude } from './utils';
 
 export function database() {
   const router = Router();
@@ -39,10 +40,11 @@ export function database() {
   );
   router.get(
     '/collections/:id/documents',
-    wrapHandler(async (context, { params }, res) => {
+    wrapHandler(async (context, { params, query }, res) => {
       const documents = await listDocuments({
         context,
         collectionId: params.id,
+        include: parseInclude(query.include),
       });
 
       res.ok(documents);
@@ -51,10 +53,11 @@ export function database() {
 
   router.get(
     '/documents/:id',
-    wrapHandler(async (context, { params }, res) => {
+    wrapHandler(async (context, { params, query }, res) => {
       const document = await getDocument({
         context,
         documentId: params.id,
+        include: parseInclude(query.include),
       });
 
       res.ok(document);
@@ -62,10 +65,11 @@ export function database() {
   );
   router.get(
     '/documents/:id/operations',
-    wrapHandler(async (context, { params }, res) => {
+    wrapHandler(async (context, { params, query }, res) => {
       const operations = await listDocumentOperations({
         context,
         documentId: params.id,
+        include: parseInclude(query.include),
       });
 
       res.ok(operations);

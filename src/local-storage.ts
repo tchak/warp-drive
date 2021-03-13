@@ -42,29 +42,17 @@ class Response {
 }
 
 export function dataWithIncluded<T>(
-  data: T | T[],
-  options?: { include?: (keyof T)[]; meta?: unknown }
+  data: (T & { included?: T[] }) | (T & { included?: T[] })[],
+  options?: { meta?: unknown }
 ) {
-  if (options?.include?.length) {
-    const included = options.include.reduce((included, include) => {
-      if (Array.isArray(data)) {
-        included.push(
-          ...(data.flatMap((data) => {
-            if ((data[include] as any).isInitialized()) {
-              return data[include];
-            }
-            return [];
-          }) as any)
-        );
-      } else {
-        if ((data[include] as any).isInitialized()) {
-          included.push(...(data[include] as any));
-        }
-      }
-      return included;
-    }, [] as { id: string }[]);
-
-    return { data, included, meta: options.meta };
+  if (Array.isArray(data)) {
+    const included = data.flatMap((data) => data.included ?? []);
+    if (included.length) {
+      return { data, included, meta: options?.meta };
+    }
+    return { data, meta: options?.meta };
+  } else if (data.included) {
+    return { data, included: data.included, meta: options?.meta };
   } else {
     return { data, meta: options?.meta };
   }

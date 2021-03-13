@@ -412,13 +412,19 @@ export interface ListCollectionsParams {
 }
 
 export async function listCollections({
-  context: { em, project, scope },
+  context,
 }: ListCollectionsParams): Promise<ProjectCollection[]> {
+  const { em, scope, audience } = context;
   authorizeCollections(scope, 'read');
 
   const collections = await em.find(
     ProjectCollection,
-    { project },
+    {
+      project:
+        audience == 'admin'
+          ? { members: { user: context.admin } }
+          : context.project,
+    },
     {
       populate: ['attributes', 'relationships'],
       orderBy: { createdDate: QueryOrder.ASC },
@@ -584,11 +590,13 @@ export async function pushDocuments({}: PushDocumentsParams): Promise<
 export interface GetDocumentParams {
   context: Context;
   documentId: string;
+  include?: string[];
 }
 
 export async function getDocument({
   context,
   documentId,
+  include,
 }: GetDocumentParams): Promise<Document> {
   if (context.audience == 'server') {
     authorizeDocuments(context.scope, 'read');
@@ -601,28 +609,51 @@ export async function getDocument({
     removeOperationId: null,
   });
 
+  if (include && include.length) {
+    const included = await listIncludedDocuments(
+      context.em,
+      document.collection,
+      [document],
+      include
+    );
+    document.included = included;
+  }
+
   return document;
 }
 
 export interface ListDocumentOperationsParams {
   context: Context;
   documentId: string;
+  include?: string[];
 }
 
 export async function listDocumentOperations({
   context,
   documentId,
+  include,
 }: ListDocumentOperationsParams): Promise<DocumentOperation[]> {
   if (context.audience == 'server') {
     authorizeDocuments(context.scope, 'read');
   }
 
   const { em, project } = context;
-  const { operations } = await em.findOneOrFail(Document, {
+  const document = await em.findOneOrFail(Document, {
     id: documentId,
     collection: { project },
     removeOperationId: null,
   });
+  const operations = document.operations;
+
+  if (include && include.length) {
+    const included = await listIncludedDocuments(
+      context.em,
+      document.collection,
+      [document],
+      include
+    );
+    return [...operations, ...included.flatMap(({ operations }) => operations)];
+  }
 
   return operations;
 }
@@ -630,11 +661,13 @@ export async function listDocumentOperations({
 export interface ListDocumentsParams {
   context: Context;
   collectionId: string;
+  include?: string[];
 }
 
 export async function listDocuments({
   context,
   collectionId,
+  include,
 }: ListDocumentsParams): Promise<Document[]> {
   if (context.audience == 'server') {
     authorizeDocuments(context.scope, 'read');
@@ -654,6 +687,14 @@ export async function listDocuments({
       orderBy: { timestamp: QueryOrder.ASC },
     }
   );
+  if (include && include.length) {
+    const included = await listIncludedDocuments(
+      context.em,
+      em.getReference(ProjectCollection, collectionId),
+      documents,
+      include
+    );
+  }
 
   return documents;
 }
@@ -724,6 +765,61 @@ async function buildRelationshipOperations(
     }
   }
   return operations;
+}
+
+async function listIncludedDocuments(
+  em: EntityManager,
+  collection: ProjectCollection,
+  documents: Document[],
+  include: string[]
+): Promise<Document[]> {
+  const operations = await em.find(
+    RelationshipOperation,
+    {
+      document: documents,
+      relatedDocument: { removeTimestamp: null },
+      relationship: {
+        name: include,
+        collection,
+        owner: true,
+      },
+    },
+    { orderBy: { timestamp: QueryOrder.ASC } }
+  );
+  const inverseOperations = await em.find(
+    RelationshipOperation,
+    {
+      document: { removeTimestamp: null },
+      relatedDocument: documents,
+      relationship: {
+        inverse: include,
+        relatedCollection: collection,
+        owner: true,
+      },
+    },
+    { orderBy: { timestamp: QueryOrder.ASC } }
+  );
+
+  const included = new Map<string, Document>();
+
+  for (const { relatedDocument, remove } of operations) {
+    if (relatedDocument) {
+      if (remove) {
+        included.delete(relatedDocument.id);
+      } else {
+        included.set(relatedDocument.id, relatedDocument);
+      }
+    }
+  }
+  for (const { document, remove } of inverseOperations) {
+    if (remove) {
+      included.delete(document.id);
+    } else {
+      included.set(document.id, document);
+    }
+  }
+
+  return [...included.values()];
 }
 
 function compact<T>(map: T) {

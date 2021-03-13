@@ -2,13 +2,13 @@ import type { ParsedQs } from 'qs';
 
 export function parseInclude<T>(
   include?: ParsedQs | ParsedQs[] | string | string[]
-): (keyof T)[] {
+): string[] | undefined {
   if (Array.isArray(include)) {
-    return include as (keyof T)[];
+    return include as string[];
   } else if (include) {
     return (include as string)
       .split(',')
-      .map((include) => include.trim()) as (keyof T)[];
+      .map((include) => include.trim()) as string[];
   }
-  return [];
+  return;
 }

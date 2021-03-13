@@ -20,6 +20,7 @@ import {
   createDocument,
   deleteDocument,
   deleteCollection,
+  getDocument,
 } from './database';
 
 describe('database', () => {
@@ -448,6 +449,14 @@ describe('database', () => {
             },
           },
         ]);
+
+        const loadedList = await getDocument({
+          context,
+          documentId: list.id,
+          include: ['items'],
+        });
+
+        expect(loadedList.included).toMatchObject([item]);
       });
     });
   });

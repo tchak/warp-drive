@@ -130,19 +130,22 @@ export class Document {
         if (!relatedDocument) {
           relationships[name].data = [];
         } else {
-          const identity = relatedDocument.identity;
-          if (remove) {
-            relationships[name].data = documents.filter(
-              ({ id }) => identity.id != id
-            );
-          } else {
-            relationships[name].data = [...documents, identity];
+          if (!relatedDocument.removeTimestamp) {
+            const identity = relatedDocument.identity;
+            if (remove) {
+              relationships[name].data = documents.filter(
+                ({ id }) => identity.id != id
+              );
+            } else {
+              relationships[name].data = [...documents, identity];
+            }
           }
         }
       } else {
-        relationships[name].data = relatedDocument
-          ? relatedDocument.identity
-          : null;
+        relationships[name].data =
+          relatedDocument && !relatedDocument.removeTimestamp
+            ? relatedDocument.identity
+            : null;
       }
     }
     return relationships;
@@ -272,4 +275,6 @@ export class Document {
       relationships,
     };
   }
+
+  included?: Document[];
 }
