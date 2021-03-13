@@ -1,17 +1,10 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ErrorBoundary, withProfiler } from '@sentry/react';
-import {
-  Provider as URQLProvider,
-  createClient,
-  dedupExchange,
-  fetchExchange,
-} from 'urql';
-import { refocusExchange } from '@urql/exchange-refocus';
-import { devtoolsExchange } from '@urql/devtools';
-
+import { Provider as URQLProvider } from 'urql';
 import { IntlProvider } from 'react-intl';
 
+import { createGraphQLClient } from './urql/client';
 import { ProjectLayout } from './components/ProjectLayout';
 import {
   ProjectListPage,
@@ -30,20 +23,7 @@ import {
   SignOutPage,
 } from './components/pages';
 
-import { createAuthExchange } from './urql/auth';
-import { createCacheExchange } from './urql/cache';
-
-const client = createClient({
-  url: '/v1/console',
-  exchanges: [
-    devtoolsExchange,
-    dedupExchange,
-    refocusExchange(),
-    createCacheExchange(),
-    createAuthExchange(),
-    fetchExchange,
-  ],
-});
+const client = createGraphQLClient();
 
 function App() {
   return (
