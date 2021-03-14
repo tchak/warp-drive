@@ -7,6 +7,7 @@ import { signOut } from '../../auth';
 const SignInLazyPage = lazy(() => import('./SignInPage'));
 const SignUpLazyPage = lazy(() => import('./SignUpPage'));
 const HelpLazyPage = lazy(() => import('./HelpPage'));
+const DocsLazyPage = lazy(() => import('./DocsPage'));
 
 const ProjectListLazyPage = lazy(() => import('./ProjectListPage'));
 const ProjectOverviewLazyPage = lazy(() => import('./ProjectOverviewPage'));
@@ -80,6 +81,11 @@ export const ProjectSettingsPage = () => (
 export const HelpPage = () => (
   <Loader>
     <HelpLazyPage />
+  </Loader>
+);
+export const DocsPage = () => (
+  <Loader>
+    <DocsLazyPage />
   </Loader>
 );
 export const SignInPage = () => (

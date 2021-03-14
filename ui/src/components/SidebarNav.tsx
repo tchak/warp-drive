@@ -8,6 +8,7 @@ import {
   HiOutlineDatabase,
   HiOutlineCog,
   HiOutlineQuestionMarkCircle,
+  HiOutlineBookOpen,
 } from 'react-icons/hi';
 import { NavLink, useParams } from 'react-router-dom';
 
@@ -100,6 +101,15 @@ export function SidebarNav({ desktop = true }: { desktop?: boolean }) {
           >
             <HiOutlineQuestionMarkCircle className="mr-4 h-6 w-6 text-green-200" />
             Help
+          </NavLink>
+
+          <NavLink
+            to="/docs"
+            activeClassName="bg-green-800 text-white"
+            className={itemClassName}
+          >
+            <HiOutlineBookOpen className="mr-4 h-6 w-6 text-green-200" />
+            Docs
           </NavLink>
         </div>
       </div>

@@ -17,6 +17,7 @@ import {
   ProjectKeysPage,
   ProjectSettingsPage,
   HelpPage,
+  DocsPage,
   SignInPage,
   SignUpPage,
   SignOutPage,
@@ -48,6 +49,7 @@ function App() {
             <Route path="settings" element={<ProjectSettingsPage />} />
           </Route>
           <Route path="/help" element={<HelpPage />} />
+          <Route path="/docs" element={<DocsPage />} />
         </Routes>
       </ErrorBoundary>
     </URQLProvider>
