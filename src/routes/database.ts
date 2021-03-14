@@ -15,6 +15,7 @@ import {
   updateDocument,
 } from '../lib/database';
 import { parseInclude } from './utils';
+import { ProjectCollection } from '../entities/ProjectCollection';
 
 export function database() {
   const router = Router();
@@ -114,9 +115,14 @@ export function database() {
     wrapHandler(async (context, { body }, res) => {
       const { type, attributes, relationships } = body.data;
       const { permissions } = body.meta ?? {};
+      // FIXME
+      const collection = await context.em.findOneOrFail(ProjectCollection, {
+        name: type,
+        project: context.project,
+      });
       const document = await createDocument({
         context,
-        collectionId: type,
+        collectionId: collection.id,
         attributes,
         relationships,
         permissions,

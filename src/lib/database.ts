@@ -630,11 +630,15 @@ export async function getDocument({
     audience == 'admin'
       ? { members: { user: context.admin } }
       : context.project;
-  const document = await em.findOneOrFail(Document, {
-    id: documentId,
-    collection: { project },
-    removeOperationId: null,
-  });
+  const document = await em.findOneOrFail(
+    Document,
+    {
+      id: documentId,
+      collection: { project },
+      removeOperationId: null,
+    },
+    ['collection.relationships', 'relationshipOperations.relatedDocument']
+  );
 
   if (include && include.length) {
     const included = await listIncludedDocuments(
@@ -819,7 +823,10 @@ async function listIncludedDocuments(
         owner: true,
       },
     },
-    { orderBy: { timestamp: QueryOrder.ASC } }
+    {
+      populate: ['relatedDocument.collection.relationships'],
+      orderBy: { timestamp: QueryOrder.ASC },
+    }
   );
   const inverseOperations = await em.find(
     RelationshipOperation,
@@ -832,7 +839,10 @@ async function listIncludedDocuments(
         owner: true,
       },
     },
-    { orderBy: { timestamp: QueryOrder.ASC } }
+    {
+      populate: ['document.collection.relationships'],
+      orderBy: { timestamp: QueryOrder.ASC },
+    }
   );
 
   const included = new Map<string, Document>();
