@@ -407,7 +407,11 @@ function AddCollectionForm({
   initialValues: { projectId: string; name: string };
   close: () => void;
 }) {
-  const { form, fetching } = useCollectionForm(initialValues.projectId);
+  const { form, fetching } = useCollectionForm(initialValues.projectId, {
+    success() {
+      close();
+    },
+  });
   useHotkeys('esc', close, { enabled: !fetching });
 
   return (
