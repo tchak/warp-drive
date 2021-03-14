@@ -72,6 +72,9 @@ export class CollectionRelationship {
   @Property()
   createdDate: Date = new Date();
 
+  @Property({ onUpdate: () => new Date() })
+  updatedDate: Date = new Date();
+
   @Field()
   get projectId(): string {
     return this.collection.project.id;

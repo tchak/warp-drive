@@ -22,4 +22,7 @@ export class ProjectMember {
 
   @Property()
   createdDate: Date = new Date();
+
+  @Property({ onUpdate: () => new Date() })
+  updatedDate: Date = new Date();
 }
