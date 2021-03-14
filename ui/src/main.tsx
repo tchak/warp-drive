@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import { Integrations } from '@sentry/tracing';
+import { IntlProvider } from 'react-intl';
 
 import App from './App';
 import './index.css';
@@ -19,7 +20,9 @@ Sentry.init({
 ReactDOM.render(
   <React.StrictMode>
     <Router>
-      <App />
+      <IntlProvider locale="en-GB" onError={() => {}}>
+        <App />
+      </IntlProvider>
     </Router>
   </React.StrictMode>,
   document.getElementById('root')

@@ -6,8 +6,9 @@ import {
 } from 'react-icons/hi';
 import useClipboard from 'react-use-clipboard';
 
-import { ListKeysQuery } from '../graphql';
+import { ListKeysQuery, Scope } from '../graphql';
 import { useKeyToken } from '../hooks';
+import { useScopeName } from '../scope';
 
 export type Key = ListKeysQuery['getProject']['keys'][0];
 
@@ -47,7 +48,6 @@ function useKeyTokenClipboard(keyId: string): [boolean, () => void] {
     if (isCopied) {
       setId(undefined);
     } else if (id && token) {
-      console.log('copied', token);
       setCopied();
     }
   }, [id, token, isCopied]);
@@ -70,7 +70,14 @@ function KeyItem({
 
   return (
     <div className="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500">
-      <div className="flex-1">{item.name}</div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-gray-900">{item.name}</p>
+        <div className="mt-1">
+          {item.scope.sort().map((scope) => (
+            <KeyScopeBadge key={scope} scope={scope} />
+          ))}
+        </div>
+      </div>
       <div className="flex-shrink-0 min-w-0">
         <button
           type="button"
@@ -98,5 +105,14 @@ function KeyItem({
         </button>
       </div>
     </div>
+  );
+}
+
+function KeyScopeBadge({ scope }: { scope: Scope }) {
+  const name = useScopeName(scope);
+  return (
+    <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-gray-100 text-gray-800 mr-1 mb-1">
+      {name}
+    </span>
   );
 }

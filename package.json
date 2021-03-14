@@ -34,6 +34,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@formatjs/cli": "^3.1.6",
     "@graphql-codegen/cli": "^1.21.2",
     "@graphql-codegen/introspection": "^1.18.1",
     "@graphql-codegen/typed-document-node": "^1.18.3",
@@ -111,7 +112,8 @@
     "schema:update": "mikro-orm schema:update --fk-checks -r",
     "lint": "eslint . --ext .ts,.tsx",
     "test": "jest",
-    "test:prepare": "NODE_ENV=test yarn schema:drop && NODE_ENV=test yarn schema:update"
+    "test:prepare": "NODE_ENV=test yarn schema:drop && NODE_ENV=test yarn schema:update",
+    "i18n:extract": "formatjs extract 'ui/src/**/*.ts*' --out-file ui/lang/en.json --id-interpolation-pattern '[sha512:contenthash:base64:6]'"
   },
   "prettier": {
     "singleQuote": true

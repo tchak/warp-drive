@@ -1,0 +1,35 @@
+{
+  "7SpVXr": {
+    "defaultMessage": "files.write"
+  },
+  "92W1Ns": {
+    "defaultMessage": "users.read"
+  },
+  "Crt5fG": {
+    "defaultMessage": "health.read"
+  },
+  "SkSiLe": {
+    "defaultMessage": "teams.read"
+  },
+  "e71s/B": {
+    "defaultMessage": "documents.write"
+  },
+  "jjH3XT": {
+    "defaultMessage": "teams.write"
+  },
+  "ltWq8I": {
+    "defaultMessage": "collections.write"
+  },
+  "qqLqKx": {
+    "defaultMessage": "users.write"
+  },
+  "u/gHEP": {
+    "defaultMessage": "files.read"
+  },
+  "xzLpTo": {
+    "defaultMessage": "documents.read"
+  },
+  "z2Q+59": {
+    "defaultMessage": "collections.read"
+  }
+}
