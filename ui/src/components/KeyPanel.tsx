@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { HiOutlineX } from 'react-icons/hi';
-import { useMutation } from 'urql';
-import { useFormik, FormikErrors } from 'formik';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { isAlphanumeric, minLength, isEmpty, maxLength } from 'class-validator';
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxList,
+  ComboboxPopover,
+  ComboboxOption,
+} from '@reach/combobox';
+import { matchSorter } from 'match-sorter';
 
-import { CreateKeyDocument, UpdateKeyDocument, Scope } from '../graphql';
+import { Scope } from '../graphql';
 import { SlideOverPanel } from './SlideOverPanel';
+import { useKeyForm } from '../forms';
+import { KeyScopeBadge } from './badges';
 
 export function KeyPanel({
   initialValues,
@@ -37,38 +44,12 @@ function KeyPanelForm({
     | { projectId: string; name: string; scope: Scope[] };
   close: () => void;
 }) {
-  const [{ fetching: creating }, createKey] = useMutation(CreateKeyDocument);
-  const [{ fetching: updating }, updateKey] = useMutation(UpdateKeyDocument);
-  const saving = creating || updating;
-  const form = useFormik({
-    initialValues,
-    validateOnBlur: false,
-    validateOnChange: false,
-    validate({ name }) {
-      const errors: FormikErrors<{ name: string }> = {};
-
-      if (isEmpty(name)) {
-        errors.name = 'Name is required.';
-      } else if (!minLength(name, 2)) {
-        errors.name = 'Name should be at least 2 characters long.';
-      } else if (!maxLength(name, 35)) {
-        errors.name = 'Name should be at most 35 characters long.';
-      } else if (!isAlphanumeric(name)) {
-        errors.name = 'Name should contain only alphanumeric characters.';
-      }
-      return errors;
-    },
-    async onSubmit(values) {
-      const { data } = await ('id' in values
-        ? updateKey(values)
-        : createKey(values));
-
-      if (data) {
-        close();
-      }
+  const { form, fetching } = useKeyForm(initialValues, {
+    success() {
+      close();
     },
   });
-  useHotkeys('esc', close, { enabled: !saving });
+  useHotkeys('esc', close, { enabled: !fetching });
 
   return (
     <form
@@ -89,7 +70,7 @@ function KeyPanelForm({
                 type="button"
                 className="bg-green-700 rounded-md text-green-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
                 onClick={close}
-                disabled={saving}
+                disabled={fetching}
               >
                 <span className="sr-only">Close panel</span>
                 <HiOutlineX className="h-6 w-6" />
@@ -107,7 +88,7 @@ function KeyPanelForm({
             <div className="space-y-6 pt-6 pb-5">
               <div>
                 <label
-                  htmlFor="collection-name"
+                  htmlFor="key-name"
                   className="block text-sm font-medium text-gray-900"
                 >
                   Name
@@ -116,13 +97,13 @@ function KeyPanelForm({
                   <input
                     type="text"
                     name="name"
-                    id="collection-name"
+                    id="key-name"
                     className="block w-full shadow-sm sm:text-sm focus:ring-green-500 focus:border-green-500 border-gray-300 rounded-md"
                     autoComplete="off"
                     autoCapitalize="off"
                     autoCorrect="off"
                     autoFocus={true}
-                    value={form.values.name}
+                    value={form.values.name ?? ''}
                     onChange={form.handleChange}
                   />
                 </div>
@@ -132,8 +113,37 @@ function KeyPanelForm({
                   </p>
                 )}
               </div>
+              <div>
+                <label
+                  htmlFor="key-scopes"
+                  className="block text-sm font-medium text-gray-900"
+                >
+                  Scope
+                </label>
+                <div className="mt-1">
+                  <KeyScopeSelector
+                    value={form.values.scope}
+                    onChange={(scope) => {
+                      form.setFieldValue('scope', scope);
+                    }}
+                  />
+                  <div className="mt-2">
+                    {form.values.scope.sort().map((scope) => (
+                      <KeyScopeBadge
+                        key={scope}
+                        scope={scope}
+                        remove={() => {
+                          form.setFieldValue(
+                            'scope',
+                            form.values.scope.filter((sc) => sc != scope)
+                          );
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="pt-4 pb-6"></div>
           </div>
         </div>
       </div>
@@ -142,18 +152,66 @@ function KeyPanelForm({
           type="button"
           className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           onClick={close}
-          disabled={saving}
+          disabled={fetching}
         >
           Cancel
         </button>
         <button
           type="submit"
           className="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          disabled={saving}
+          disabled={fetching}
         >
           Save
         </button>
       </div>
     </form>
+  );
+}
+
+function getScopes(scopes: Scope[], term?: string) {
+  const results = Object.values(Scope).filter(
+    (scope) => !scopes.includes(scope)
+  );
+  return term ? matchSorter(results, term) : results;
+}
+
+function KeyScopeSelector({
+  value,
+  onChange,
+}: {
+  value: Scope[];
+  onChange: (value: Scope[]) => void;
+}) {
+  const [term, setTerm] = useState('');
+  const results = getScopes(value, term);
+  return (
+    <Combobox
+      className="flex"
+      aria-labelledby="key-scopes"
+      onSelect={(scope) => {
+        onChange([...new Set([...value, scope as Scope])]);
+        setTerm('');
+      }}
+    >
+      <ComboboxInput
+        type="text"
+        className="shadow-sm focus:ring-green-500 focus:border-green-500 flex-grow sm:text-sm border-gray-300 rounded-md"
+        value={term}
+        onChange={({ currentTarget: { value } }) => setTerm(value)}
+      />
+      {results.length ? (
+        <ComboboxPopover className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-30">
+          <ComboboxList persistSelection className="py-1">
+            {results.map((scope) => (
+              <ComboboxOption
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                key={scope}
+                value={scope}
+              />
+            ))}
+          </ComboboxList>
+        </ComboboxPopover>
+      ) : null}
+    </Combobox>
   );
 }

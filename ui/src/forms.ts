@@ -3,6 +3,7 @@ import { isAlphanumeric, minLength, isEmpty, maxLength } from 'class-validator';
 import { useMutation, CombinedError } from 'urql';
 
 import {
+  Scope,
   AttributeType,
   CreateAttributeDocument,
   DeleteAttributeDocument,
@@ -14,12 +15,21 @@ import {
   CreateManyToOneRelationshipMutationVariables,
   CreateOneToOneRelationshipMutationVariables,
   CreateCollectionMutationVariables,
+  CreateKeyDocument,
+  UpdateKeyDocument,
+  CreateKeyMutationVariables,
+  UpdateKeyMutationVariables,
 } from './graphql';
 
 type CreateRelationshipMutationVariables = (
   | CreateManyToOneRelationshipMutationVariables
   | CreateOneToOneRelationshipMutationVariables
 ) & { type: 'ManyToOne' | 'OneToOne' };
+
+type KeyMutationVariables = (
+  | CreateKeyMutationVariables
+  | UpdateKeyMutationVariables
+) & { scope: Scope[] };
 
 export type AttributeForm = ReturnType<typeof useAttributeForm>['form'];
 export type RelationshipForm = ReturnType<typeof useRelationshipForm>['form'];
@@ -188,5 +198,48 @@ export function useCollectionForm(projectId: string, options?: UseFormOptions) {
   return {
     form,
     fetching,
+  };
+}
+
+export function useKeyForm(
+  input: KeyMutationVariables,
+  options?: UseFormOptions
+) {
+  const [{ fetching: creating }, createKey] = useMutation(CreateKeyDocument);
+  const [{ fetching: updating }, updateKey] = useMutation(UpdateKeyDocument);
+  const form = useFormik({
+    initialValues: input,
+    validateOnBlur: false,
+    validateOnChange: false,
+    validate({ name }) {
+      const errors: FormikErrors<KeyMutationVariables> = {};
+
+      if (isEmpty(name)) {
+        errors.name = 'Name is required.';
+      } else if (!minLength(name, 2)) {
+        errors.name = 'Name should be at least 2 characters long.';
+      } else if (!maxLength(name, 35)) {
+        errors.name = 'Name should be at most 35 characters long.';
+      } else if (!isAlphanumeric(name)) {
+        errors.name = 'Name should contain only alphanumeric characters.';
+      }
+      return errors;
+    },
+    async onSubmit(values) {
+      const { data, error } = await ('id' in values
+        ? updateKey(values)
+        : createKey(values));
+
+      if (data) {
+        options?.success && options.success();
+      } else if (error) {
+        options?.error && options.error(error);
+      }
+    },
+  });
+
+  return {
+    form,
+    fetching: creating || updating,
   };
 }

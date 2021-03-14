@@ -1,4 +1,5 @@
 import React from 'react';
+import { HiOutlineXCircle } from 'react-icons/hi';
 import { useIntl } from 'react-intl';
 import { EventType, Scope, AttributeType, RelationshipType } from '../graphql';
 
@@ -167,11 +168,26 @@ export function RelationshipTypeBadge({ type }: { type: RelationshipType }) {
   );
 }
 
-export function KeyScopeBadge({ scope }: { scope: Scope }) {
+export function KeyScopeBadge({
+  scope,
+  remove,
+}: {
+  scope: Scope;
+  remove?: () => void;
+}) {
   const name = useKeyScopeName(scope);
   return (
     <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-gray-100 text-gray-800 mr-1 mb-1">
       {name}
+      {remove ? (
+        <button
+          type="button"
+          onClick={remove}
+          className="ml-2 hover:text-red-600"
+        >
+          <HiOutlineXCircle />
+        </button>
+      ) : null}
     </span>
   );
 }
