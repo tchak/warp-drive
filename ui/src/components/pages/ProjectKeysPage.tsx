@@ -3,7 +3,7 @@ import { HiPlusCircle } from 'react-icons/hi';
 import { useParams } from 'react-router-dom';
 import { useMutation } from 'urql';
 
-import { DeleteKeyDocument } from '../../graphql';
+import { DeleteKeyDocument, Scope } from '../../graphql';
 import { useListKeys, useProject } from '../../hooks';
 import { KeyPanel } from '../KeyPanel';
 import { KeyList, Key } from '../KeyList';
@@ -59,7 +59,16 @@ export default function ProjectKeysPage() {
           initialValues={
             selectedKey
               ? selectedKey
-              : { projectId: project.id, name: '', scope: [] }
+              : {
+                  projectId: project.id,
+                  name: '',
+                  scope: [
+                    Scope.DocumentsRead,
+                    Scope.DocumentsWrite,
+                    Scope.CollectionsRead,
+                    Scope.CollectionsWrite,
+                  ],
+                }
           }
           show={show}
           close={close}
