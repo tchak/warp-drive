@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { FormattedDate } from 'react-intl';
 
 import { Event, EventType } from '../graphql';
+import { EventTypeBadge } from './badges';
 
 export function EventFeed({ events }: { events: Event[] }) {
   return (
@@ -25,10 +26,8 @@ export function EventFeed({ events }: { events: Event[] }) {
                 <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                   <div>
                     <p className="text-sm text-gray-500">
-                      {event.type}{' '}
-                      <a href="#" className="font-medium text-gray-900">
-                        {event.type}
-                      </a>
+                      <EventTypeBadge type={event.type} />{' '}
+                      <a href="#" className="font-medium text-gray-900"></a>
                     </p>
                   </div>
                   <div className="text-right text-sm whitespace-nowrap text-gray-500">

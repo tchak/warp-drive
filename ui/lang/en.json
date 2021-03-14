@@ -1,6 +1,21 @@
 {
+  "01OFk+": {
+    "defaultMessage": "database.documents.delete"
+  },
+  "1Tye23": {
+    "defaultMessage": "users.delete"
+  },
+  "3JU54l": {
+    "defaultMessage": "database.documents.update"
+  },
+  "3PAofM": {
+    "defaultMessage": "account.create"
+  },
   "7SpVXr": {
     "defaultMessage": "files.write"
+  },
+  "83TFJD": {
+    "defaultMessage": "teams.create"
   },
   "92W1Ns": {
     "defaultMessage": "users.read"
@@ -8,8 +23,23 @@
   "Crt5fG": {
     "defaultMessage": "health.read"
   },
+  "DwYFQm": {
+    "defaultMessage": "database.collections.delete"
+  },
+  "FF0W5d": {
+    "defaultMessage": "teams.delete"
+  },
+  "KDsN9b": {
+    "defaultMessage": "database.documents.create"
+  },
+  "R2koPk": {
+    "defaultMessage": "database.collections.update"
+  },
   "SkSiLe": {
     "defaultMessage": "teams.read"
+  },
+  "UnaH8y": {
+    "defaultMessage": "users.create"
   },
   "e71s/B": {
     "defaultMessage": "documents.write"
@@ -20,8 +50,20 @@
   "ltWq8I": {
     "defaultMessage": "collections.write"
   },
+  "nG3dki": {
+    "defaultMessage": "account.sessions.delete"
+  },
+  "oLXSMg": {
+    "defaultMessage": "users.sessions.delete"
+  },
+  "oN6vWe": {
+    "defaultMessage": "account.delete"
+  },
   "qqLqKx": {
     "defaultMessage": "users.write"
+  },
+  "t/ue7c": {
+    "defaultMessage": "database.collections.create"
   },
   "u/gHEP": {
     "defaultMessage": "files.read"
@@ -29,7 +71,13 @@
   "xzLpTo": {
     "defaultMessage": "documents.read"
   },
+  "yZLbzX": {
+    "defaultMessage": "teams.update"
+  },
   "z2Q+59": {
     "defaultMessage": "collections.read"
+  },
+  "zmKPv8": {
+    "defaultMessage": "account.sessions.create"
   }
 }

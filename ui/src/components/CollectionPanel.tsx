@@ -6,9 +6,10 @@ import {
 } from 'react-icons/hi';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import { AttributeType, RelationshipType } from '../graphql';
+import { AttributeType } from '../graphql';
 import { SlideOverPanel } from './SlideOverPanel';
 import { Collection } from './CollectionList';
+import { AttributeTypeBadge, RelationshipTypeBadge } from './badges';
 
 import {
   useAttributeForm,
@@ -381,22 +382,6 @@ function RelationshipList({
         </li>
       ))}
     </ul>
-  );
-}
-
-function AttributeTypeBadge({ type }: { type: AttributeType }) {
-  return (
-    <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-gray-100 text-gray-800">
-      {type}
-    </span>
-  );
-}
-
-function RelationshipTypeBadge({ type }: { type: RelationshipType }) {
-  return (
-    <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-gray-100 text-gray-800">
-      {type}
-    </span>
   );
 }
 

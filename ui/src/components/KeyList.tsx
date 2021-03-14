@@ -6,9 +6,9 @@ import {
 } from 'react-icons/hi';
 import useClipboard from 'react-use-clipboard';
 
-import { ListKeysQuery, Scope } from '../graphql';
+import { ListKeysQuery } from '../graphql';
 import { useKeyToken } from '../hooks';
-import { useScopeName } from '../scope';
+import { KeyScopeBadge } from './badges';
 
 export type Key = ListKeysQuery['getProject']['keys'][0];
 
@@ -105,14 +105,5 @@ function KeyItem({
         </button>
       </div>
     </div>
-  );
-}
-
-function KeyScopeBadge({ scope }: { scope: Scope }) {
-  const name = useScopeName(scope);
-  return (
-    <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-gray-100 text-gray-800 mr-1 mb-1">
-      {name}
-    </span>
   );
 }
