@@ -6,7 +6,6 @@ import {
   getCollection,
   listDocuments,
   getDocument,
-  listDocumentOperations,
   createCollection,
   createDocument,
   deleteCollection,
@@ -64,18 +63,6 @@ export function database() {
       res.ok(document);
     })
   );
-  router.get(
-    '/documents/:id/operations',
-    wrapHandler(async (context, { params, query }, res) => {
-      const operations = await listDocumentOperations({
-        context,
-        documentId: params.id,
-        include: parseInclude(query.include),
-      });
-
-      res.ok(operations);
-    })
-  );
 
   router.patch(
     '/operations',
@@ -85,8 +72,7 @@ export function database() {
   router.post(
     '/collections',
     wrapHandler(async (context, { body }, res) => {
-      const name = body.data.attributes.name;
-      const { permissions } = body.meta;
+      const { name, permissions } = body.data.attributes;
       const collection = await createCollection({ context, name, permissions });
 
       res.created(collection);
@@ -95,8 +81,13 @@ export function database() {
   router.patch(
     '/collections/:id',
     wrapHandler(async (context, { params, body }, res) => {
-      const name = body.data.attributes.name;
-      await updateCollection({ context, collectionId: params.id, name });
+      const { name, permissions } = body.data.attributes;
+      await updateCollection({
+        context,
+        collectionId: params.id,
+        name,
+        permissions,
+      });
 
       res.noContent();
     })
