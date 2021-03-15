@@ -479,7 +479,7 @@ export async function createDocument({
   permissions,
 }: CreateDocumentParams): Promise<Document> {
   const { em, audience } = context;
-  if (audience !== 'client') {
+  if (audience == 'server' || audience == 'admin') {
     authorizeDocuments(context.scope, 'write');
   }
 
@@ -544,7 +544,7 @@ export async function updateDocument({
   permissions,
 }: UpdateDocumentParams): Promise<void> {
   const { em, audience } = context;
-  if (audience !== 'client') {
+  if (audience == 'server' || audience == 'admin') {
     authorizeDocuments(context.scope, 'write');
   }
 
@@ -597,7 +597,7 @@ export async function deleteDocument({
   documentId,
 }: DeleteDocumentParams): Promise<void> {
   const { em, audience } = context;
-  if (audience !== 'client') {
+  if (audience == 'server' || audience == 'admin') {
     authorizeDocuments(context.scope, 'write');
   }
 
@@ -647,7 +647,7 @@ export async function getDocument({
   include,
 }: GetDocumentParams): Promise<Document> {
   const { em, audience } = context;
-  if (audience !== 'client') {
+  if (audience == 'server' || audience == 'admin') {
     authorizeDocuments(context.scope, 'read');
   }
 
@@ -677,7 +677,8 @@ export async function getDocument({
       context.em,
       document.collection,
       [document],
-      include
+      include,
+      permissions
     );
     document.included = included;
   }
@@ -697,7 +698,7 @@ export async function listDocuments({
   include,
 }: ListDocumentsParams): Promise<Document[]> {
   const { em, audience } = context;
-  if (audience !== 'client') {
+  if (audience == 'server' || audience == 'admin') {
     authorizeDocuments(context.scope, 'read');
   }
 
@@ -730,7 +731,8 @@ export async function listDocuments({
       context.em,
       em.getReference(ProjectCollection, collectionId),
       documents,
-      include
+      include,
+      permissions
     );
   }
 
@@ -809,7 +811,8 @@ async function listIncludedDocuments(
   em: EntityManager,
   collection: ProjectCollection,
   documents: Document[],
-  include: string[]
+  include: string[],
+  permissions: Permission[]
 ): Promise<Document[]> {
   const operations = await em.find(
     RelationshipOperation,
@@ -821,6 +824,16 @@ async function listIncludedDocuments(
         collection,
         owner: true,
       },
+      $or: permissions.length
+        ? [
+            {
+              relationship: {
+                relatedCollection: { permissions: { $overlap: permissions } },
+              },
+            },
+            { relatedDocument: { permissions: { $overlap: permissions } } },
+          ]
+        : [],
     },
     {
       populate: ['relatedDocument.collection.relationships'],
@@ -837,6 +850,16 @@ async function listIncludedDocuments(
         relatedCollection: collection,
         owner: true,
       },
+      $or: permissions.length
+        ? [
+            {
+              relationship: {
+                collection: { permissions: { $overlap: permissions } },
+              },
+            },
+            { document: { permissions: { $overlap: permissions } } },
+          ]
+        : [],
     },
     {
       populate: ['document.collection.relationships'],
