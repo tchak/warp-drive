@@ -92,9 +92,9 @@ export class ProjectUser {
   @Property({ type: ArrayType, hidden: true })
   permissions: string[];
 
-  permissionsFor(action: PermissionAction): Permission[] {
-    return this.permissions.map(
-      (permission) => `${action}:${permission}`
+  permissionsFor(action: PermissionAction[]): Permission[] {
+    return action.flatMap((action) =>
+      this.permissions.map((permission) => `${action}:${permission}`)
     ) as Permission[];
   }
 

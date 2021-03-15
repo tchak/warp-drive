@@ -8,6 +8,10 @@ import {
 import { User } from '../entities/User';
 import { ProjectUser } from '../entities/ProjectUser';
 import { Project } from '../entities/Project';
+import type {
+  PermissionAction,
+  Permission,
+} from '../entities/ProjectCollection';
 
 import { getEnvValue } from './env';
 import { extractTokenFomRequest } from './auth';
@@ -98,6 +102,23 @@ export class Context {
   set accessToken(accessToken: ProjectAccessToken) {
     this.#project = accessToken.project;
     this.#accessToken = accessToken;
+  }
+
+  permissionsFor(action: PermissionAction[]): Permission[] {
+    const permissions = ['*', ...action.map((action) => `${action}:*`)];
+    if (this.audience == 'client') {
+      return [
+        ...permissions,
+        ...action.map((action) => `${action}:role:user`),
+        ...this.user.permissionsFor(action),
+      ] as Permission[];
+    } else if (this.audience == 'guest') {
+      return [
+        ...permissions,
+        ...action.map((action) => `${action}:role:guest`),
+      ] as Permission[];
+    }
+    return [];
   }
 }
 

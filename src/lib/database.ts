@@ -487,11 +487,15 @@ export async function createDocument({
     audience == 'admin'
       ? { members: { user: context.admin } }
       : context.project;
+  const userPermissions = context.permissionsFor(['write', 'create']);
   const collection = await em.findOneOrFail(
     ProjectCollection,
     {
       id: collectionId,
       project,
+      ...(userPermissions.length
+        ? { permissions: { $overlap: userPermissions } }
+        : undefined),
     },
     ['attributes', 'relationships']
   );
@@ -548,12 +552,19 @@ export async function updateDocument({
     audience == 'admin'
       ? { members: { user: context.admin } }
       : context.project;
+  const userPermissions = context.permissionsFor(['write', 'update']);
   const document = await em.findOneOrFail(
     Document,
     {
       id: documentId,
       collection: { project },
       removeOperationId: null,
+      $or: userPermissions.length
+        ? [
+            { collection: { permissions: { $overlap: userPermissions } } },
+            { permissions: { $overlap: userPermissions } },
+          ]
+        : [],
     },
     ['collection.attributes', 'collection.relationships']
   );
@@ -594,10 +605,17 @@ export async function deleteDocument({
     audience == 'admin'
       ? { members: { user: context.admin } }
       : context.project;
+  const permissions = context.permissionsFor(['write', 'delete']);
   const document = await em.findOneOrFail(Document, {
     id: documentId,
     collection: { project },
     removeOperationId: null,
+    $or: permissions.length
+      ? [
+          { collection: { permissions: { $overlap: permissions } } },
+          { permissions: { $overlap: permissions } },
+        ]
+      : [],
   });
 
   document.removeOperationId = uuid();
@@ -637,12 +655,19 @@ export async function getDocument({
     audience == 'admin'
       ? { members: { user: context.admin } }
       : context.project;
+  const permissions = context.permissionsFor(['read', 'get']);
   const document = await em.findOneOrFail(
     Document,
     {
       id: documentId,
       collection: { project },
       removeOperationId: null,
+      $or: permissions.length
+        ? [
+            { collection: { permissions: { $overlap: permissions } } },
+            { permissions: { $overlap: permissions } },
+          ]
+        : [],
     },
     ['collection.relationships', 'relationshipOperations.relatedDocument']
   );
@@ -658,46 +683,6 @@ export async function getDocument({
   }
 
   return document;
-}
-
-export interface ListDocumentOperationsParams {
-  context: Context;
-  documentId: string;
-  include?: string[];
-}
-
-export async function listDocumentOperations({
-  context,
-  documentId,
-  include,
-}: ListDocumentOperationsParams): Promise<DocumentOperation[]> {
-  const { em, audience } = context;
-  if (audience !== 'client') {
-    authorizeDocuments(context.scope, 'read');
-  }
-
-  const project =
-    audience == 'admin'
-      ? { members: { user: context.admin } }
-      : context.project;
-  const document = await em.findOneOrFail(Document, {
-    id: documentId,
-    collection: { project },
-    removeOperationId: null,
-  });
-  const operations = document.operations;
-
-  if (include && include.length) {
-    const included = await listIncludedDocuments(
-      context.em,
-      document.collection,
-      [document],
-      include
-    );
-    return [...operations, ...included.flatMap(({ operations }) => operations)];
-  }
-
-  return operations;
 }
 
 export interface ListDocumentsParams {
@@ -720,6 +705,7 @@ export async function listDocuments({
     audience == 'admin'
       ? { members: { user: context.admin } }
       : context.project;
+  const permissions = context.permissionsFor(['read', 'list']);
   const documents = await em.find(
     Document,
     {
@@ -728,6 +714,12 @@ export async function listDocuments({
         project,
       },
       removeOperationId: null,
+      $or: permissions.length
+        ? [
+            { collection: { permissions: { $overlap: permissions } } },
+            { permissions: { $overlap: permissions } },
+          ]
+        : [],
     },
     {
       orderBy: { timestamp: QueryOrder.ASC },
