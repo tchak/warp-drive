@@ -40,6 +40,7 @@ export type Collection = {
   createdDate: Scalars['DateTime'];
   id: Scalars['ID'];
   name: Scalars['String'];
+  permissions: Array<Scalars['String']>;
   relationships: Array<Relationship>;
   updatedDate: Scalars['DateTime'];
 };
@@ -142,6 +143,7 @@ export type Mutation = {
   renameRelationshipInverse: Relationship;
   signIn: SignInPayload;
   signUp: SignUpPayload;
+  updateCollection: Collection;
   updateKey: Key;
 };
 
@@ -153,6 +155,7 @@ export type MutationCreateAttributeArgs = {
 
 export type MutationCreateCollectionArgs = {
   name: Scalars['String'];
+  permissions?: Maybe<Array<Scalars['String']>>;
   projectId: Scalars['ID'];
 };
 
@@ -247,6 +250,12 @@ export type MutationSignInArgs = {
 export type MutationSignUpArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
+};
+
+export type MutationUpdateCollectionArgs = {
+  collectionId: Scalars['ID'];
+  name?: Maybe<Scalars['String']>;
+  permissions?: Maybe<Array<Scalars['String']>>;
 };
 
 export type MutationUpdateKeyArgs = {
@@ -369,10 +378,21 @@ export type GetProfileQuery = { getProfile: Pick<Profile, 'name' | 'email'> };
 export type CreateCollectionMutationVariables = Exact<{
   projectId: Scalars['ID'];
   name: Scalars['String'];
+  permissions?: Maybe<Array<Scalars['String']> | Scalars['String']>;
 }>;
 
 export type CreateCollectionMutation = {
-  createCollection: Pick<Collection, 'id' | 'name' | 'createdDate'>;
+  createCollection: Pick<Collection, 'id' | 'name' | 'updatedDate'>;
+};
+
+export type UpdateCollectionMutationVariables = Exact<{
+  collectionId: Scalars['ID'];
+  name?: Maybe<Scalars['String']>;
+  permissions?: Maybe<Array<Scalars['String']> | Scalars['String']>;
+}>;
+
+export type UpdateCollectionMutation = {
+  updateCollection: Pick<Collection, 'id' | 'name' | 'updatedDate'>;
 };
 
 export type DeleteCollectionMutationVariables = Exact<{
@@ -789,6 +809,23 @@ export const CreateCollectionDocument: DocumentNode<
             },
           },
         },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'permissions' },
+          },
+          type: {
+            kind: 'ListType',
+            type: {
+              kind: 'NonNullType',
+              type: {
+                kind: 'NamedType',
+                name: { kind: 'Name', value: 'String' },
+              },
+            },
+          },
+        },
       ],
       selectionSet: {
         kind: 'SelectionSet',
@@ -813,13 +850,112 @@ export const CreateCollectionDocument: DocumentNode<
                   name: { kind: 'Name', value: 'name' },
                 },
               },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'permissions' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'permissions' },
+                },
+              },
             ],
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'createdDate' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedDate' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
+export const UpdateCollectionDocument: DocumentNode<
+  UpdateCollectionMutation,
+  UpdateCollectionMutationVariables
+> = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'updateCollection' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'collectionId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'name' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'permissions' },
+          },
+          type: {
+            kind: 'ListType',
+            type: {
+              kind: 'NonNullType',
+              type: {
+                kind: 'NamedType',
+                name: { kind: 'Name', value: 'String' },
+              },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateCollection' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'collectionId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'collectionId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'name' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'name' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'permissions' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'permissions' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedDate' } },
               ],
             },
           },

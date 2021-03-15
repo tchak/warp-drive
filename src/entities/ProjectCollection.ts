@@ -5,8 +5,6 @@ import {
   ManyToOne,
   ArrayType,
   wrap,
-  Embeddable,
-  Embedded,
   OneToMany,
   Collection,
   Cascade,
@@ -23,21 +21,26 @@ import {
   RelationshipType,
 } from './CollectionRelationship';
 
-type ID = string;
-type Role = string;
+type PermissionID = string;
+type PermissionRole = string;
+export type PermissionAction =
+  | 'read'
+  | 'write'
+  | 'get'
+  | 'list'
+  | 'create'
+  | 'update'
+  | 'delete';
 
-type Permission =
+export type Permission =
   | '*'
-  | 'role:guest'
-  | 'role:user'
-  | `user:${ID}`
-  | `team:${ID}`
-  | `team:${ID}/${Role}`;
-
-export interface PermissionsOptions {
-  read?: Permission[];
-  write?: Permission[];
-}
+  | `${PermissionAction}:*`
+  | `${PermissionAction}:role:guest`
+  | `${PermissionAction}:role:user`
+  | `${PermissionAction}:user:${PermissionID}`
+  | `${PermissionAction}:team:${PermissionID}`
+  | `${PermissionAction}:team:${PermissionID}/${PermissionRole}`
+  | `${PermissionAction}:member:${PermissionID}`;
 
 export interface CollectionSchema {
   attributes: Record<string, { type: AttributeType; required: boolean }>;
@@ -51,31 +54,17 @@ export interface CollectionSchema {
   >;
 }
 
-@Embeddable()
-export class Permissions {
-  constructor(options?: PermissionsOptions) {
-    this.read = options?.read ?? [];
-    this.write = options?.write ?? [];
-  }
-
-  @Property({ type: ArrayType })
-  read: Permission[];
-
-  @Property({ type: ArrayType })
-  write: Permission[];
+export interface CollectionOptions {
+  permissions?: Permission[];
 }
 
 @Entity()
 @ObjectType('Collection')
 export class ProjectCollection {
-  constructor(
-    project: Project,
-    name: string,
-    permissions?: PermissionsOptions
-  ) {
+  constructor(project: Project, name: string, options?: CollectionOptions) {
     this.project = project;
     this.name = name;
-    //this.permissions = new Permissions(permissions);
+    this.permissions = options?.permissions ?? [];
   }
 
   @Field(() => ID)
@@ -86,8 +75,9 @@ export class ProjectCollection {
   @Property()
   name: string;
 
-  // @Embedded(() => Permissions, { prefix: false })
-  // permissions: Permissions;
+  @Field(() => [String])
+  @Property({ type: ArrayType })
+  permissions: Permission[];
 
   @ManyToOne(() => Project, { hidden: true })
   project: Project;

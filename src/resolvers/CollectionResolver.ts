@@ -10,7 +10,7 @@ import {
   Root,
 } from 'type-graphql';
 
-import { ProjectCollection } from '../entities/ProjectCollection';
+import { ProjectCollection, Permission } from '../entities/ProjectCollection';
 import {
   AttributeType,
   CollectionAttribute,
@@ -23,6 +23,7 @@ import {
 import { Context } from '../lib/context';
 import {
   createCollection,
+  updateCollection,
   deleteCollection,
   createCollectionAttribute,
   deleteCollectionAttribute,
@@ -58,10 +59,23 @@ export class CollectionResolver {
   async createCollection(
     @Ctx('context') context: Context,
     @Arg('projectId', () => ID) projectId: string,
-    @Arg('name') name: string
+    @Arg('name') name: string,
+    @Arg('permissions', () => [String], { nullable: true })
+    permissions?: Permission[]
   ): Promise<ProjectCollection> {
     context.project = await getProject({ context, projectId });
-    return createCollection({ context, name });
+    return createCollection({ context, name, permissions });
+  }
+
+  @Mutation(() => ProjectCollection)
+  async updateCollection(
+    @Ctx('context') context: Context,
+    @Arg('collectionId', () => ID) collectionId: string,
+    @Arg('name', { nullable: true }) name?: string,
+    @Arg('permissions', () => [String], { nullable: true })
+    permissions?: Permission[]
+  ): Promise<ProjectCollection> {
+    return updateCollection({ context, collectionId, name, permissions });
   }
 
   @Mutation(() => DeletedCollection)

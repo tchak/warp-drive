@@ -25,6 +25,7 @@ type Collection {
   createdDate: DateTime!
   id: ID!
   name: String!
+  permissions: [String!]!
   relationships: [Relationship!]!
   updatedDate: DateTime!
 }
@@ -112,7 +113,7 @@ type Key {
 
 type Mutation {
   createAttribute(collectionId: ID!, name: String!, type: AttributeType!): Attribute!
-  createCollection(name: String!, projectId: ID!): Collection!
+  createCollection(name: String!, permissions: [String!], projectId: ID!): Collection!
   createKey(name: String!, projectId: ID!, scope: [Scope!]!): Key!
   createManyToOneRelationship(collectionId: ID!, inverse: String, name: String!, relatedCollectionId: ID!): Relationship!
   createOneToOneRelationship(collectionId: ID!, inverse: String, name: String!, relatedCollectionId: ID!): Relationship!
@@ -132,6 +133,7 @@ type Mutation {
   renameRelationshipInverse(id: ID!, inverse: String!): Relationship!
   signIn(email: String!, password: String!): SignInPayload!
   signUp(email: String!, password: String!): SignUpPayload!
+  updateCollection(collectionId: ID!, name: String, permissions: [String!]): Collection!
   updateKey(id: ID!, name: String, scope: [Scope!]): Key!
 }
 

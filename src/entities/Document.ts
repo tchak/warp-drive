@@ -6,18 +6,14 @@ import {
   OneToMany,
   Collection,
   QueryOrder,
-  Embedded,
   Cascade,
   wrap,
+  ArrayType,
 } from '@mikro-orm/core';
 import { v4 as uuid } from 'uuid';
 
 import { getClock } from '../lib/hlc';
-import {
-  ProjectCollection,
-  Permissions,
-  PermissionsOptions,
-} from './ProjectCollection';
+import { ProjectCollection, Permission } from './ProjectCollection';
 import { RelationshipType } from './CollectionRelationship';
 import { AttributeOperation } from './AttributeOperation';
 import { RelationshipOperation } from './RelationshipOperation';
@@ -52,7 +48,7 @@ export type DocumentRelationships = Record<
 
 export interface DocumentOptions {
   id?: string;
-  permissions?: PermissionsOptions;
+  permissions?: Permission[];
   timestamp?: string;
   operationId?: string;
 }
@@ -64,14 +60,14 @@ export class Document {
     this.id = options?.id ?? uuid();
     this.operationId = options?.operationId ?? uuid();
     this.timestamp = options?.timestamp ?? getClock().inc();
-    //this.permissions = new Permissions(options?.permissions);
+    this.permissions = options?.permissions ?? [];
   }
 
   @PrimaryKey({ type: 'uuid' })
   id: string;
 
-  // @Embedded(() => Permissions, { prefix: false })
-  // permissions: Permissions;
+  @Property({ type: ArrayType })
+  permissions: Permission[];
 
   @ManyToOne(() => ProjectCollection, { hidden: true, eager: true })
   collection: ProjectCollection;
@@ -267,12 +263,17 @@ export class Document {
   removeOperationId?: string;
 
   toJSON() {
-    const { identity, attributes, relationships } = wrap(this).toObject();
+    const { identity, attributes, relationships, permissions } = wrap(
+      this
+    ).toObject();
 
     return {
       ...identity,
       attributes,
       relationships,
+      meta: {
+        permissions,
+      },
     };
   }
 

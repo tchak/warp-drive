@@ -8,6 +8,7 @@ import {
   Cascade,
   Unique,
   wrap,
+  ArrayType,
 } from '@mikro-orm/core';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { v4 as uuid } from 'uuid';
@@ -16,6 +17,7 @@ import { Project } from './Project';
 import { ProjectEvent } from './ProjectEvent';
 import { TeamMember } from './TeamMember';
 import { ProjectUserSession } from './ProjectUserSession';
+import type { Permission, PermissionAction } from './ProjectCollection';
 
 @Entity()
 @ObjectType('User')
@@ -32,6 +34,7 @@ export class ProjectUser {
     this.email = email;
     this.passwordHash = password;
     this.name = name;
+    this.permissions = [`user:${this.id}`];
   }
 
   @Field(() => ID)
@@ -85,6 +88,15 @@ export class ProjectUser {
   @Field()
   @Property({ onUpdate: () => new Date() })
   updatedDate: Date = new Date();
+
+  @Property({ type: ArrayType, hidden: true })
+  permissions: string[];
+
+  permissionsFor(action: PermissionAction): Permission[] {
+    return this.permissions.map(
+      (permission) => `${action}:${permission}`
+    ) as Permission[];
+  }
 
   toJSON() {
     const { id, ...attributes } = wrap(this).toObject();

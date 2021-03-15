@@ -8,7 +8,7 @@ import { CollectionRelationship } from './entities/CollectionRelationship';
 import { Document } from './entities/Document';
 import { Project } from './entities/Project';
 import { ProjectAccessToken } from './entities/ProjectAccessToken';
-import { ProjectCollection, Permissions } from './entities/ProjectCollection';
+import { ProjectCollection } from './entities/ProjectCollection';
 import { ProjectEvent } from './entities/ProjectEvent';
 import { ProjectMember } from './entities/ProjectMember';
 import { ProjectTeam } from './entities/ProjectTeam';
@@ -91,7 +91,6 @@ const options: Options = {
     CollectionAttribute,
     CollectionRelationship,
     Document,
-    Permissions,
     Project,
     ProjectAccessToken,
     ProjectCollection,

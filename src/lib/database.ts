@@ -8,7 +8,7 @@ import { ValidationError } from './errors';
 
 import {
   ProjectCollection,
-  PermissionsOptions,
+  Permission,
   CollectionSchema,
 } from '../entities/ProjectCollection';
 import {
@@ -39,7 +39,7 @@ import { RelationshipOperation } from '../entities/RelationshipOperation';
 export interface CreateCollectionParams {
   context: Context;
   name: string;
-  permissions?: PermissionsOptions;
+  permissions?: Permission[];
 }
 
 export async function createCollection({
@@ -49,7 +49,7 @@ export async function createCollection({
 }: CreateCollectionParams): Promise<ProjectCollection> {
   authorizeCollections(scope, 'write');
 
-  const collection = new ProjectCollection(project, name, permissions);
+  const collection = new ProjectCollection(project, name, { permissions });
   const event = logCollectionCreate(collection);
   await em.persistAndFlush([collection, event]);
   return collection;
@@ -59,7 +59,7 @@ export interface UpdateCollectionParams {
   context: Context;
   collectionId: string;
   name?: string;
-  permissions?: PermissionsOptions;
+  permissions?: Permission[];
 }
 
 export async function updateCollection({
@@ -67,7 +67,7 @@ export async function updateCollection({
   collectionId,
   name,
   permissions,
-}: UpdateCollectionParams): Promise<void> {
+}: UpdateCollectionParams): Promise<ProjectCollection> {
   const { em, scope, audience } = context;
   authorizeCollections(scope, 'write');
 
@@ -84,6 +84,7 @@ export async function updateCollection({
   });
   const event = logCollectionUpdate(collection);
   await em.persistAndFlush(event);
+  return collection;
 }
 
 export interface CreateCollectionAttributeParams {
@@ -467,7 +468,7 @@ export interface CreateDocumentParams {
   collectionId: string;
   attributes?: DocumentAttributes;
   relationships?: DocumentRelationships;
-  permissions?: PermissionsOptions;
+  permissions?: Permission[];
 }
 
 export async function createDocument({
@@ -528,6 +529,7 @@ export interface UpdateDocumentParams {
   documentId: string;
   attributes?: DocumentAttributes;
   relationships?: DocumentRelationships;
+  permissions?: Permission[];
 }
 
 export async function updateDocument({
@@ -535,6 +537,7 @@ export async function updateDocument({
   documentId,
   attributes,
   relationships,
+  permissions,
 }: UpdateDocumentParams): Promise<void> {
   const { em, audience } = context;
   if (audience !== 'client') {
@@ -554,6 +557,10 @@ export async function updateDocument({
     },
     ['collection.attributes', 'collection.relationships']
   );
+
+  if (permissions) {
+    document.permissions = [...new Set(permissions.sort())];
+  }
 
   const attributeOperations = buildAttributeOperations(document, attributes);
   const relationshipOperations = await buildRelationshipOperations(

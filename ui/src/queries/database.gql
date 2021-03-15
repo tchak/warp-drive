@@ -1,8 +1,32 @@
-mutation createCollection($projectId: ID!, $name: String!) {
-  createCollection(projectId: $projectId, name: $name) {
+mutation createCollection(
+  $projectId: ID!
+  $name: String!
+  $permissions: [String!]
+) {
+  createCollection(
+    projectId: $projectId
+    name: $name
+    permissions: $permissions
+  ) {
     id
     name
-    createdDate
+    updatedDate
+  }
+}
+
+mutation updateCollection(
+  $collectionId: ID!
+  $name: String
+  $permissions: [String!]
+) {
+  updateCollection(
+    collectionId: $collectionId
+    name: $name
+    permissions: $permissions
+  ) {
+    id
+    name
+    updatedDate
   }
 }
 

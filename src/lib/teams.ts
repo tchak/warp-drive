@@ -1,6 +1,7 @@
 import type { Context } from './context';
 import { ProjectTeam } from '../entities/ProjectTeam';
-import { TeamMember } from '../entities/TeamMember';
+import { TeamMember, RoleOwner } from '../entities/TeamMember';
+import { logTeamsCreate, logTeamsDelete } from '../entities/ProjectEvent';
 
 import { authorizeTeams } from './authorize';
 
@@ -100,8 +101,9 @@ async function createTeamClient({
   name,
 }: CreateTeamParams): Promise<ProjectTeam> {
   const team = new ProjectTeam(project, name);
-  const member = new TeamMember(team, user);
-  em.persistAndFlush([team, member]);
+  const member = new TeamMember(team, user, [RoleOwner]);
+  const event = logTeamsCreate(team, user);
+  em.persistAndFlush([team, member, event]);
   return team;
 }
 
@@ -112,7 +114,8 @@ async function createTeamServer({
   authorizeTeams(scope, 'write');
 
   const team = new ProjectTeam(project, name);
-  em.persistAndFlush(team);
+  const event = logTeamsCreate(team);
+  em.persistAndFlush([team, event]);
   return team;
 }
 
@@ -141,7 +144,7 @@ async function updateTeamClient({
   const team = await em.findOneOrFail(ProjectTeam, {
     id: teamId,
     project,
-    members: { user },
+    members: { user, roles: [RoleOwner] },
   });
   team.name = name;
   await em.flush();
@@ -181,12 +184,18 @@ async function deleteTeamClient({
   context: { em, project, user },
   teamId,
 }: DeleteTeamParams): Promise<void> {
-  const team = await em.findOneOrFail(ProjectTeam, {
-    id: teamId,
-    project,
-    members: { user },
-  });
-  await em.removeAndFlush(team);
+  const team = await em.findOneOrFail(
+    ProjectTeam,
+    {
+      id: teamId,
+      project,
+      members: { user, roles: [RoleOwner] },
+    },
+    ['members']
+  );
+  em.remove(team);
+  const event = logTeamsDelete(team, user);
+  await em.persistAndFlush(event);
 }
 
 async function deleteTeamServer({
@@ -195,9 +204,15 @@ async function deleteTeamServer({
 }: DeleteTeamParams): Promise<void> {
   authorizeTeams(scope, 'write');
 
-  const team = await em.findOneOrFail(ProjectTeam, {
-    id: teamId,
-    project,
-  });
-  await em.removeAndFlush(team);
+  const team = await em.findOneOrFail(
+    ProjectTeam,
+    {
+      id: teamId,
+      project,
+    },
+    ['members']
+  );
+  em.remove(team);
+  const event = logTeamsDelete(team);
+  await em.persistAndFlush(event);
 }
