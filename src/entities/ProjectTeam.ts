@@ -6,7 +6,6 @@ import {
   ManyToOne,
   Collection,
   Cascade,
-  ArrayType,
   wrap,
 } from '@mikro-orm/core';
 import { ObjectType, Field, ID } from 'type-graphql';
@@ -18,11 +17,9 @@ import { TeamMember } from './TeamMember';
 @Entity()
 @ObjectType('Team')
 export class ProjectTeam {
-  constructor(project: Project, name: string, roles: string[] = []) {
+  constructor(project: Project, name: string) {
     this.project = project;
-
     this.name = name;
-    this.roles = [...new Set([...roles, 'owner'])];
   }
 
   @Field(() => ID)
@@ -32,9 +29,6 @@ export class ProjectTeam {
   @Field()
   @Property()
   name: string;
-
-  @Property({ type: ArrayType })
-  roles: string[];
 
   @ManyToOne(() => Project, { hidden: true })
   project: Project;
