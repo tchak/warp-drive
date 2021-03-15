@@ -1,4 +1,5 @@
 import { useQuery } from 'urql';
+import { useParams } from 'react-router';
 
 import {
   GetKeyTokenDocument,
@@ -44,8 +45,20 @@ export function useListUsers(id: string) {
   return useQuery({ query: ListUsersDocument, variables: { projectId: id } });
 }
 
+export function useListProjectUsers() {
+  const { id } = useParams();
+  const [{ data, error, fetching }] = useListUsers(id);
+  return { users: data?.getProject.users ?? [], error, fetching };
+}
+
 export function useListTeams(id: string) {
   return useQuery({ query: ListTeamsDocument, variables: { projectId: id } });
+}
+
+export function useListProjectTeams() {
+  const { id } = useParams();
+  const [{ data, error, fetching }] = useListTeams(id);
+  return { users: data?.getProject.teams ?? [], error, fetching };
 }
 
 export function useListCollections(id: string) {

@@ -19,6 +19,8 @@ import {
   UpdateKeyDocument,
   CreateKeyMutationVariables,
   UpdateKeyMutationVariables,
+  UpdateCollectionMutationVariables,
+  UpdateCollectionDocument,
 } from './graphql';
 
 type CreateRelationshipMutationVariables = (
@@ -26,10 +28,15 @@ type CreateRelationshipMutationVariables = (
   | CreateOneToOneRelationshipMutationVariables
 ) & { type: 'ManyToOne' | 'OneToOne' };
 
-type KeyMutationVariables = (
+export type KeyMutationVariables = (
   | CreateKeyMutationVariables
   | UpdateKeyMutationVariables
 ) & { scope: Scope[] };
+
+export type CollectionMutationVariables = (
+  | CreateCollectionMutationVariables
+  | UpdateCollectionMutationVariables
+) & { permissions: string[] };
 
 export type AttributeForm = ReturnType<typeof useAttributeForm>['form'];
 export type RelationshipForm = ReturnType<typeof useRelationshipForm>['form'];
@@ -159,19 +166,22 @@ export function useRelationshipForm(
   };
 }
 
-export function useCollectionForm(projectId: string, options?: UseFormOptions) {
-  const [{ fetching }, createCollection] = useMutation(
+export function useCollectionForm(
+  input: CollectionMutationVariables,
+  options?: UseFormOptions
+) {
+  const [{ fetching: creating }, createCollection] = useMutation(
     CreateCollectionDocument
   );
-  const form = useFormik<CreateCollectionMutationVariables>({
-    initialValues: {
-      projectId,
-      name: '',
-    },
+  const [{ fetching: updating }, updateCollection] = useMutation(
+    UpdateCollectionDocument
+  );
+  const form = useFormik<CollectionMutationVariables>({
+    initialValues: input,
     validateOnBlur: false,
     validateOnChange: false,
     validate({ name }) {
-      const errors: FormikErrors<CreateCollectionMutationVariables> = {};
+      const errors: FormikErrors<CollectionMutationVariables> = {};
 
       if (isEmpty(name)) {
         errors.name = 'Name is required.';
@@ -185,7 +195,9 @@ export function useCollectionForm(projectId: string, options?: UseFormOptions) {
       return errors;
     },
     async onSubmit(values) {
-      const { data, error } = await createCollection(values);
+      const { data, error } = await ('id' in values
+        ? updateCollection(values)
+        : createCollection(values));
 
       if (data) {
         options?.success && options.success();
@@ -197,7 +209,7 @@ export function useCollectionForm(projectId: string, options?: UseFormOptions) {
 
   return {
     form,
-    fetching,
+    fetching: creating || updating,
   };
 }
 

@@ -1,16 +1,29 @@
-import React, { KeyboardEvent } from 'react';
+import React, { KeyboardEvent, useState } from 'react';
 import {
   HiOutlinePlusCircle,
   HiOutlineTrash,
   HiOutlineX,
 } from 'react-icons/hi';
 import { useHotkeys } from 'react-hotkeys-hook';
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxList,
+  ComboboxPopover,
+  ComboboxOption,
+} from '@reach/combobox';
+import { matchSorter } from 'match-sorter';
 
-import { AttributeType } from '../graphql';
+import { AttributeType, CreateCollectionMutationVariables } from '../graphql';
 import { SlideOverPanel } from './SlideOverPanel';
 import { Collection } from './CollectionList';
-import { AttributeTypeBadge, RelationshipTypeBadge } from './badges';
-
+import { User } from './UserList';
+import {
+  AttributeTypeBadge,
+  RelationshipTypeBadge,
+  PermissionBadge,
+} from './badges';
+import { useListProjectUsers } from '../hooks';
 import {
   useAttributeForm,
   useRelationshipForm,
@@ -26,7 +39,7 @@ export function CollectionPanel({
   close,
   afterClose,
 }: {
-  initialValues: Collection | { projectId: string; name: string };
+  initialValues: Collection | CreateCollectionMutationVariables;
   collections: Collection[];
   show: boolean;
   close: () => void;
@@ -56,6 +69,8 @@ function EditCollectionForm({
   collections: Collection[];
   close: () => void;
 }) {
+  const { users } = useListProjectUsers();
+  const collection = useCollectionForm(initialValues);
   const attribute = useAttributeForm(initialValues.id, {
     success() {
       attribute.form.resetForm();
@@ -70,7 +85,8 @@ function EditCollectionForm({
       },
     }
   );
-  const fetching = attribute.fetching || relationship.fetching;
+  const fetching =
+    attribute.fetching || relationship.fetching || collection.fetching;
 
   useHotkeys('esc', close, { enabled: !fetching });
 
@@ -101,11 +117,15 @@ function EditCollectionForm({
         </div>
         <div className="flex-1 flex flex-col justify-between">
           <div className="px-4 sm:px-6">
-            <div className="space-y-6 pt-6 pb-5">
+            <div className="space-y-6 pt-6">
+              <AddAttributeForm
+                form={attribute.form}
+                fetching={fetching}
+                close={close}
+              />
+            </div>
+            <div className="pt-2 pb-4">
               <div>
-                <span className="block text-sm font-medium text-gray-700 mb-1">
-                  Attributes
-                </span>
                 <AttributeList
                   attributes={initialValues.attributes}
                   fetching={fetching}
@@ -113,29 +133,10 @@ function EditCollectionForm({
                 />
               </div>
             </div>
-            <div className="pt-2 pb-6">
-              <AddAttributeForm
-                form={attribute.form}
-                fetching={fetching}
-                close={close}
-              />
-            </div>
           </div>
           {collections.length ? (
             <div className="px-4 sm:px-6">
-              <div className="space-y-6 pt-6 pb-5">
-                <div>
-                  <span className="block text-sm font-medium text-gray-700 mb-1">
-                    Relationships
-                  </span>
-                  <RelationshipList
-                    relationships={initialValues.relationships}
-                    fetching={fetching}
-                    remove={(id) => relationship.delete({ id })}
-                  />
-                </div>
-              </div>
-              <div className="pt-2 pb-6">
+              <div className="pt-4">
                 <AddRelationshipForm
                   collections={collections}
                   form={relationship.form}
@@ -143,8 +144,71 @@ function EditCollectionForm({
                   close={close}
                 />
               </div>
+              <div className="pt-2 pb-4">
+                <div>
+                  <RelationshipList
+                    relationships={initialValues.relationships}
+                    fetching={fetching}
+                    remove={(id) => relationship.delete({ id })}
+                  />
+                </div>
+              </div>
             </div>
           ) : null}
+          <form onSubmit={collection.form.handleSubmit}>
+            <div className="px-4 sm:px-6">
+              <div className="pt-4">
+                <label
+                  htmlFor="collection-permissions"
+                  className="block text-sm font-medium text-gray-900 mb-1"
+                >
+                  Permissions
+                </label>
+                <CollectionPermissionCombobox
+                  value={collection.form.values.permissions}
+                  users={users}
+                  onChange={(permissions) => {
+                    collection.form.setFieldValue('permissions', permissions);
+                  }}
+                />
+                <div className="mt-2">
+                  {collection.form.values.permissions
+                    .sort()
+                    .map((permission) => (
+                      <PermissionBadge
+                        key={permission}
+                        permission={permission}
+                        remove={() => {
+                          collection.form.setFieldValue(
+                            'permissions',
+                            collection.form.values.permissions.filter(
+                              (setPermission) => setPermission != permission
+                            )
+                          );
+                        }}
+                      />
+                    ))}
+                </div>
+              </div>
+            </div>
+            <div className="flex-shrink-0 px-4 py-4 flex justify-end">
+              <button
+                type="button"
+                className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                onClick={close}
+                disabled={fetching}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                disabled={fetching}
+              >
+                Save
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -166,7 +230,7 @@ function AddAttributeForm({
         htmlFor="attribute-name"
         className="block text-sm font-medium text-gray-700 mb-1"
       >
-        Add attribute
+        Attributes
       </label>
       <span className="relative z-0 inline-flex shadow-sm rounded-md w-full">
         <select
@@ -271,7 +335,7 @@ function AddRelationshipForm({
         htmlFor="relationship-name"
         className="block text-sm font-medium text-gray-700 mb-1"
       >
-        Add relationship
+        Relationships
       </label>
       <span className="relative inline-flex w-full">
         <select
@@ -392,11 +456,14 @@ function AddCollectionForm({
   initialValues: { projectId: string; name: string };
   close: () => void;
 }) {
-  const { form, fetching } = useCollectionForm(initialValues.projectId, {
-    success() {
-      close();
-    },
-  });
+  const { form, fetching } = useCollectionForm(
+    { ...initialValues, name: '', permissions: [] },
+    {
+      success() {
+        close();
+      },
+    }
+  );
   useHotkeys('esc', close, { enabled: !fetching });
 
   return (
@@ -452,7 +519,7 @@ function AddCollectionForm({
                     autoCapitalize="off"
                     autoCorrect="off"
                     autoFocus={true}
-                    value={form.values.name}
+                    value={form.values.name ?? ''}
                     onChange={form.handleChange}
                     onBlur={form.handleBlur}
                     onKeyUp={closeOnKeyUp(close)}
@@ -496,4 +563,85 @@ function closeOnKeyUp(close: () => void) {
       close();
     }
   };
+}
+
+const permissionActions = [
+  'read',
+  'write',
+  'get',
+  'list',
+  'create',
+  'update',
+  'delete',
+];
+
+const allPermissions = [
+  '*',
+  ...permissionActions.map((action) => `${action}:*`),
+  ...permissionActions.map((action) => `${action}:role:guest`),
+  ...permissionActions.map((action) => `${action}:role:user`),
+];
+// `${PermissionAction}:team:${PermissionID}`
+// `${PermissionAction}:team:${PermissionID}/${PermissionRole}`
+// `${PermissionAction}:member:${PermissionID}`
+
+function usePermissions(
+  permissions: string[],
+  term: string,
+  users: User[]
+): string[] {
+  return term
+    ? matchSorter(
+        [
+          ...allPermissions,
+          ...users.flatMap(({ id }) =>
+            permissionActions.map((action) => `${action}:user:${id}`)
+          ),
+        ],
+        term
+      ).filter((permission) => !permissions.includes(permission))
+    : [];
+}
+
+function CollectionPermissionCombobox({
+  value,
+  onChange,
+  users,
+}: {
+  value: string[];
+  onChange: (value: string[]) => void;
+  users: User[];
+}) {
+  const [term, setTerm] = useState('');
+  const permissions = usePermissions(value, term, users);
+  return (
+    <Combobox
+      className="flex"
+      aria-labelledby="collection-permissions"
+      onSelect={(permission) => {
+        onChange([...new Set([...value, permission])]);
+        setTerm('');
+      }}
+    >
+      <ComboboxInput
+        type="text"
+        className="shadow-sm focus:ring-green-500 focus:border-green-500 flex-grow sm:text-sm border-gray-300 rounded-md"
+        value={term}
+        onChange={({ currentTarget: { value } }) => setTerm(value)}
+      />
+      {permissions.length ? (
+        <ComboboxPopover className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-30">
+          <ComboboxList persistSelection className="py-1">
+            {permissions.map((permission) => (
+              <ComboboxOption
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                key={permission}
+                value={permission}
+              />
+            ))}
+          </ComboboxList>
+        </ComboboxPopover>
+      ) : null}
+    </Combobox>
+  );
 }

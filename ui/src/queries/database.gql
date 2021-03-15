@@ -11,22 +11,16 @@ mutation createCollection(
     id
     name
     updatedDate
+    permissions
   }
 }
 
-mutation updateCollection(
-  $collectionId: ID!
-  $name: String
-  $permissions: [String!]
-) {
-  updateCollection(
-    collectionId: $collectionId
-    name: $name
-    permissions: $permissions
-  ) {
+mutation updateCollection($id: ID!, $name: String, $permissions: [String!]) {
+  updateCollection(collectionId: $id, name: $name, permissions: $permissions) {
     id
     name
     updatedDate
+    permissions
   }
 }
 

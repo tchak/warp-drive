@@ -382,17 +382,23 @@ export type CreateCollectionMutationVariables = Exact<{
 }>;
 
 export type CreateCollectionMutation = {
-  createCollection: Pick<Collection, 'id' | 'name' | 'updatedDate'>;
+  createCollection: Pick<
+    Collection,
+    'id' | 'name' | 'updatedDate' | 'permissions'
+  >;
 };
 
 export type UpdateCollectionMutationVariables = Exact<{
-  collectionId: Scalars['ID'];
+  id: Scalars['ID'];
   name?: Maybe<Scalars['String']>;
   permissions?: Maybe<Array<Scalars['String']> | Scalars['String']>;
 }>;
 
 export type UpdateCollectionMutation = {
-  updateCollection: Pick<Collection, 'id' | 'name' | 'updatedDate'>;
+  updateCollection: Pick<
+    Collection,
+    'id' | 'name' | 'updatedDate' | 'permissions'
+  >;
 };
 
 export type DeleteCollectionMutationVariables = Exact<{
@@ -530,7 +536,7 @@ export type ListCollectionsQueryVariables = Exact<{
 export type ListCollectionsQuery = {
   getProject: Pick<Project, 'id'> & {
     collections: Array<
-      Pick<Collection, 'id' | 'name' | 'updatedDate'> & {
+      Pick<Collection, 'id' | 'name' | 'updatedDate' | 'permissions'> & {
         attributes: Array<Pick<Attribute, 'id' | 'name' | 'type'>>;
         relationships: Array<
           Pick<Relationship, 'id' | 'name' | 'type' | 'owner' | 'inverse'> & {
@@ -865,6 +871,7 @@ export const CreateCollectionDocument: DocumentNode<
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'updatedDate' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'permissions' } },
               ],
             },
           },
@@ -886,10 +893,7 @@ export const UpdateCollectionDocument: DocumentNode<
       variableDefinitions: [
         {
           kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'collectionId' },
-          },
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
           type: {
             kind: 'NonNullType',
             type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
@@ -930,7 +934,7 @@ export const UpdateCollectionDocument: DocumentNode<
                 name: { kind: 'Name', value: 'collectionId' },
                 value: {
                   kind: 'Variable',
-                  name: { kind: 'Name', value: 'collectionId' },
+                  name: { kind: 'Name', value: 'id' },
                 },
               },
               {
@@ -956,6 +960,7 @@ export const UpdateCollectionDocument: DocumentNode<
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'updatedDate' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'permissions' } },
               ],
             },
           },
@@ -2056,6 +2061,10 @@ export const ListCollectionsDocument: DocumentNode<
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'updatedDate' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'permissions' },
                       },
                     ],
                   },

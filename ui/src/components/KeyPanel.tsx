@@ -12,7 +12,7 @@ import { matchSorter } from 'match-sorter';
 
 import { Scope } from '../graphql';
 import { SlideOverPanel } from './SlideOverPanel';
-import { useKeyForm } from '../forms';
+import { useKeyForm, KeyMutationVariables } from '../forms';
 import { KeyScopeBadge } from './badges';
 
 export function KeyPanel({
@@ -21,9 +21,7 @@ export function KeyPanel({
   close,
   afterClose,
 }: {
-  initialValues:
-    | { id: string; name: string; scope: Scope[] }
-    | { projectId: string; name: string; scope: Scope[] };
+  initialValues: KeyMutationVariables;
   show: boolean;
   close: () => void;
   afterClose?: () => void;
@@ -39,9 +37,7 @@ function KeyPanelForm({
   initialValues,
   close,
 }: {
-  initialValues:
-    | { id: string; name: string; scope: Scope[] }
-    | { projectId: string; name: string; scope: Scope[] };
+  initialValues: KeyMutationVariables;
   close: () => void;
 }) {
   const { form, fetching } = useKeyForm(initialValues, {
@@ -121,7 +117,7 @@ function KeyPanelForm({
                   Scope
                 </label>
                 <div className="mt-1">
-                  <KeyScopeSelector
+                  <KeyScopeCombobox
                     value={form.values.scope}
                     onChange={(scope) => {
                       form.setFieldValue('scope', scope);
@@ -175,7 +171,7 @@ function getScopes(scopes: Scope[], term?: string) {
   return term ? matchSorter(results, term) : results;
 }
 
-function KeyScopeSelector({
+function KeyScopeCombobox({
   value,
   onChange,
 }: {

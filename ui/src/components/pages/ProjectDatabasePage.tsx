@@ -28,7 +28,7 @@ export default function ProjectDatabasePage() {
   const editorInitialValues = selectedCollection
     ? collections.find(({ id }) => id == selectedCollection.id)
     : project
-    ? { projectId: project.id, name: '' }
+    ? { projectId: project.id, name: '', permissions: [] }
     : null;
   const collectionsToRelate = selectedCollection
     ? collections.filter(({ id }) => id !== selectedCollection.id)

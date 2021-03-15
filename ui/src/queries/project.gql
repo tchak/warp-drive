@@ -60,6 +60,7 @@ query listCollections($projectId: ID!) {
         inverse
       }
       updatedDate
+      permissions
     }
   }
 }

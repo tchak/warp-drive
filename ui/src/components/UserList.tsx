@@ -7,7 +7,7 @@ import { FormattedDate } from 'react-intl';
 import { ListUsersQuery } from '../graphql';
 import { ListPagination, TablePagination } from './Pagination';
 
-type User = ListUsersQuery['getProject']['users'][0];
+export type User = ListUsersQuery['getProject']['users'][0];
 
 function getCellProps(cell: Cell<User>) {
   switch (cell.column.id) {

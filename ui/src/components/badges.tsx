@@ -192,6 +192,29 @@ export function KeyScopeBadge({
   );
 }
 
+export function PermissionBadge({
+  permission,
+  remove,
+}: {
+  permission: string;
+  remove?: () => void;
+}) {
+  return (
+    <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-gray-100 text-gray-800 mr-1 mb-1">
+      {permission}
+      {remove ? (
+        <button
+          type="button"
+          onClick={remove}
+          className="ml-2 hover:text-red-600"
+        >
+          <HiOutlineXCircle />
+        </button>
+      ) : null}
+    </span>
+  );
+}
+
 export function EventTypeBadge({ type }: { type: EventType }) {
   const name = useEventTypeName(type);
   return <span>{name}</span>;
