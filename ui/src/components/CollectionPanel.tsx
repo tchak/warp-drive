@@ -362,7 +362,7 @@ function AddRelationshipForm({
           onKeyUp={closeOnKeyUp(close)}
         />
       </span>
-      <span className="relative inline-flex  w-full">
+      <span className="relative inline-flex w-full">
         <select
           name="relatedCollectionId"
           className="-mr-px w-44 px-2 py-2 rounded-bl-md border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
