@@ -2332,6 +2332,14 @@
     "@urql/core" ">=2.0.0"
     wonka "^4.0.14"
 
+"@urql/exchange-persisted-fetch@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@urql/exchange-persisted-fetch/-/exchange-persisted-fetch-1.3.0.tgz#d9e43b151487eaa87e022b2d897c8edf6cfd4fa9"
+  integrity sha512-pP73iVeh8qKGm94oTf+cRLdxrB7fKeQpru76ANKi4EVw9PxvfWUb9zAWnfBXXham2MlWrGxIoBO6h8C+IZ3Qxw==
+  dependencies:
+    "@urql/core" ">=2.0.0"
+    wonka "^4.0.14"
+
 "@urql/exchange-refocus@^0.2.1":
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/@urql/exchange-refocus/-/exchange-refocus-0.2.1.tgz#0701fbe71c4009d9bcd3ae6ec7ee9ca86b70bd5d"
