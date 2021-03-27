@@ -10,15 +10,22 @@ mutation createUser(
     password: $password
     name: $name
   ) {
-    id
-    name
-    email
-    createdDate
+    code
+    success
+    message
+    user {
+      id
+      name
+      email
+      createdDate
+    }
   }
 }
 
 mutation deleteUser($id: ID!) {
   deleteUser(id: $id) {
-    id
+    code
+    success
+    message
   }
 }

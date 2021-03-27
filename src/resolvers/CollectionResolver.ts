@@ -10,6 +10,7 @@ import {
   Root,
 } from 'type-graphql';
 
+import { Project } from '../entities/Project';
 import { ProjectCollection, Permission } from '../entities/ProjectCollection';
 import {
   AttributeType,
@@ -34,152 +35,336 @@ import {
   renameCollectionRelationshipInverse,
 } from '../lib/database';
 import { getProject } from '../lib/projects';
+import { MutationResponse, DeleteMutationResponse } from './MutationResponse';
 
-@ObjectType()
-class DeletedCollection {
-  @Field(() => ID)
-  id!: string;
+@ObjectType({ implements: MutationResponse })
+class CollectionMutationResponse extends MutationResponse {
+  @Field({ nullable: true })
+  collection?: ProjectCollection;
+
+  @Field(() => Project, { nullable: true })
+  project?: Project;
 }
 
-@ObjectType()
-class DeletedAttribute {
-  @Field(() => ID)
-  id!: string;
+@ObjectType({ implements: MutationResponse })
+class AttributeMutationResponse extends MutationResponse {
+  @Field({ nullable: true })
+  attribute?: CollectionAttribute;
+
+  @Field(() => Project, { nullable: true })
+  project?: Project;
 }
 
-@ObjectType()
-class DeletedRelationship {
-  @Field(() => ID)
-  id!: string;
+@ObjectType({ implements: MutationResponse })
+class RelationshipMutationResponse extends MutationResponse {
+  @Field({ nullable: true })
+  relationship?: CollectionRelationship;
+
+  @Field(() => Project, { nullable: true })
+  project?: Project;
 }
 
 @Resolver(ProjectCollection)
 export class CollectionResolver {
-  @Mutation(() => ProjectCollection)
+  @Mutation(() => CollectionMutationResponse)
   async createCollection(
     @Ctx('context') context: Context,
     @Arg('projectId', () => ID) projectId: string,
     @Arg('name') name: string,
     @Arg('permissions', () => [String], { nullable: true })
     permissions?: Permission[]
-  ): Promise<ProjectCollection> {
-    context.project = await getProject({ context, projectId });
-    return createCollection({ context, name, permissions });
+  ): Promise<CollectionMutationResponse> {
+    try {
+      context.project = await getProject({ context, projectId });
+      const collection = await createCollection({ context, name, permissions });
+      return {
+        code: '201',
+        success: true,
+        message: 'Collection was successfully created',
+        collection,
+        project: collection.project,
+      };
+    } catch (error) {
+      return {
+        code: '400',
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
-  @Mutation(() => ProjectCollection)
+  @Mutation(() => CollectionMutationResponse)
   async updateCollection(
     @Ctx('context') context: Context,
     @Arg('collectionId', () => ID) collectionId: string,
     @Arg('name', { nullable: true }) name?: string,
     @Arg('permissions', () => [String], { nullable: true })
     permissions?: Permission[]
-  ): Promise<ProjectCollection> {
-    return updateCollection({ context, collectionId, name, permissions });
+  ): Promise<CollectionMutationResponse> {
+    try {
+      const collection = await updateCollection({
+        context,
+        collectionId,
+        name,
+        permissions,
+      });
+      return {
+        code: '200',
+        success: true,
+        message: 'Collection was successfully updated',
+        collection,
+        project: collection.project,
+      };
+    } catch (error) {
+      return {
+        code: '400',
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
-  @Mutation(() => DeletedCollection)
+  @Mutation(() => DeleteMutationResponse)
   async deleteCollection(
     @Ctx('context') context: Context,
     @Arg('id', () => ID) collectionId: string
-  ): Promise<DeletedCollection> {
-    await deleteCollection({ context, collectionId });
-    return { id: collectionId };
+  ): Promise<DeleteMutationResponse> {
+    try {
+      await deleteCollection({ context, collectionId });
+      return {
+        code: '200',
+        success: true,
+        message: 'Collection was successfully deleted',
+      };
+    } catch (error) {
+      return {
+        code: '400',
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
-  @Mutation(() => CollectionAttribute)
+  @Mutation(() => AttributeMutationResponse)
   async createAttribute(
     @Ctx('context') context: Context,
     @Arg('collectionId', () => ID) collectionId: string,
     @Arg('name') name: string,
     @Arg('type', () => AttributeType) type: AttributeType
-  ): Promise<CollectionAttribute> {
-    return createCollectionAttribute({ context, collectionId, name, type });
+  ): Promise<AttributeMutationResponse> {
+    try {
+      const attribute = await createCollectionAttribute({
+        context,
+        collectionId,
+        name,
+        type,
+      });
+      return {
+        code: '201',
+        success: true,
+        message: 'Attribute was successfully created',
+        attribute,
+        project: attribute.collection.project,
+      };
+    } catch (error) {
+      return {
+        code: '400',
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
-  @Mutation(() => CollectionAttribute)
+  @Mutation(() => AttributeMutationResponse)
   async renameAttribute(
     @Ctx('context') context: Context,
     @Arg('id', () => ID) attributeId: string,
     @Arg('name') name: string
-  ): Promise<CollectionAttribute> {
-    return renameCollectionAttribute({ context, attributeId, name });
+  ): Promise<AttributeMutationResponse> {
+    try {
+      const attribute = await renameCollectionAttribute({
+        context,
+        attributeId,
+        name,
+      });
+      return {
+        code: '200',
+        success: true,
+        message: 'Attribute was successfully renamed',
+        attribute,
+        project: attribute.collection.project,
+      };
+    } catch (error) {
+      return {
+        code: '400',
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
-  @Mutation(() => DeletedAttribute)
+  @Mutation(() => DeleteMutationResponse)
   async deleteAttribute(
     @Ctx('context') context: Context,
     @Arg('id', () => ID) attributeId: string
-  ): Promise<DeletedAttribute> {
-    await deleteCollectionAttribute({ context, attributeId });
-    return { id: attributeId };
+  ): Promise<DeleteMutationResponse> {
+    try {
+      await deleteCollectionAttribute({ context, attributeId });
+      return {
+        code: '200',
+        success: true,
+        message: 'Attribute was successfully deleted',
+      };
+    } catch (error) {
+      return {
+        code: '400',
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
-  @Mutation(() => CollectionRelationship)
+  @Mutation(() => RelationshipMutationResponse)
   async createManyToOneRelationship(
     @Ctx('context') context: Context,
     @Arg('collectionId', () => ID) collectionId: string,
     @Arg('name') name: string,
     @Arg('relatedCollectionId', () => ID) relatedCollectionId: string,
     @Arg('inverse', { nullable: true }) inverse?: string
-  ): Promise<CollectionRelationship> {
-    return createCollectionRelationship({
-      context,
-      collectionId,
-      name,
-      relationship: [RelationshipType.hasOne, RelationshipType.hasMany],
-      relatedCollectionId,
-      inverse,
-    });
+  ): Promise<RelationshipMutationResponse> {
+    try {
+      const relationship = await createCollectionRelationship({
+        context,
+        collectionId,
+        name,
+        relationship: [RelationshipType.hasOne, RelationshipType.hasMany],
+        relatedCollectionId,
+        inverse,
+      });
+      return {
+        code: '201',
+        success: true,
+        message: 'Many to One Relationship was successfully created',
+        relationship,
+        project: relationship.collection.project,
+      };
+    } catch (error) {
+      return {
+        code: '400',
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
-  @Mutation(() => CollectionRelationship)
+  @Mutation(() => RelationshipMutationResponse)
   async createOneToOneRelationship(
     @Ctx('context') context: Context,
     @Arg('collectionId', () => ID) collectionId: string,
     @Arg('name') name: string,
     @Arg('relatedCollectionId', () => ID) relatedCollectionId: string,
     @Arg('inverse', { nullable: true }) inverse?: string
-  ): Promise<CollectionRelationship> {
-    return createCollectionRelationship({
-      context,
-      collectionId,
-      name,
-      relationship: [RelationshipType.hasOne, RelationshipType.hasOne],
-      relatedCollectionId,
-      inverse,
-    });
+  ): Promise<RelationshipMutationResponse> {
+    try {
+      const relationship = await createCollectionRelationship({
+        context,
+        collectionId,
+        name,
+        relationship: [RelationshipType.hasOne, RelationshipType.hasOne],
+        relatedCollectionId,
+        inverse,
+      });
+      return {
+        code: '201',
+        success: true,
+        message: 'One to One Relationship was successfully created',
+        relationship,
+        project: relationship.collection.project,
+      };
+    } catch (error) {
+      return {
+        code: '400',
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
-  @Mutation(() => CollectionRelationship)
+  @Mutation(() => RelationshipMutationResponse)
   async renameRelationship(
     @Ctx('context') context: Context,
     @Arg('id', () => ID) relationshipId: string,
     @Arg('name') name: string
-  ): Promise<CollectionRelationship> {
-    return renameCollectionRelationship({ context, relationshipId, name });
+  ): Promise<RelationshipMutationResponse> {
+    try {
+      const relationship = await renameCollectionRelationship({
+        context,
+        relationshipId,
+        name,
+      });
+      return {
+        code: '200',
+        success: true,
+        message: 'Relationship was successfully renamed',
+        relationship,
+        project: relationship.collection.project,
+      };
+    } catch (error) {
+      return {
+        code: '400',
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
-  @Mutation(() => CollectionRelationship)
+  @Mutation(() => RelationshipMutationResponse)
   async renameRelationshipInverse(
     @Ctx('context') context: Context,
     @Arg('id', () => ID) relationshipId: string,
     @Arg('inverse') inverse: string
-  ): Promise<CollectionRelationship> {
-    return renameCollectionRelationshipInverse({
-      context,
-      relationshipId,
-      inverse,
-    });
+  ): Promise<RelationshipMutationResponse> {
+    try {
+      const relationship = await renameCollectionRelationshipInverse({
+        context,
+        relationshipId,
+        inverse,
+      });
+      return {
+        code: '200',
+        success: true,
+        message: 'Relationhip inverse was successfully renamed',
+        relationship,
+        project: relationship.collection.project,
+      };
+    } catch (error) {
+      return {
+        code: '400',
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
-  @Mutation(() => DeletedRelationship)
+  @Mutation(() => DeleteMutationResponse)
   async deleteRelationship(
     @Ctx('context') context: Context,
     @Arg('id', () => ID) relationshipId: string
-  ): Promise<DeletedRelationship> {
-    await deleteCollectionRelationship({ context, relationshipId });
-    return { id: relationshipId };
+  ): Promise<DeleteMutationResponse> {
+    try {
+      await deleteCollectionRelationship({ context, relationshipId });
+      return {
+        code: '200',
+        success: true,
+        message: 'Relationship was successfully deleted',
+      };
+    } catch (error) {
+      return {
+        code: '400',
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
   @FieldResolver(() => [CollectionAttribute])

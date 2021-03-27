@@ -90,14 +90,21 @@ query listEvents($projectId: ID!) {
 
 mutation createProject($name: String!) {
   createProject(name: $name) {
-    id
-    name
-    updatedDate
+    code
+    success
+    message
+    project {
+      id
+      name
+      updatedDate
+    }
   }
 }
 
 mutation deleteProject($id: ID!) {
   deleteProject(id: $id) {
-    id
+    code
+    success
+    message
   }
 }

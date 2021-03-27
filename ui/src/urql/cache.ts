@@ -11,6 +11,10 @@ import {
   CreateManyToOneRelationshipMutation,
   CreateOneToOneRelationshipMutationVariables,
   CreateOneToOneRelationshipMutation,
+  CreateKeyMutation,
+  CreateUserMutation,
+  CreateProjectMutation,
+  CreateCollectionMutation,
 } from '../graphql';
 import schema from '../schema.json';
 
@@ -30,8 +34,11 @@ export function createCacheExchange() {
     updates: {
       Mutation: {
         createProject(result, _, cache) {
+          const {
+            createProject: { project },
+          } = (result as unknown) as CreateProjectMutation;
           cache.updateQuery({ query: ListProjectsDocument }, (data) => {
-            data?.listProjects.push(result.createProject as any);
+            data?.listProjects.push(project as any);
             return data;
           });
         },
@@ -42,10 +49,13 @@ export function createCacheExchange() {
           });
         },
         createCollection(result, args, cache) {
+          const {
+            createCollection: { collection },
+          } = (result as unknown) as CreateCollectionMutation;
           cache.updateQuery(
             { query: ListCollectionsDocument, variables: args },
             (data) => {
-              data?.getProject.collections.push(result.createCollection as any);
+              data?.getProject.collections.push(collection as any);
               return data;
             }
           );
@@ -57,10 +67,13 @@ export function createCacheExchange() {
           });
         },
         createUser(result, args, cache) {
+          const {
+            createUser: { user },
+          } = (result as unknown) as CreateUserMutation;
           cache.updateQuery(
             { query: ListUsersDocument, variables: args },
             (data) => {
-              data?.getProject.users.push(result.createUser as any);
+              data?.getProject.users.push(user as any);
               return data;
             }
           );
@@ -72,10 +85,13 @@ export function createCacheExchange() {
           });
         },
         createKey(result, args, cache) {
+          const {
+            createKey: { key },
+          } = (result as unknown) as CreateKeyMutation;
           cache.updateQuery(
             { query: ListKeysDocument, variables: args },
             (data) => {
-              data?.getProject.keys.push(result.createKey as any);
+              data?.getProject.keys.push(key as any);
               return data;
             }
           );
@@ -89,19 +105,19 @@ export function createCacheExchange() {
         createAttribute(result, args, cache) {
           const { collectionId } = args as CreateAttributeMutationVariables;
           const {
-            createAttribute,
+            createAttribute: { attribute, project },
           } = (result as unknown) as CreateAttributeMutation;
           cache.updateQuery(
             {
               query: ListCollectionsDocument,
               variables: {
-                projectId: createAttribute.projectId,
+                projectId: project?.id,
               },
             },
             (data) => {
               data?.getProject.collections
                 .find((collection) => collection.id == collectionId)
-                ?.attributes.push(createAttribute);
+                ?.attributes.push(attribute as any);
               return data;
             }
           );
@@ -117,19 +133,19 @@ export function createCacheExchange() {
             collectionId,
           } = args as CreateManyToOneRelationshipMutationVariables;
           const {
-            createManyToOneRelationship,
+            createManyToOneRelationship: { relationship, project },
           } = (result as unknown) as CreateManyToOneRelationshipMutation;
           cache.updateQuery(
             {
               query: ListCollectionsDocument,
               variables: {
-                projectId: createManyToOneRelationship.projectId,
+                projectId: project?.id,
               },
             },
             (data) => {
               data?.getProject.collections
                 .find((collection) => collection.id == collectionId)
-                ?.relationships.push(createManyToOneRelationship);
+                ?.relationships.push(relationship as any);
               return data;
             }
           );
@@ -139,19 +155,19 @@ export function createCacheExchange() {
             collectionId,
           } = args as CreateOneToOneRelationshipMutationVariables;
           const {
-            createOneToOneRelationship,
+            createOneToOneRelationship: { relationship, project },
           } = (result as unknown) as CreateOneToOneRelationshipMutation;
           cache.updateQuery(
             {
               query: ListCollectionsDocument,
               variables: {
-                projectId: createOneToOneRelationship.projectId,
+                projectId: project?.id,
               },
             },
             (data) => {
               data?.getProject.collections
                 .find((collection) => collection.id == collectionId)
-                ?.relationships.push(createOneToOneRelationship);
+                ?.relationships.push(relationship as any);
               return data;
             }
           );

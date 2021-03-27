@@ -21,9 +21,16 @@ export type Scalars = {
 export type Attribute = {
   id: Scalars['ID'];
   name: Scalars['String'];
-  projectId: Scalars['String'];
   required: Scalars['Boolean'];
   type: AttributeType;
+};
+
+export type AttributeMutationResponse = MutationResponse & {
+  attribute?: Maybe<Attribute>;
+  code: Scalars['String'];
+  message: Scalars['String'];
+  project?: Maybe<Project>;
+  success: Scalars['Boolean'];
 };
 
 export enum AttributeType {
@@ -45,36 +52,18 @@ export type Collection = {
   updatedDate: Scalars['DateTime'];
 };
 
-export type DeletedAttribute = {
-  id: Scalars['ID'];
+export type CollectionMutationResponse = MutationResponse & {
+  code: Scalars['String'];
+  collection?: Maybe<Collection>;
+  message: Scalars['String'];
+  project?: Maybe<Project>;
+  success: Scalars['Boolean'];
 };
 
-export type DeletedCollection = {
-  id: Scalars['ID'];
-};
-
-export type DeletedKey = {
-  id: Scalars['ID'];
-};
-
-export type DeletedProject = {
-  id: Scalars['ID'];
-};
-
-export type DeletedRelationship = {
-  id: Scalars['ID'];
-};
-
-export type DeletedSession = {
-  id: Scalars['ID'];
-};
-
-export type DeletedTeam = {
-  id: Scalars['ID'];
-};
-
-export type DeletedUser = {
-  id: Scalars['ID'];
+export type DeleteMutationResponse = MutationResponse & {
+  code: Scalars['String'];
+  message: Scalars['String'];
+  success: Scalars['Boolean'];
 };
 
 export type Event = {
@@ -121,30 +110,37 @@ export type Key = {
   updatedDate: Scalars['DateTime'];
 };
 
+export type KeyMutationResponse = MutationResponse & {
+  code: Scalars['String'];
+  key?: Maybe<Key>;
+  message: Scalars['String'];
+  success: Scalars['Boolean'];
+};
+
 export type Mutation = {
-  createAttribute: Attribute;
-  createCollection: Collection;
-  createKey: Key;
-  createManyToOneRelationship: Relationship;
-  createOneToOneRelationship: Relationship;
-  createProject: Project;
-  createTeam: Team;
-  createUser: User;
-  deleteAttribute: DeletedAttribute;
-  deleteCollection: DeletedCollection;
-  deleteKey: DeletedKey;
-  deleteProject: DeletedProject;
-  deleteRelationship: DeletedRelationship;
-  deleteSession: DeletedSession;
-  deleteTeam: DeletedTeam;
-  deleteUser: DeletedUser;
-  renameAttribute: Attribute;
-  renameRelationship: Relationship;
-  renameRelationshipInverse: Relationship;
-  signIn: SignInPayload;
-  signUp: SignUpPayload;
-  updateCollection: Collection;
-  updateKey: Key;
+  createAttribute: AttributeMutationResponse;
+  createCollection: CollectionMutationResponse;
+  createKey: KeyMutationResponse;
+  createManyToOneRelationship: RelationshipMutationResponse;
+  createOneToOneRelationship: RelationshipMutationResponse;
+  createProject: ProjectMutationResponse;
+  createTeam: TeamMutationResponse;
+  createUser: UserMutationResponse;
+  deleteAttribute: DeleteMutationResponse;
+  deleteCollection: DeleteMutationResponse;
+  deleteKey: DeleteMutationResponse;
+  deleteProject: DeleteMutationResponse;
+  deleteRelationship: DeleteMutationResponse;
+  deleteSession: DeleteMutationResponse;
+  deleteTeam: DeleteMutationResponse;
+  deleteUser: DeleteMutationResponse;
+  renameAttribute: AttributeMutationResponse;
+  renameRelationship: RelationshipMutationResponse;
+  renameRelationshipInverse: RelationshipMutationResponse;
+  signIn: SignInMutationResponse;
+  signUp: SignUpMutationResponse;
+  updateCollection: CollectionMutationResponse;
+  updateKey: KeyMutationResponse;
 };
 
 export type MutationCreateAttributeArgs = {
@@ -264,6 +260,12 @@ export type MutationUpdateKeyArgs = {
   scope?: Maybe<Array<Scope>>;
 };
 
+export type MutationResponse = {
+  code: Scalars['String'];
+  message: Scalars['String'];
+  success: Scalars['Boolean'];
+};
+
 export type Profile = {
   email: Scalars['String'];
   name?: Maybe<Scalars['String']>;
@@ -279,6 +281,13 @@ export type Project = {
   teams: Array<Team>;
   updatedDate: Scalars['DateTime'];
   users: Array<User>;
+};
+
+export type ProjectMutationResponse = MutationResponse & {
+  code: Scalars['String'];
+  message: Scalars['String'];
+  project?: Maybe<Project>;
+  success: Scalars['Boolean'];
 };
 
 export type Query = {
@@ -301,9 +310,16 @@ export type Relationship = {
   inverse?: Maybe<Scalars['String']>;
   name: Scalars['String'];
   owner: Scalars['Boolean'];
-  projectId: Scalars['String'];
   relatedCollection: Collection;
   type: RelationshipType;
+};
+
+export type RelationshipMutationResponse = MutationResponse & {
+  code: Scalars['String'];
+  message: Scalars['String'];
+  project?: Maybe<Project>;
+  relationship?: Maybe<Relationship>;
+  success: Scalars['Boolean'];
 };
 
 export enum RelationshipType {
@@ -331,12 +347,18 @@ export type Session = {
   userAgent: Scalars['String'];
 };
 
-export type SignInPayload = {
-  token: Scalars['String'];
+export type SignInMutationResponse = MutationResponse & {
+  code: Scalars['String'];
+  message: Scalars['String'];
+  success: Scalars['Boolean'];
+  token?: Maybe<Scalars['String']>;
 };
 
-export type SignUpPayload = {
-  token: Scalars['String'];
+export type SignUpMutationResponse = MutationResponse & {
+  code: Scalars['String'];
+  message: Scalars['String'];
+  success: Scalars['Boolean'];
+  token?: Maybe<Scalars['String']>;
 };
 
 export type Team = {
@@ -344,6 +366,13 @@ export type Team = {
   id: Scalars['ID'];
   name: Scalars['String'];
   updatedDate: Scalars['DateTime'];
+};
+
+export type TeamMutationResponse = MutationResponse & {
+  code: Scalars['String'];
+  message: Scalars['String'];
+  success: Scalars['Boolean'];
+  team?: Maybe<Team>;
 };
 
 export type User = {
@@ -357,19 +386,36 @@ export type User = {
   verifiedDate?: Maybe<Scalars['DateTime']>;
 };
 
+export type UserMutationResponse = MutationResponse & {
+  code: Scalars['String'];
+  message: Scalars['String'];
+  success: Scalars['Boolean'];
+  user?: Maybe<User>;
+};
+
 export type SignInMutationVariables = Exact<{
   email: Scalars['String'];
   password: Scalars['String'];
 }>;
 
-export type SignInMutation = { signIn: Pick<SignInPayload, 'token'> };
+export type SignInMutation = {
+  signIn: Pick<
+    SignInMutationResponse,
+    'code' | 'success' | 'message' | 'token'
+  >;
+};
 
 export type SignUpMutationVariables = Exact<{
   email: Scalars['String'];
   password: Scalars['String'];
 }>;
 
-export type SignUpMutation = { signUp: Pick<SignUpPayload, 'token'> };
+export type SignUpMutation = {
+  signUp: Pick<
+    SignUpMutationResponse,
+    'code' | 'success' | 'message' | 'token'
+  >;
+};
 
 export type GetProfileQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -383,9 +429,13 @@ export type CreateCollectionMutationVariables = Exact<{
 
 export type CreateCollectionMutation = {
   createCollection: Pick<
-    Collection,
-    'id' | 'name' | 'updatedDate' | 'permissions'
-  >;
+    CollectionMutationResponse,
+    'code' | 'success' | 'message'
+  > & {
+    collection?: Maybe<
+      Pick<Collection, 'id' | 'name' | 'updatedDate' | 'permissions'>
+    >;
+  };
 };
 
 export type UpdateCollectionMutationVariables = Exact<{
@@ -396,9 +446,13 @@ export type UpdateCollectionMutationVariables = Exact<{
 
 export type UpdateCollectionMutation = {
   updateCollection: Pick<
-    Collection,
-    'id' | 'name' | 'updatedDate' | 'permissions'
-  >;
+    CollectionMutationResponse,
+    'code' | 'success' | 'message'
+  > & {
+    collection?: Maybe<
+      Pick<Collection, 'id' | 'name' | 'updatedDate' | 'permissions'>
+    >;
+  };
 };
 
 export type DeleteCollectionMutationVariables = Exact<{
@@ -406,7 +460,10 @@ export type DeleteCollectionMutationVariables = Exact<{
 }>;
 
 export type DeleteCollectionMutation = {
-  deleteCollection: Pick<DeletedCollection, 'id'>;
+  deleteCollection: Pick<
+    DeleteMutationResponse,
+    'code' | 'success' | 'message'
+  >;
 };
 
 export type CreateAttributeMutationVariables = Exact<{
@@ -416,7 +473,13 @@ export type CreateAttributeMutationVariables = Exact<{
 }>;
 
 export type CreateAttributeMutation = {
-  createAttribute: Pick<Attribute, 'id' | 'name' | 'type' | 'projectId'>;
+  createAttribute: Pick<
+    AttributeMutationResponse,
+    'code' | 'success' | 'message'
+  > & {
+    attribute?: Maybe<Pick<Attribute, 'id' | 'name' | 'type'>>;
+    project?: Maybe<Pick<Project, 'id'>>;
+  };
 };
 
 export type DeleteAttributeMutationVariables = Exact<{
@@ -424,7 +487,7 @@ export type DeleteAttributeMutationVariables = Exact<{
 }>;
 
 export type DeleteAttributeMutation = {
-  deleteAttribute: Pick<DeletedAttribute, 'id'>;
+  deleteAttribute: Pick<DeleteMutationResponse, 'code' | 'success' | 'message'>;
 };
 
 export type CreateManyToOneRelationshipMutationVariables = Exact<{
@@ -436,9 +499,16 @@ export type CreateManyToOneRelationshipMutationVariables = Exact<{
 
 export type CreateManyToOneRelationshipMutation = {
   createManyToOneRelationship: Pick<
-    Relationship,
-    'id' | 'name' | 'type' | 'owner' | 'projectId'
-  > & { relatedCollection: Pick<Collection, 'id' | 'name'> };
+    RelationshipMutationResponse,
+    'code' | 'success' | 'message'
+  > & {
+    relationship?: Maybe<
+      Pick<Relationship, 'id' | 'name' | 'type' | 'owner'> & {
+        relatedCollection: Pick<Collection, 'id' | 'name'>;
+      }
+    >;
+    project?: Maybe<Pick<Project, 'id'>>;
+  };
 };
 
 export type CreateOneToOneRelationshipMutationVariables = Exact<{
@@ -450,9 +520,16 @@ export type CreateOneToOneRelationshipMutationVariables = Exact<{
 
 export type CreateOneToOneRelationshipMutation = {
   createOneToOneRelationship: Pick<
-    Relationship,
-    'id' | 'name' | 'type' | 'owner' | 'projectId'
-  > & { relatedCollection: Pick<Collection, 'id' | 'name'> };
+    RelationshipMutationResponse,
+    'code' | 'success' | 'message'
+  > & {
+    relationship?: Maybe<
+      Pick<Relationship, 'id' | 'name' | 'type' | 'owner'> & {
+        relatedCollection: Pick<Collection, 'id' | 'name'>;
+      }
+    >;
+    project?: Maybe<Pick<Project, 'id'>>;
+  };
 };
 
 export type DeleteRelationshipMutationVariables = Exact<{
@@ -460,7 +537,10 @@ export type DeleteRelationshipMutationVariables = Exact<{
 }>;
 
 export type DeleteRelationshipMutation = {
-  deleteRelationship: Pick<DeletedRelationship, 'id'>;
+  deleteRelationship: Pick<
+    DeleteMutationResponse,
+    'code' | 'success' | 'message'
+  >;
 };
 
 export type CreateKeyMutationVariables = Exact<{
@@ -470,7 +550,9 @@ export type CreateKeyMutationVariables = Exact<{
 }>;
 
 export type CreateKeyMutation = {
-  createKey: Pick<Key, 'id' | 'name' | 'scope' | 'createdDate'>;
+  createKey: Pick<KeyMutationResponse, 'code' | 'success' | 'message'> & {
+    key?: Maybe<Pick<Key, 'id' | 'name' | 'scope' | 'createdDate'>>;
+  };
 };
 
 export type UpdateKeyMutationVariables = Exact<{
@@ -480,14 +562,18 @@ export type UpdateKeyMutationVariables = Exact<{
 }>;
 
 export type UpdateKeyMutation = {
-  updateKey: Pick<Key, 'id' | 'name' | 'scope'>;
+  updateKey: Pick<KeyMutationResponse, 'code' | 'success' | 'message'> & {
+    key?: Maybe<Pick<Key, 'id' | 'name' | 'scope'>>;
+  };
 };
 
 export type DeleteKeyMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export type DeleteKeyMutation = { deleteKey: Pick<DeletedKey, 'id'> };
+export type DeleteKeyMutation = {
+  deleteKey: Pick<DeleteMutationResponse, 'code' | 'success' | 'message'>;
+};
 
 export type GetKeyTokenQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -573,7 +659,10 @@ export type CreateProjectMutationVariables = Exact<{
 }>;
 
 export type CreateProjectMutation = {
-  createProject: Pick<Project, 'id' | 'name' | 'updatedDate'>;
+  createProject: Pick<
+    ProjectMutationResponse,
+    'code' | 'success' | 'message'
+  > & { project?: Maybe<Pick<Project, 'id' | 'name' | 'updatedDate'>> };
 };
 
 export type DeleteProjectMutationVariables = Exact<{
@@ -581,7 +670,7 @@ export type DeleteProjectMutationVariables = Exact<{
 }>;
 
 export type DeleteProjectMutation = {
-  deleteProject: Pick<DeletedProject, 'id'>;
+  deleteProject: Pick<DeleteMutationResponse, 'code' | 'success' | 'message'>;
 };
 
 export type CreateUserMutationVariables = Exact<{
@@ -592,14 +681,18 @@ export type CreateUserMutationVariables = Exact<{
 }>;
 
 export type CreateUserMutation = {
-  createUser: Pick<User, 'id' | 'name' | 'email' | 'createdDate'>;
+  createUser: Pick<UserMutationResponse, 'code' | 'success' | 'message'> & {
+    user?: Maybe<Pick<User, 'id' | 'name' | 'email' | 'createdDate'>>;
+  };
 };
 
 export type DeleteUserMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export type DeleteUserMutation = { deleteUser: Pick<DeletedUser, 'id'> };
+export type DeleteUserMutation = {
+  deleteUser: Pick<DeleteMutationResponse, 'code' | 'success' | 'message'>;
+};
 
 export const SignInDocument: DocumentNode<
   SignInMutation,
@@ -668,6 +761,9 @@ export const SignInDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'token' } },
               ],
             },
@@ -744,6 +840,9 @@ export const SignUpDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'token' } },
               ],
             },
@@ -868,10 +967,28 @@ export const CreateCollectionDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'updatedDate' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'permissions' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'collection' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'updatedDate' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'permissions' },
+                      },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -957,10 +1074,28 @@ export const UpdateCollectionDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'updatedDate' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'permissions' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'collection' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'updatedDate' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'permissions' },
+                      },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -1008,7 +1143,9 @@ export const DeleteCollectionDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
               ],
             },
           },
@@ -1097,10 +1234,31 @@ export const CreateAttributeDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'type' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'projectId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'attribute' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                    ],
+                  },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'project' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -1148,7 +1306,9 @@ export const DeleteAttributeDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
               ],
             },
           },
@@ -1253,22 +1413,49 @@ export const CreateManyToOneRelationshipDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'type' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'owner' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
                 {
                   kind: 'Field',
-                  name: { kind: 'Name', value: 'relatedCollection' },
+                  name: { kind: 'Name', value: 'relationship' },
                   selectionSet: {
                     kind: 'SelectionSet',
                     selections: [
                       { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                       { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'owner' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'relatedCollection' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                          ],
+                        },
+                      },
                     ],
                   },
                 },
-                { kind: 'Field', name: { kind: 'Name', value: 'projectId' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'project' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -1373,22 +1560,49 @@ export const CreateOneToOneRelationshipDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'type' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'owner' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
                 {
                   kind: 'Field',
-                  name: { kind: 'Name', value: 'relatedCollection' },
+                  name: { kind: 'Name', value: 'relationship' },
                   selectionSet: {
                     kind: 'SelectionSet',
                     selections: [
                       { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                       { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'owner' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'relatedCollection' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                          ],
+                        },
+                      },
                     ],
                   },
                 },
-                { kind: 'Field', name: { kind: 'Name', value: 'projectId' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'project' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -1436,7 +1650,9 @@ export const DeleteRelationshipDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
               ],
             },
           },
@@ -1534,10 +1750,25 @@ export const CreateKeyDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'scope' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'createdDate' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'key' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'scope' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'createdDate' },
+                      },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -1623,9 +1854,21 @@ export const UpdateKeyDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'scope' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'key' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'scope' } },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -1673,7 +1916,9 @@ export const DeleteKeyDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
               ],
             },
           },
@@ -2252,9 +2497,24 @@ export const CreateProjectDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'updatedDate' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'project' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'updatedDate' },
+                      },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -2302,7 +2562,9 @@ export const DeleteProjectDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
               ],
             },
           },
@@ -2410,10 +2672,25 @@ export const CreateUserDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'email' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'createdDate' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'user' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'email' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'createdDate' },
+                      },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -2461,7 +2738,9 @@ export const DeleteUserDocument: DocumentNode<
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
               ],
             },
           },

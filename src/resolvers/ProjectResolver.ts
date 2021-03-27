@@ -30,11 +30,12 @@ import { listUsers } from '../lib/users';
 import { listTeams } from '../lib/teams';
 import { listAccessTokens } from '../lib/accessToken';
 import { listCollections } from '../lib/database';
+import { MutationResponse, DeleteMutationResponse } from './MutationResponse';
 
-@ObjectType()
-class DeletedProject {
-  @Field(() => ID)
-  id!: string;
+@ObjectType({ implements: MutationResponse })
+class ProjectMutationResponse extends MutationResponse {
+  @Field({ nullable: true })
+  project?: Project;
 }
 
 @Resolver(Project)
@@ -52,21 +53,47 @@ export class ProjectResolver {
     return listProjects({ context });
   }
 
-  @Mutation(() => Project)
+  @Mutation(() => ProjectMutationResponse)
   async createProject(
     @Ctx('context') context: Context,
     @Arg('name') name: string
-  ): Promise<Project> {
-    return createProject({ context, name });
+  ): Promise<ProjectMutationResponse> {
+    try {
+      const project = await createProject({ context, name });
+      return {
+        code: '201',
+        success: true,
+        message: 'Project was successfully created',
+        project,
+      };
+    } catch (error) {
+      return {
+        code: '400',
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
-  @Mutation(() => DeletedProject)
+  @Mutation(() => DeleteMutationResponse)
   async deleteProject(
     @Ctx('context') context: Context,
     @Arg('id', () => ID) projectId: string
-  ): Promise<DeletedProject> {
-    await deleteProject({ context, projectId });
-    return { id: projectId };
+  ): Promise<DeleteMutationResponse> {
+    try {
+      await deleteProject({ context, projectId });
+      return {
+        code: '200',
+        success: true,
+        message: 'Project was successfully deleted',
+      };
+    } catch (error) {
+      return {
+        code: '400',
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
   @FieldResolver(() => [ProjectUser])

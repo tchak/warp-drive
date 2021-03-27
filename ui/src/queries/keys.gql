@@ -1,23 +1,35 @@
 mutation createKey($projectId: ID!, $name: String!, $scope: [Scope!]!) {
   createKey(projectId: $projectId, name: $name, scope: $scope) {
-    id
-    name
-    scope
-    createdDate
+    code
+    success
+    message
+    key {
+      id
+      name
+      scope
+      createdDate
+    }
   }
 }
 
 mutation updateKey($id: ID!, $name: String, $scope: [Scope!]) {
   updateKey(id: $id, name: $name, scope: $scope) {
-    id
-    name
-    scope
+    code
+    success
+    message
+    key {
+      id
+      name
+      scope
+    }
   }
 }
 
 mutation deleteKey($id: ID!) {
   deleteKey(id: $id) {
-    id
+    code
+    success
+    message
   }
 }
 

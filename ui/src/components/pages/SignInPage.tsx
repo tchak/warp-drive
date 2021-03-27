@@ -17,9 +17,8 @@ export default function SignInPage() {
     },
     async onSubmit(values) {
       const { data } = await signIn(values);
-      const accessToken = data?.signIn.token;
-      if (accessToken) {
-        setAccessToken(accessToken);
+      if (data?.signIn.success && data.signIn.token) {
+        setAccessToken(data.signIn.token);
       }
     },
   });
@@ -62,6 +61,7 @@ export default function SignInPage() {
                 placeholder="Email address"
                 value={form.values.email}
                 onChange={form.handleChange}
+                onBlur={form.handleBlur}
               />
             </div>
             <div>
@@ -78,6 +78,7 @@ export default function SignInPage() {
                 placeholder="Password"
                 value={form.values.password}
                 onChange={form.handleChange}
+                onBlur={form.handleBlur}
               />
             </div>
           </div>

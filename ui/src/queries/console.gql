@@ -1,11 +1,17 @@
 mutation signIn($email: String!, $password: String!) {
   signIn(email: $email, password: $password) {
+    code
+    success
+    message
     token
   }
 }
 
 mutation signUp($email: String!, $password: String!) {
   signUp(email: $email, password: $password) {
+    code
+    success
+    message
     token
   }
 }

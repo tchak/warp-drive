@@ -14,17 +14,18 @@ import { User } from '../entities/User';
 import { Context } from '../lib/context';
 import { generateToken } from '../lib/auth';
 import { getEnvValue } from '../lib/env';
+import { MutationResponse } from './MutationResponse';
 
-@ObjectType()
-class SignInPayload {
-  @Field()
-  token!: string;
+@ObjectType({ implements: MutationResponse })
+class SignInMutationResponse extends MutationResponse {
+  @Field({ nullable: true })
+  token?: string;
 }
 
-@ObjectType()
-class SignUpPayload {
-  @Field()
-  token!: string;
+@ObjectType({ implements: MutationResponse })
+class SignUpMutationResponse extends MutationResponse {
+  @Field({ nullable: true })
+  token?: string;
 }
 
 @ObjectType()
@@ -43,18 +44,19 @@ export class ConsoleResolver {
     return context.admin;
   }
 
-  @Mutation(() => SignInPayload)
+  @Mutation(() => SignInMutationResponse)
   async signIn(
     @Ctx('context') context: Context,
     @Arg('email') email: string,
     @Arg('password') password: string
-  ): Promise<SignInPayload> {
-    const user = await context.em.findOneOrFail(User, { email }, [
-      'passwordHash',
-    ]);
+  ): Promise<SignInMutationResponse> {
+    const user = await context.em.findOne(User, { email }, ['passwordHash']);
 
-    if (await verify(user.passwordHash, password)) {
+    if (user && (await verify(user.passwordHash, password))) {
       return {
+        code: '200',
+        success: true,
+        message: 'User successfully signed in',
         token: generateToken(
           {
             jti: uuid(),
@@ -67,18 +69,25 @@ export class ConsoleResolver {
       };
     }
 
-    throw new Error('Invalid email or password');
+    return {
+      code: '401',
+      success: false,
+      message: 'Invalid email or password',
+    };
   }
 
-  @Mutation(() => SignUpPayload)
+  @Mutation(() => SignUpMutationResponse)
   async signUp(
     @Ctx('context') context: Context,
     @Arg('email') email: string,
     @Arg('password') password: string
-  ): Promise<SignUpPayload> {
+  ): Promise<SignUpMutationResponse> {
     const user = new User(email, await hash(password));
     await context.em.persistAndFlush(user);
     return {
+      code: '201',
+      success: true,
+      message: 'User successfully signed up',
       token: generateToken(
         {
           jti: uuid(),

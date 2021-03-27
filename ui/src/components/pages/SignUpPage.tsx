@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { HiUserAdd } from 'react-icons/hi';
 import { useMutation } from 'urql';
 import { useFormik } from 'formik';
@@ -17,9 +17,8 @@ export default function SignUpPage() {
     },
     async onSubmit(values) {
       const { data } = await signUp(values);
-      const accessToken = data?.signUp.token;
-      if (accessToken) {
-        setAccessToken(accessToken);
+      if (data?.signUp.success && data.signUp.token) {
+        setAccessToken(data.signUp.token);
       }
     },
   });
@@ -53,6 +52,7 @@ export default function SignUpPage() {
                 placeholder="Email address"
                 value={form.values.email}
                 onChange={form.handleChange}
+                onBlur={form.handleBlur}
               />
             </div>
             <div>
@@ -69,6 +69,7 @@ export default function SignUpPage() {
                 placeholder="Password"
                 value={form.values.password}
                 onChange={form.handleChange}
+                onBlur={form.handleBlur}
               />
             </div>
           </div>

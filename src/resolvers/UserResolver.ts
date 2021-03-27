@@ -21,49 +21,82 @@ import {
   listUserSessions,
 } from '../lib/users';
 import { getProject } from '../lib/projects';
+import { MutationResponse, DeleteMutationResponse } from './MutationResponse';
 
-@ObjectType()
-class DeletedUser {
-  @Field(() => ID)
-  id!: string;
-}
-
-@ObjectType()
-class DeletedSession {
-  @Field(() => ID)
-  id!: string;
+@ObjectType({ implements: MutationResponse })
+class UserMutationResponse extends MutationResponse {
+  @Field({ nullable: true })
+  user?: ProjectUser;
 }
 
 @Resolver(ProjectUser)
 export class UserResolver {
-  @Mutation(() => ProjectUser)
+  @Mutation(() => UserMutationResponse)
   async createUser(
     @Ctx('context') context: Context,
     @Arg('projectId', () => ID) projectId: string,
     @Arg('email') email: string,
     @Arg('password') password: string,
     @Arg('name', { nullable: true }) name?: string
-  ): Promise<ProjectUser> {
-    context.project = await getProject({ context, projectId });
-    return createUser({ context, email, password, name });
+  ): Promise<UserMutationResponse> {
+    try {
+      context.project = await getProject({ context, projectId });
+      const user = await createUser({ context, email, password, name });
+      return {
+        code: '201',
+        success: true,
+        message: 'User was successfully created',
+        user,
+      };
+    } catch (error) {
+      return {
+        code: '400',
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
-  @Mutation(() => DeletedUser)
+  @Mutation(() => DeleteMutationResponse)
   async deleteUser(
     @Ctx('context') context: Context,
     @Arg('id', () => ID) userId: string
-  ): Promise<DeletedUser> {
-    await deleteUser({ context, userId });
-    return { id: userId };
+  ): Promise<DeleteMutationResponse> {
+    try {
+      await deleteUser({ context, userId });
+      return {
+        code: '200',
+        success: true,
+        message: 'User was successfully deleted',
+      };
+    } catch (error) {
+      return {
+        code: '400',
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
-  @Mutation(() => DeletedSession)
+  @Mutation(() => DeleteMutationResponse)
   async deleteSession(
     @Ctx('context') context: Context,
     @Arg('id', () => ID) sessionId: string
-  ): Promise<DeletedSession> {
-    await deleteUserSession({ context, sessionId });
-    return { id: sessionId };
+  ): Promise<DeleteMutationResponse> {
+    try {
+      await deleteUserSession({ context, sessionId });
+      return {
+        code: '200',
+        success: true,
+        message: 'Session was successfully deleted',
+      };
+    } catch (error) {
+      return {
+        code: '400',
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
   @FieldResolver(() => [ProjectUserSession])

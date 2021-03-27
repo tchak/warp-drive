@@ -8,25 +8,37 @@ mutation createCollection(
     name: $name
     permissions: $permissions
   ) {
-    id
-    name
-    updatedDate
-    permissions
+    code
+    success
+    message
+    collection {
+      id
+      name
+      updatedDate
+      permissions
+    }
   }
 }
 
 mutation updateCollection($id: ID!, $name: String, $permissions: [String!]) {
   updateCollection(collectionId: $id, name: $name, permissions: $permissions) {
-    id
-    name
-    updatedDate
-    permissions
+    code
+    success
+    message
+    collection {
+      id
+      name
+      updatedDate
+      permissions
+    }
   }
 }
 
 mutation deleteCollection($id: ID!) {
   deleteCollection(id: $id) {
-    id
+    code
+    success
+    message
   }
 }
 
@@ -36,16 +48,25 @@ mutation createAttribute(
   $type: AttributeType!
 ) {
   createAttribute(collectionId: $collectionId, name: $name, type: $type) {
-    id
-    name
-    type
-    projectId
+    code
+    success
+    message
+    attribute {
+      id
+      name
+      type
+    }
+    project {
+      id
+    }
   }
 }
 
 mutation deleteAttribute($id: ID!) {
   deleteAttribute(id: $id) {
-    id
+    code
+    success
+    message
   }
 }
 
@@ -61,15 +82,22 @@ mutation createManyToOneRelationship(
     relatedCollectionId: $relatedCollectionId
     inverse: $inverse
   ) {
-    id
-    name
-    type
-    owner
-    relatedCollection {
+    code
+    success
+    message
+    relationship {
       id
       name
+      type
+      owner
+      relatedCollection {
+        id
+        name
+      }
     }
-    projectId
+    project {
+      id
+    }
   }
 }
 
@@ -85,20 +113,29 @@ mutation createOneToOneRelationship(
     relatedCollectionId: $relatedCollectionId
     inverse: $inverse
   ) {
-    id
-    name
-    type
-    owner
-    relatedCollection {
+    code
+    success
+    message
+    relationship {
       id
       name
+      type
+      owner
+      relatedCollection {
+        id
+        name
+      }
     }
-    projectId
+    project {
+      id
+    }
   }
 }
 
 mutation deleteRelationship($id: ID!) {
   deleteRelationship(id: $id) {
-    id
+    code
+    success
+    message
   }
 }

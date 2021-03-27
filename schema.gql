@@ -6,9 +6,16 @@
 type Attribute {
   id: ID!
   name: String!
-  projectId: String!
   required: Boolean!
   type: AttributeType!
+}
+
+type AttributeMutationResponse implements MutationResponse {
+  attribute: Attribute
+  code: String!
+  message: String!
+  project: Project
+  success: Boolean!
 }
 
 enum AttributeType {
@@ -30,41 +37,23 @@ type Collection {
   updatedDate: DateTime!
 }
 
+type CollectionMutationResponse implements MutationResponse {
+  code: String!
+  collection: Collection
+  message: String!
+  project: Project
+  success: Boolean!
+}
+
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
 scalar DateTime
 
-type DeletedAttribute {
-  id: ID!
-}
-
-type DeletedCollection {
-  id: ID!
-}
-
-type DeletedKey {
-  id: ID!
-}
-
-type DeletedProject {
-  id: ID!
-}
-
-type DeletedRelationship {
-  id: ID!
-}
-
-type DeletedSession {
-  id: ID!
-}
-
-type DeletedTeam {
-  id: ID!
-}
-
-type DeletedUser {
-  id: ID!
+type DeleteMutationResponse implements MutationResponse {
+  code: String!
+  message: String!
+  success: Boolean!
 }
 
 type Event {
@@ -111,30 +100,43 @@ type Key {
   updatedDate: DateTime!
 }
 
+type KeyMutationResponse implements MutationResponse {
+  code: String!
+  key: Key
+  message: String!
+  success: Boolean!
+}
+
 type Mutation {
-  createAttribute(collectionId: ID!, name: String!, type: AttributeType!): Attribute!
-  createCollection(name: String!, permissions: [String!], projectId: ID!): Collection!
-  createKey(name: String!, projectId: ID!, scope: [Scope!]!): Key!
-  createManyToOneRelationship(collectionId: ID!, inverse: String, name: String!, relatedCollectionId: ID!): Relationship!
-  createOneToOneRelationship(collectionId: ID!, inverse: String, name: String!, relatedCollectionId: ID!): Relationship!
-  createProject(name: String!): Project!
-  createTeam(name: String!, projectId: ID!): Team!
-  createUser(email: String!, name: String, password: String!, projectId: ID!): User!
-  deleteAttribute(id: ID!): DeletedAttribute!
-  deleteCollection(id: ID!): DeletedCollection!
-  deleteKey(id: ID!): DeletedKey!
-  deleteProject(id: ID!): DeletedProject!
-  deleteRelationship(id: ID!): DeletedRelationship!
-  deleteSession(id: ID!): DeletedSession!
-  deleteTeam(id: ID!): DeletedTeam!
-  deleteUser(id: ID!): DeletedUser!
-  renameAttribute(id: ID!, name: String!): Attribute!
-  renameRelationship(id: ID!, name: String!): Relationship!
-  renameRelationshipInverse(id: ID!, inverse: String!): Relationship!
-  signIn(email: String!, password: String!): SignInPayload!
-  signUp(email: String!, password: String!): SignUpPayload!
-  updateCollection(collectionId: ID!, name: String, permissions: [String!]): Collection!
-  updateKey(id: ID!, name: String, scope: [Scope!]): Key!
+  createAttribute(collectionId: ID!, name: String!, type: AttributeType!): AttributeMutationResponse!
+  createCollection(name: String!, permissions: [String!], projectId: ID!): CollectionMutationResponse!
+  createKey(name: String!, projectId: ID!, scope: [Scope!]!): KeyMutationResponse!
+  createManyToOneRelationship(collectionId: ID!, inverse: String, name: String!, relatedCollectionId: ID!): RelationshipMutationResponse!
+  createOneToOneRelationship(collectionId: ID!, inverse: String, name: String!, relatedCollectionId: ID!): RelationshipMutationResponse!
+  createProject(name: String!): ProjectMutationResponse!
+  createTeam(name: String!, projectId: ID!): TeamMutationResponse!
+  createUser(email: String!, name: String, password: String!, projectId: ID!): UserMutationResponse!
+  deleteAttribute(id: ID!): DeleteMutationResponse!
+  deleteCollection(id: ID!): DeleteMutationResponse!
+  deleteKey(id: ID!): DeleteMutationResponse!
+  deleteProject(id: ID!): DeleteMutationResponse!
+  deleteRelationship(id: ID!): DeleteMutationResponse!
+  deleteSession(id: ID!): DeleteMutationResponse!
+  deleteTeam(id: ID!): DeleteMutationResponse!
+  deleteUser(id: ID!): DeleteMutationResponse!
+  renameAttribute(id: ID!, name: String!): AttributeMutationResponse!
+  renameRelationship(id: ID!, name: String!): RelationshipMutationResponse!
+  renameRelationshipInverse(id: ID!, inverse: String!): RelationshipMutationResponse!
+  signIn(email: String!, password: String!): SignInMutationResponse!
+  signUp(email: String!, password: String!): SignUpMutationResponse!
+  updateCollection(collectionId: ID!, name: String, permissions: [String!]): CollectionMutationResponse!
+  updateKey(id: ID!, name: String, scope: [Scope!]): KeyMutationResponse!
+}
+
+interface MutationResponse {
+  code: String!
+  message: String!
+  success: Boolean!
 }
 
 type Profile {
@@ -154,6 +156,13 @@ type Project {
   users: [User!]!
 }
 
+type ProjectMutationResponse implements MutationResponse {
+  code: String!
+  message: String!
+  project: Project
+  success: Boolean!
+}
+
 type Query {
   getKeyToken(id: ID!): String!
   getProfile: Profile!
@@ -166,9 +175,16 @@ type Relationship {
   inverse: String
   name: String!
   owner: Boolean!
-  projectId: String!
   relatedCollection: Collection!
   type: RelationshipType!
+}
+
+type RelationshipMutationResponse implements MutationResponse {
+  code: String!
+  message: String!
+  project: Project
+  relationship: Relationship
+  success: Boolean!
 }
 
 enum RelationshipType {
@@ -196,12 +212,18 @@ type Session {
   userAgent: String!
 }
 
-type SignInPayload {
-  token: String!
+type SignInMutationResponse implements MutationResponse {
+  code: String!
+  message: String!
+  success: Boolean!
+  token: String
 }
 
-type SignUpPayload {
-  token: String!
+type SignUpMutationResponse implements MutationResponse {
+  code: String!
+  message: String!
+  success: Boolean!
+  token: String
 }
 
 type Team {
@@ -209,6 +231,13 @@ type Team {
   id: ID!
   name: String!
   updatedDate: DateTime!
+}
+
+type TeamMutationResponse implements MutationResponse {
+  code: String!
+  message: String!
+  success: Boolean!
+  team: Team
 }
 
 type User {
@@ -220,4 +249,11 @@ type User {
   sessions: [Session!]!
   updatedDate: DateTime!
   verifiedDate: DateTime
+}
+
+type UserMutationResponse implements MutationResponse {
+  code: String!
+  message: String!
+  success: Boolean!
+  user: User
 }

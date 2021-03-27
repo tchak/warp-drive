@@ -64,7 +64,7 @@ function UserPanelForm({
     async onSubmit(values) {
       const { data } = await createUser(values);
 
-      if (data) {
+      if (data?.createUser.success) {
         close();
       }
     },

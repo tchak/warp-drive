@@ -42,9 +42,15 @@ export type AttributeForm = ReturnType<typeof useAttributeForm>['form'];
 export type RelationshipForm = ReturnType<typeof useRelationshipForm>['form'];
 export type CollectionForm = ReturnType<typeof useCollectionForm>['form'];
 
+class MutationError extends Error {}
+
 export interface UseFormOptions {
   success?: () => void;
-  error?: (error: CombinedError) => void;
+  error?: (error: CombinedError | MutationError) => void;
+}
+
+function makeMutationError(message?: string) {
+  return new MutationError(message ?? '[GraphQL] Mutation Error');
 }
 
 export function useAttributeForm(
@@ -82,10 +88,13 @@ export function useAttributeForm(
     async onSubmit(values) {
       const { data, error } = await createAttribute(values);
 
-      if (data) {
+      if (data?.createAttribute.success) {
         options?.success && options.success();
-      } else if (error) {
-        options?.error && options.error(error);
+      } else {
+        options?.error &&
+          options.error(
+            error ?? makeMutationError(data?.createAttribute.message)
+          );
       }
     },
   });
@@ -150,11 +159,16 @@ export function useRelationshipForm(
       const { data, error } = await (type == 'ManyToOne'
         ? createManyToOneRelationship(values)
         : createOneToOneRelationship(values));
+      const payload =
+        data && 'createManyToOneRelationship' in data
+          ? data.createManyToOneRelationship
+          : data?.createOneToOneRelationship;
 
-      if (data) {
+      if (payload?.success) {
         options?.success && options.success();
-      } else if (error) {
-        options?.error && options.error(error);
+      } else {
+        options?.error &&
+          options.error(error ?? makeMutationError(payload?.message));
       }
     },
   });
@@ -198,11 +212,16 @@ export function useCollectionForm(
       const { data, error } = await ('id' in values
         ? updateCollection(values)
         : createCollection(values));
+      const payload =
+        data && 'createCollection' in data
+          ? data.createCollection
+          : data?.updateCollection;
 
-      if (data) {
+      if (payload?.success) {
         options?.success && options.success();
-      } else if (error) {
-        options?.error && options.error(error);
+      } else {
+        options?.error &&
+          options.error(error ?? makeMutationError(payload?.message));
       }
     },
   });
@@ -241,11 +260,14 @@ export function useKeyForm(
       const { data, error } = await ('id' in values
         ? updateKey(values)
         : createKey(values));
+      const payload =
+        data && 'createKey' in data ? data.createKey : data?.updateKey;
 
-      if (data) {
+      if (payload?.success) {
         options?.success && options.success();
-      } else if (error) {
-        options?.error && options.error(error);
+      } else {
+        options?.error &&
+          options.error(error ?? makeMutationError(payload?.message));
       }
     },
   });
