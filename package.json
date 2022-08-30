@@ -100,7 +100,7 @@
     "typescript": "^4.2.3",
     "urql": "^2.0.1",
     "use-debounce": "^6.0.0",
-    "vite": "^2.1.3"
+    "vite": "^2.9.13"
   },
   "scripts": {
     "dev:server": "ts-node-dev ./src/index.ts",
